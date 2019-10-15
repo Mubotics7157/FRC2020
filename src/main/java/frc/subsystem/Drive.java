@@ -74,8 +74,7 @@ public class Drive extends Threaded {
 
 	private boolean drivePercentVbus;
 
-	private ADXRS450_Gyro gyroSensor;// = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
-	//private LazyTalonSRX leftTalon, rightTalon, leftSlaveTalon, leftSlave2Talon, rightSlaveTalon, rightSlave2Talon;
+	private ADXRS450_Gyro gyroSensor;
 	private PurePursuitController autonomousDriver;
 	private SynchronousPid turnPID;
 	private DriveState driveState;
@@ -100,41 +99,17 @@ public class Drive extends Threaded {
 		leftSparkSlave = new LazyCANSparkMax(Constants.DriveLeftSlave1Id, MotorType.kBrushless);
 		rightSpark = new LazyCANSparkMax(Constants.DriveRightMasterId, MotorType.kBrushless);
 		rightSparkSlave = new LazyCANSparkMax(Constants.DriveRightSlave1Id, MotorType.kBrushless);
-		//rightSparkSlave2 = new CANSparkMax(0, MotorType.kBrushless);
-		//leftSparkSlave2 = new CANSparkMax(0, MotorType.kBrushless);
 		leftSpark.setInverted(true);
 		rightSpark.setInverted(false);
 		leftSparkSlave.setInverted(true);
 		rightSparkSlave.setInverted(false);
-
-
-		
 
 		leftSparkPID = leftSpark.getPIDController();
 		rightSparkPID = rightSpark.getPIDController();
 		leftSparkEncoder = leftSpark.getEncoder();
 		rightSparkEncoder = rightSpark.getEncoder();
 
-	
-		//leftSparkPID.
-		
-		//rightSparkSlave.follow(rightSpark);
-		//leftSparkSlave.follow(leftSpark);
-		//leftSparkSlave2.follow(leftSpark);
-		//rightSparkSlave2.follow(rightSpark);
-
-
 		shifter = new Solenoid(Constants.DriveShifterSolenoidId);
-		//leftTalon = new LazyTalonSRX(Constants.DriveLeftMasterId);
-		//rightTalon = new LazyTalonSRX(Constants.DriveRightMasterId);
-
-		//leftTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
-		//rightTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
-
-		//leftSlaveTalon = new LazyTalonSRX(Constants.DriveLeftSlave1Id);
-		//leftSlave2Talon = new LazyTalonSRX(Constants.DriveLeftSlave2Id);
-		//rightSlaveTalon = new LazyTalonSRX(Constants.DriveRightSlave1Id);
-		//rightSlave2Talon = new LazyTalonSRX(Constants.DriveRightSlave2Id);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -168,18 +143,6 @@ public class Drive extends Threaded {
 	}
 
 	private void configAuto() {
-		/*
-		rightTalon.config_kP(0, Constants.kDriveRightAutoP, 10);
-		rightTalon.config_kD(0, Constants.kDriveRightAutoD, 10);
-		rightTalon.config_kF(0, Constants.kDriveRightAutoF, 10);
-		leftTalon.config_kP(0, Constants.kDriveLeftAutoP, 10);
-		leftTalon.config_kD(0, Constants.kDriveRightAutoD, 10);
-		leftTalon.config_kF(0, Constants.kDriveLeftAutoF, 10);
-		driveMultiplier = Constants.DriveHighSpeed;
-		rightTalon.configClosedloopRamp(12d / 200d, 10);
-		leftTalon.configClosedloopRamp(12d / 200d, 10);
-		*/
-		//System.out.println(rightTalon.)
 		rightSparkPID.setP(Constants.kDriveRightAutoP, 0);
 		rightSparkPID.setD(Constants.kDriveRightAutoD, 0);
 		rightSparkPID.setFF(Constants.kDriveRightAutoF,0);
@@ -190,29 +153,13 @@ public class Drive extends Threaded {
 		leftSparkPID.setD(Constants.kDriveLeftAutoD, 0);
 		leftSparkPID.setFF(Constants.kDriveLeftAutoF,0);
 		leftSparkPID.setOutputRange(-1, 1);
-		
-
-		
 	}
 
 	private void configHigh() {
-		//rightTalon.config_kP(0, Constants.kDriveRightHighP, 10);
-		//rightTalon.config_kD(0, Constants.kDriveRightHighD, 10);
-		//rightTalon.config_kF(0, Constants.kDriveRightHighF, 10);
-		//rightTalon.configClosedloopRamp(12d / 200d, 10);
-		//leftTalon.config_kP(0, Constants.kDriveLeftHighP, 10);
-		//leftTalon.config_kD(0, Constants.kDriveRightHighD, 10);
-		//leftTalon.config_kF(0, Constants.kDriveLeftHighF, 10);
-		//leftTalon.configClosedloopRamp(12d / 200d, 10);
-
 		driveMultiplier = Constants.DriveHighSpeed;
 	}
 
 	private void configLow() {
-		//rightTalon.config_kP(0, Constants.kDriveRightLowP, 10);
-		//rightTalon.config_kF(0, Constants.kDriveRightLowF, 10);
-		//leftTalon.config_kP(0, Constants.kDriveLeftLowP, 10);
-		//leftTalon.config_kF(0, Constants.kDriveLeftLowF, 10);
 		driveMultiplier = Constants.DriveLowSpeed;
 	}
 	boolean teleopstart =true;

@@ -15,7 +15,7 @@ import frc.utility.math.Rotation2D;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.I2C.Port;
 import frc.utility.LazyCANSparkMax;
 
 public class Drive extends Threaded {
@@ -74,7 +75,7 @@ public class Drive extends Threaded {
 
 	private boolean drivePercentVbus;
 
-	private ADXRS450_Gyro gyroSensor;
+	private AHRS gyroSensor;
 	private PurePursuitController autonomousDriver;
 	private SynchronousPid turnPID;
 	private DriveState driveState;
@@ -82,6 +83,7 @@ public class Drive extends Threaded {
 	private Solenoid shifter;
 	private Rotation2D wantedHeading;
 	private volatile double driveMultiplier;
+	private double conversionFactor = Constants.WheelDiameter * Math.PI / Constants.DrivetrainGearingDivisor / Constants.DrivetrainEncoderTicksPerRotation;
 
 	double prevPositionL = 0;
 	double prevPositionR = 0;
@@ -93,7 +95,7 @@ public class Drive extends Threaded {
 
 	private Drive() {
 
-		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+		gyroSensor = new AHRS(Port.kMXP);
 
 		leftSpark = new LazyCANSparkMax(Constants.DriveLeftMasterId, MotorType.kBrushless);
 		leftSparkSlave = new LazyCANSparkMax(Constants.DriveLeftSlave1Id, MotorType.kBrushless);
@@ -109,7 +111,10 @@ public class Drive extends Threaded {
 		leftSparkEncoder = leftSpark.getEncoder();
 		rightSparkEncoder = rightSpark.getEncoder();
 
-		shifter = new Solenoid(Constants.DriveShifterSolenoidId);
+		leftSparkEncoder.setPositionConversionFactor(conversionFactor);
+		rightSparkEncoder.setPositionConversionFactor(conversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(conversionFactor);
+		rightSparkEncoder.setVelocityConversionFactor(conversionFactor);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -145,13 +150,13 @@ public class Drive extends Threaded {
 	private void configAuto() {
 		rightSparkPID.setP(Constants.kDriveRightAutoP, 0);
 		rightSparkPID.setD(Constants.kDriveRightAutoD, 0);
-		rightSparkPID.setFF(Constants.kDriveRightAutoF,0);
+		rightSparkPID.setFF(Constants.kRv,0);
 		rightSparkPID.setOutputRange(-1, 1);
 
 
 		leftSparkPID.setP(Constants.kDriveLeftAutoP, 0);
 		leftSparkPID.setD(Constants.kDriveLeftAutoD, 0);
-		leftSparkPID.setFF(Constants.kDriveLeftAutoF,0);
+		leftSparkPID.setFF(Constants.kLv,0);
 		leftSparkPID.setOutputRange(-1, 1);
 	}
 
@@ -268,7 +273,7 @@ public class Drive extends Threaded {
 	}
 
 	public void calibrateGyro() {
-		gyroSensor.calibrate();
+		gyroSensor.reset();;
 	}
 
 	public void printCurrent() {
@@ -348,18 +353,6 @@ public class Drive extends Threaded {
 		}
 	}
 
-	public void hold() {
-		//leftSparkPID.setReference(leftSparkEncoder.getPosition(), ControlType.kPosition);
-		//rightSparkPID.setReference(leftSparkEncoder.getPosition(), ControlType.kPosition);
-		//driveState = DriveState.HOLD;
-		double errorL = prevPositionL - getLeftDistance();
-		double errorR = prevPositionR - getRightDistance();
-		setWheelVelocity(new DriveSignal(errorL * Constants.kHoldP , errorR* Constants.kHoldP));
-
-
-		
-	}
-
 	public void orangeDrive(double moveValue, double rotateValue, boolean isQuickTurn) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
@@ -400,6 +393,27 @@ public class Drive extends Threaded {
 		}
 	}
 
+	public void tankDrive(double leftValue, double rightValue) {
+		synchronized (this) {
+			driveState = DriveState.TELEOP;
+		}
+		leftValue = scaleJoystickValues(leftValue, 0);
+		rightValue = scaleJoystickValues(rightValue, 0);
+
+		double leftMotorSpeed = leftValue;
+		double rightMotorSpeed = rightValue;
+		if (drivePercentVbus) {
+			setWheelPower(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
+		} else {
+			leftMotorSpeed *= driveMultiplier;
+			rightMotorSpeed *= driveMultiplier;
+			if (leftMotorSpeed == 0 && rightMotorSpeed == 0) {
+				setWheelPower(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
+			}
+			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
+		}
+	}
+
 	private void configMotors() {
 		leftSparkSlave.follow(leftSpark);
 		rightSparkSlave.follow(rightSpark);
@@ -407,33 +421,7 @@ public class Drive extends Threaded {
 		leftSpark.setIdleMode(IdleMode.kCoast);
 		rightSpark.setIdleMode(IdleMode.kCoast);
 		leftSparkSlave.setIdleMode(IdleMode.kCoast);
-		rightSparkSlave.setIdleMode(IdleMode.kCoast); 
-		/*
-		leftSlaveTalon.set(ControlMode.Follower, Constants.DriveLeftMasterId);
-		leftSlave2Talon.set(ControlMode.Follower, Constants.DriveLeftMasterId);
-		rightSlaveTalon.set(ControlMode.Follower, Constants.DriveRightMasterId);
-		rightSlave2Talon.set(ControlMode.Follower, Constants.DriveRightMasterId);
-		setBrakeState(NeutralMode.Brake);
-
-		leftTalon.setInverted(true);
-		leftSlaveTalon.setInverted(true);
-		leftSlave2Talon.setInverted(true);
-
-		rightTalon.setInverted(false);
-		rightSlaveTalon.setInverted(false);
-		rightSlave2Talon.setInverted(false);
-
-		leftTalon.setSensorPhase(false);
-		rightTalon.setSensorPhase(false);
-
-		rightTalon.setNeutralMode(NeutralMode.Brake);
-		leftTalon.setNeutralMode(NeutralMode.Brake);
-		rightSlaveTalon.setNeutralMode(NeutralMode.Brake);
-		leftSlaveTalon.setNeutralMode(NeutralMode.Brake);
-		rightSlave2Talon.setNeutralMode(NeutralMode.Brake);
-		leftSlave2Talon.setNeutralMode(NeutralMode.Brake);
-		*/
-		
+		rightSparkSlave.setIdleMode(IdleMode.kCoast);
 	}
 
 	public void resetMotionProfile() {
@@ -453,37 +441,24 @@ public class Drive extends Threaded {
 		return Rotation2D.fromDegrees(gyroSensor.getAngle());
 	}
 
-	public double getLeftDistance() { 
-		/*
-		return leftTalon.getSelectedSensorPosition(0) / Constants.EncoderTicksPerRotation * Constants.WheelDiameter
-				* Math.PI * 22d / 62d / 3d;
-		*/
-		return leftSparkEncoder.getPosition() * Constants.WheelDiameter
-		* Math.PI * 22d / 62d / 3d;
+	public double getLeftDistance() {
+		return leftSparkEncoder.getPosition();
 	}
 
 	public double getRightDistance() {
-		//return rightTalon.getSelectedSensorPosition(0) / Constants.EncoderTicksPerRotation * Constants.WheelDiameter
-		//		* Math.PI * 22d / 62d / 3d;
-		return rightSparkEncoder.getPosition() * Constants.WheelDiameter
-		* Math.PI * 22d / 62d / 3d;
+		return rightSparkEncoder.getPosition();
 	}
 
 	public double getSpeed() {
-		/*
-		return (-leftSparkEncoder.getVelocity() + rightSparkEncoder.getVelocity())
-		 / 10 / 2 * Constants.WheelDiameter * Math.PI;  */
 		return (getLeftSpeed()+getRightSpeed())/2;
 	}
 
 	public double getLeftSpeed() {
-		return leftSparkEncoder.getVelocity()  * 2 * Math.PI/60d * Constants.WheelDiameter/2d
-		* 22d / 62d / 3d;
+		return leftSparkEncoder.getVelocity();
 	}
 
 	public double getRightSpeed() {
-		return rightSparkEncoder.getVelocity()  * 2 * Math.PI/60d * Constants.WheelDiameter/2d
-		* 22d / 62d / 3d;
+		return rightSparkEncoder.getVelocity();
 	}
 
 	public double scaleJoystickValues(double rawValue, int profile) {
@@ -497,17 +472,7 @@ public class Drive extends Threaded {
 		autonomousDriver = new PurePursuitController(autoPath, isReversed);
 		autonomousDriver.resetTime();
 		configAuto();
-		//System.out.println("even more bad");
 		updatePurePursuit();
-	}
-
-	public void setBrakeState(NeutralMode mode) {
-		//leftTalon.setNeutralMode(mode);
-		//rightTalon.setNeutralMode(mode);
-		//leftSlaveTalon.setNeutralMode(mode);
-		//rightSlaveTalon.setNeutralMode(mode);
-		//leftSlave2Talon.setNeutralMode(mode);
-		//rightSlave2Talon.setNeutralMode(mode);
 	}
 
 	public double getVoltage() {
@@ -518,23 +483,8 @@ public class Drive extends Threaded {
 	}
 
 	private void setWheelPower(DriveSignal setVelocity) {
-		//leftTalon.set(ControlMode.PercentOutput, setVelocity.rightVelocity);
-		//rightTalon.set(ControlMode.PercentOutput, setVelocity.leftVelocity);
-		
 		leftSpark.set(setVelocity.leftVelocity);
-		//leftSparkSlave.set(setVelocity.leftVelocity);
-		//rightSparkSlave.set(setVelocity.rightVelocity);
 		rightSpark.set(setVelocity.rightVelocity);
-	/*	System.out.println(
-			"Left Spark: " + leftSpark.getOutputCurrent() + "\n" +
-			"Left Slave: " + leftSparkSlave.getOutputCurrent() + "\n" +
-			"Right Spark: " + rightSpark.getOutputCurrent() + "\n" +
-			"Right Slave: " + rightSparkSlave.getOutputCurrent() + "\n"
-		); */
-		//System.out.println("velo: " + setVelocity.leftVelocity);
-
-		//leftSparkPID.setReference(setVelocity.leftVelocity, ControlType.kDutyCycle);
-		//rightSparkPID.setReference(setVelocity.rightVelocity, ControlType.kDutyCycle);
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
@@ -544,19 +494,12 @@ public class Drive extends Threaded {
 			DriverStation.reportError("Velocity set over " + Constants.DriveHighSpeed + " !", false);
 			return;
 		}
-		 //System.out.println("Left: " + setVelocity.leftVelocity);
-		 //+ getLeftSpeed());
-		// inches per sec to rotations per min
-		double leftSetpoint = (setVelocity.leftVelocity)/(2 * Math.PI * Constants.WheelDiameter/2d) * 60d *
-				 (62d / 22d) * 3d;
-		double rightSetpoint = (setVelocity.rightVelocity)/(2 * Math.PI * Constants.WheelDiameter/2d) * 60d *
-		(62d / 22d) * 3d;
-		//leftTalon.set(ControlMode.Velocity, leftSetpoint);
-		//rightTalon.set(ControlMode.Velocity, rightSetpoint);
+
+		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
+		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
+
 		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
 		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
-		//System.out.println("desired left rpm: " +setVelocity.leftVelocity + "desired right rpm: " + setVelocity.rightVelocity);
-		//System.out.println("actual left rpm: " + getLeftSpeed() + " actual right rpm: " + getRightSpeed());
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {
@@ -565,9 +508,6 @@ public class Drive extends Threaded {
 
 	@Override
 	public void update() {
-	//	System.out.println("L speed " + getLeftSpeed() + " position x " + RobotTracker.getInstance().getOdometry().translationMat.getX());
-	//	System.out.println("R speed " + getRightSpeed() + " position y " + RobotTracker.getInstance().getOdometry().translationMat.getY());
-	//System.out.println(driveState);	
 	DriveState snapDriveState;
 		synchronized (this) {
 			snapDriveState = driveState;
@@ -625,7 +565,6 @@ public class Drive extends Threaded {
 	}
 
 	private void updatePurePursuit() {
-	//	System.out.println("updating pure presuit");
 		AutoDriveSignal signal = autonomousDriver.calculate(RobotTracker.getInstance().getOdometry());
 		if (signal.isDone) {
 			synchronized (this) {
@@ -633,7 +572,6 @@ public class Drive extends Threaded {
 			}
 			configHigh();
 		}
-		//System.out.println("signal l:" + signal.command.leftVelocity + " signal R " + signal.command.rightVelocity);
 		setWheelVelocity(signal.command);
 	}
 
@@ -642,19 +580,7 @@ public class Drive extends Threaded {
 	}
 
 	public boolean checkSubsystem() {
-
-		// TODO: Get accurate thresholds
-		// TODO: Use PDP to get current
-		// boolean success =
-		//boolean success = leftTalon.getSensorCollection().getPulseWidthRiseToRiseUs() == 0;
-		//success = rightTalon.getSensorCollection().getPulseWidthRiseToRiseUs() == 0 && success;
-		//success = OrangeUtility.checkMotors(.25, Constants.DriveExpectedCurrent, Constants.DriveExpectedRPM,
-		//		Constants.DriveExpectedPosition, rightTalon, rightTalon, rightSlaveTalon, rightSlave2Talon);
-		//success = OrangeUtility.checkMotors(.25, Constants.DriveExpectedCurrent, Constants.DriveExpectedRPM,
-		//		Constants.DriveExpectedPosition, leftTalon, leftTalon, leftSlaveTalon, leftSlave2Talon) && success;
-		configMotors();
 		return true;
-		//return success;
 	}
 
 	synchronized public void stopMovement() {
@@ -676,11 +602,5 @@ public class Drive extends Threaded {
 	}
 
 	public void clearStickyFaults() {
-		//leftTalon.clearStickyFaults(10);
-		//leftSlaveTalon.clearStickyFaults(10);
-		//leftSlave2Talon.clearStickyFaults(10);
-		//rightTalon.clearStickyFaults(10);
-		//rightSlaveTalon.clearStickyFaults(10);
-		//rightSlave2Talon.clearStickyFaults(10);
 	}
 }

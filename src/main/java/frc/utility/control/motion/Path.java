@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import frc.auton.AutoCommand;
+import frc.auton.AutoRoutine;
 import frc.robot.Constants;
 //import frc.utility.auto.AutoCommand;
 //import frc.utility.auto.AutoRoutine;
@@ -25,7 +27,7 @@ public class Path {
 		public Translation2D closestPoint;
 		public Translation2D currentSegEnd;
 	}
-	/*
+
 	public static class AutoRoutineTrigger implements Comparable<AutoRoutineTrigger> {
 		private double percentage;
 		private AutoRoutine routine;
@@ -44,14 +46,14 @@ public class Path {
 				return -1;
 			return -0;
 		}
-	} */
+	} 
 
 	private List<Segment> segments;
 	private Translation2D lastPoint;
 	private Rotation2D endAngle = null;
 	private double totalDist;
 	private double finishedDist;
-	//private ArrayList<AutoRoutineTrigger> commands = new ArrayList<>();
+	private ArrayList<AutoRoutineTrigger> commands = new ArrayList<>();
 	private volatile boolean isEmpty;
 	private double percentage;
 
@@ -153,7 +155,6 @@ public class Path {
 		return this.percentage;
 	}
 
-	/*
 	public void addRoutine(AutoRoutine routine, double percentage) {
 		addAutoRoutineTrigger(new AutoRoutineTrigger(routine, percentage));
 	}
@@ -167,7 +168,7 @@ public class Path {
 	public void addAutoRoutineTrigger(AutoRoutineTrigger routine) {
 		this.commands.add(routine);
 		Collections.sort(this.commands);
-	}*/
+	}
 
 	/**
 	 * TODO: Explain what's goin on in this function. Review with uncool
@@ -204,14 +205,6 @@ public class Path {
 				+ finishedDist);
 		double percentage = traveledDist / totalDist;
 		this.percentage = percentage;
-		/*
-		while (!commands.isEmpty()) {
-			if (commands.get(0).percentage <= percentage) {
-				commands.remove(0).routine.run();
-			} else {
-				break;
-			}
-		} */
 		data.closestPoint = closestPoint;
 		data.currentSegEnd = segments.get(0).getEnd();
 		Translation2D closestToEnd = closestPoint.inverse().translateBy(segments.get(0).getEnd());

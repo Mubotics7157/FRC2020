@@ -19,36 +19,19 @@ public final class Constants {
 	public static final int DriveRightSlave1Id = 6;
 	public static final int DriveRightSlave2Id = 13;//not currently used
 
-	
-
-	public static final int HatchIntakeMotorId = 23;
-	public static final int HatchIntakeDeployMotorId = 22;
-
-	public static final int ElevatorMasterId = 9;
-	public static final int ElevatorSlaveId = 8;
-
-	public static final int ManipulatorMotor1Id = 31;
-	public static final int ManipulatorMotor2Id = 32;
-	
-	public static final int ClimberMasterId = 15;
-	public static final int ClimberSlaveId = 16;
-	
-	// PCM IDs
-	public static final int DriveShifterSolenoidId = 4;
-	public static final int BallIntakeSolenoidId = 7;
-	public static final int ArmSolenoidId = 5;
-	public static final int ManipulatorSolenoidId = 6;
-
 	// IO IDs
 	public static final int TurretLimitId = 0;
 	
 	// Controller
 
-	public static final double[] MinControllerInput = {0.15, 0.08};
+	public static final double[] MinControllerInput = {0.1, 0.08};
 	public static final double MaxControllerInput = 1;
 	public static final double MinControllerOutput = 0;
 	public static final double MaxControllerOutput = 1;
 	public static final double MaxAcceleration = 1000;
+	public static final double DrivetrainEncoderTicksPerRotation = 42;
+	public static final double DrivetrainGearingDivisor = 10.71;
+	
 	
 	// General
 	public static final double EncoderTicksPerRotation = 4096;
@@ -79,41 +62,34 @@ public final class Constants {
 	public static final int TimeoutMs = 10;
 	
 	// Drive
-	public static final double kDriveInchesPerSecPerRPM = 2 * Math.PI/60d * Constants.WheelDiameter/2d
-	* 22d / 62d / 3d;
+	public static final double kDriveInchesPerSecPerRPM = 2 * Math.PI/60d * Constants.WheelDiameter / DrivetrainGearingDivisor;
 	public static final double maxTurnError = 2;
 	public static final double maxPIDStopSpeed = 8;
 	public static final double DriveHighSpeed = 190;
 	public static final double DriveLowSpeed = 95;
 	
-	public static final double kDriveRightAutoP = 4*0.0005263 * kDriveInchesPerSecPerRPM; //0.00065
-	public static final double kDriveRightAutoD = 0.000; 
-	public static final double kDriveRightAutoF = 1/193.12283370478679  * kDriveInchesPerSecPerRPM; //0.055
-	public static final double kDriveLeftAutoP = 4*0.0005263 * kDriveInchesPerSecPerRPM;
+	public static final double kDriveRightAutoP = 0; //0.00065
+	public static final double kDriveRightAutoD = 0.000;
+	public static final double kDriveRightAutoF = 0; //0.055
+	public static final double kDriveLeftAutoP = 0;
 	public static final double kDriveLeftAutoD = 0.000; //0.0001
-	public static final double kDriveLeftAutoF = 1/203.7763632654868 * kDriveInchesPerSecPerRPM ; //0.0005 too high
+	public static final double kDriveLeftAutoF = 0;
+
+	//SOOPER SPECIAL FEEDFORWARD CONSTANTS
+	public static final double kLv = 0.000; //kv
+	public static final double kLa = 0.000; //ka
+	public static final double kLVi = 0.000; //Vintercept
+
+	
+	public static final double kRv = 0.000; //kv
+	public static final double kRa = 0.000; //ka
+	public static final double kRVi = 0.000; //Vintercept
+	
 
 	public static final double kDriveRightHighP = kDriveRightAutoP;
 	public static final double kDriveRightHighD = kDriveRightAutoD;
 	public static final double kDriveRightHighF = kDriveRightAutoF;
-	public static final double kDriveRightHighFIntercept = 0;
-	public static final double kDriveRightHighA = 0;
-	public static final double kDriveRightLowP = 0;
-	public static final double kDriveRightLowD = 0;
-	public static final double kDriveRightLowF = 0;
-	public static final double kDriveRightLowFIntercept = 0;
-	public static final double kDriveRightLowA = 0;
-	
-	public static final double kDriveLeftHighP = kDriveLeftAutoP;
-	public static final double kDriveLeftHighD = kDriveLeftAutoD;
-	public static final double kDriveLeftHighF = kDriveLeftAutoF;
-	public static final double kDriveLeftHighFIntercept = 0;
-	public static final double kDriveLeftHighA = 0;
-	public static final double kDriveLeftLowP = 0;
-	public static final double kDriveLeftLowD = 0;
-	public static final double kDriveLeftLowF = 0;
-	public static final double kDriveLeftLowFIntercept = 0;
-	public static final double kDriveLeftLowA = 0;
+
 	public static final double kHoldP = 4;
 	
 	

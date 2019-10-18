@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     System.out.println("teleop init!");
     scheduler.resume();
+    drive.getFFGraph();
   }
 
   @Override
@@ -101,6 +102,13 @@ public class Robot extends TimedRobot {
       xbox.update();
       leftStick.update();
       rightStick.update();
+      
+      if (xbox.getRisingEdge(1)) {
+        drive.writeFFPeriodic();
+      }
+      if (xbox.getFallingEdge(1)) {
+        drive.FFClose();
+      }
       
       //boolean quickTurn = xbox.getRawButton(1) || xbox.getRawButton(2);
 

@@ -12,6 +12,9 @@ import frc.utility.control.motion.Path;
 import frc.utility.control.motion.PurePursuitController;
 import frc.utility.math.Rotation2D;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -83,14 +86,16 @@ public class Drive extends Threaded {
 	private Solenoid shifter;
 	private Rotation2D wantedHeading;
 	private volatile double driveMultiplier;
-	private double conversionFactor = Constants.WheelDiameter * Math.PI / Constants.DrivetrainGearingDivisor / Constants.DrivetrainEncoderTicksPerRotation;
 
 	double prevPositionL = 0;
 	double prevPositionR = 0;
 
 	public LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
   	private CANPIDController leftSparkPID, rightSparkPID;
-	  private CANEncoder leftSparkEncoder, rightSparkEncoder;
+	private CANEncoder leftSparkEncoder, rightSparkEncoder;
+
+	private FileWriter leftWriter;
+	private FileWriter rightWriter;
 	  
 
 	private Drive() {
@@ -111,10 +116,10 @@ public class Drive extends Threaded {
 		leftSparkEncoder = leftSpark.getEncoder();
 		rightSparkEncoder = rightSpark.getEncoder();
 
-		leftSparkEncoder.setPositionConversionFactor(conversionFactor);
-		rightSparkEncoder.setPositionConversionFactor(conversionFactor);
-		leftSparkEncoder.setVelocityConversionFactor(conversionFactor);
-		rightSparkEncoder.setVelocityConversionFactor(conversionFactor);
+		leftSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
+		rightSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
+		rightSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -353,6 +358,12 @@ public class Drive extends Threaded {
 		}
 	}
 
+	public void hold() {
+		double errorL = prevPositionL - getLeftDistance();
+		double errorR = prevPositionR - getRightDistance();
+		setWheelVelocity(new DriveSignal(errorL * Constants.kHoldP , errorR* Constants.kHoldP));
+	}
+
 	public void orangeDrive(double moveValue, double rotateValue, boolean isQuickTurn) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
@@ -411,6 +422,61 @@ public class Drive extends Threaded {
 				setWheelPower(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 			}
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
+		}
+	}
+
+	public void getFFGraph() {
+		try {
+		leftWriter = new FileWriter("left.csv");
+		rightWriter = new FileWriter("right.csv");
+
+		leftWriter.append("Voltage");
+		leftWriter.append(",");
+		leftWriter.append("Velocity");
+		leftWriter.append("\n");
+
+		rightWriter.append("Voltage");
+		rightWriter.append(",");
+		rightWriter.append("Velocity");
+		rightWriter.append("\n");
+		}
+		catch (IOException e) {
+
+		}
+	}
+
+	public void writeFFPeriodic() {
+		double voltage = leftSpark.getBusVoltage();
+		voltage+=0.25/0.05;
+		setWheelPower(new DriveSignal(voltage, voltage));
+
+		try {
+    	leftWriter.append(Double.toString(leftSpark.getBusVoltage()));
+		leftWriter.append(",");
+    	leftWriter.append(Double.toString(leftSparkEncoder.getVelocity()));
+		leftWriter.append("\n");
+
+		rightWriter.append(Double.toString(rightSpark.getBusVoltage()));
+		rightWriter.append(",");
+    	rightWriter.append(Double.toString(rightSparkEncoder.getVelocity()));
+		rightWriter.append("\n");
+		}
+		catch (IOException e) {
+
+		}
+	}
+
+	public void FFClose() {
+		setWheelPower(new DriveSignal(0,0));
+		try {
+		leftWriter.flush();
+		leftWriter.close();
+
+		rightWriter.flush();
+		rightWriter.close();
+		}
+		catch (IOException e) {
+
 		}
 	}
 
@@ -476,10 +542,7 @@ public class Drive extends Threaded {
 	}
 
 	public double getVoltage() {
-		return 0;
-		//return (leftTalon.getMotorOutputVoltage() + rightTalon.getMotorOutputVoltage()
-		//		+ leftSlaveTalon.getMotorOutputVoltage() + rightSlaveTalon.getMotorOutputVoltage()
-		//		+ rightSlave2Talon.getMotorOutputVoltage() + leftSlave2Talon.getMotorOutputVoltage()) / 6;
+		return (leftSpark.getBusVoltage() + rightSpark.getBusVoltage()) / 2;
 	}
 
 	private void setWheelPower(DriveSignal setVelocity) {
@@ -584,10 +647,7 @@ public class Drive extends Threaded {
 	}
 
 	synchronized public void stopMovement() {
-		//leftTalon.set(ControlMode.PercentOutput, 0);
-		//rightTalon.set(ControlMode.PercentOutput, 0);
 		leftSpark.set(0);
-		//leftSpark.set(ControlMode.Current, 3);
 		rightSpark.set(0);
 		leftSparkPID.setReference(0, ControlType.kDutyCycle);
 		rightSparkPID.setReference(0, ControlType.kDutyCycle);

@@ -17,7 +17,6 @@ public class AutoRoutineGenerator {
 
 	private static AutoRoutine toMidFieldRightReverse;
 	private static AutoRoutine toMidFieldLeftReverse;
-	private static AutoRoutine stowPosition;
 	private static AutoRoutine initialDrive;
 
 	private static Position switchPos;
@@ -56,7 +55,6 @@ public class AutoRoutineGenerator {
         initialPath.addPoint(180, 115, 120); //80
         initialPath.addPoint(270, 90, 120); //60
 
-        initialPath.addRoutine(stowPosition, 1.0);;
         initialDrive.addCommands(new SetDrivePath(initialPath, false));
         initialDrive.addCommands(new SetDriveAngle(new Translation2D(231, 80)));
         Path secondPath = new Path(new Translation2D(270, 90));
@@ -88,7 +86,7 @@ public class AutoRoutineGenerator {
         overallRoutine.addCommands(new SetDrivePath(fifthPath, true));
         overallRoutine.addCommands(new SetDriveAngle(Rotation2D.fromDegrees(-55))); //-55
         overallRoutine.addCommands(new Delay(3.0));
-
+        
 		return overallRoutine;
 	}
 }

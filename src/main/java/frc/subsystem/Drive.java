@@ -96,6 +96,8 @@ public class Drive extends Threaded {
 
 	private FileWriter leftWriter;
 	private FileWriter rightWriter;
+
+	double voltage = 0;
 	  
 
 	private Drive() {
@@ -118,8 +120,8 @@ public class Drive extends Threaded {
 
 		leftSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
 		rightSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
-		leftSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
-		rightSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor/60);
+		rightSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor/60);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -427,8 +429,8 @@ public class Drive extends Threaded {
 
 	public void getFFGraph() {
 		try {
-		leftWriter = new FileWriter("left.csv");
-		rightWriter = new FileWriter("right.csv");
+		leftWriter = new FileWriter("/home/lvuser/left.csv");
+		rightWriter = new FileWriter("/home/lvuser/right.csv");
 
 		leftWriter.append("Voltage");
 		leftWriter.append(",");
@@ -446,17 +448,16 @@ public class Drive extends Threaded {
 	}
 
 	public void writeFFPeriodic() {
-		double voltage = leftSpark.getBusVoltage();
-		voltage+=0.25/0.05;
+		voltage+=0.25/(1/0.02);
 		setWheelPower(new DriveSignal(voltage, voltage));
 
 		try {
-    	leftWriter.append(Double.toString(leftSpark.getBusVoltage()));
+    	leftWriter.append(Double.toString(voltage));
 		leftWriter.append(",");
     	leftWriter.append(Double.toString(leftSparkEncoder.getVelocity()));
 		leftWriter.append("\n");
 
-		rightWriter.append(Double.toString(rightSpark.getBusVoltage()));
+		rightWriter.append(Double.toString(voltage));
 		rightWriter.append(",");
     	rightWriter.append(Double.toString(rightSparkEncoder.getVelocity()));
 		rightWriter.append("\n");
@@ -478,6 +479,7 @@ public class Drive extends Threaded {
 		catch (IOException e) {
 
 		}
+		voltage=0;
 	}
 
 	private void configMotors() {

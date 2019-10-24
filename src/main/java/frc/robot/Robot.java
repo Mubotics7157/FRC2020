@@ -103,10 +103,10 @@ public class Robot extends TimedRobot {
       leftStick.update();
       rightStick.update();
       
-      if (xbox.getRisingEdge(1)) {
+      if (xbox.getRawButton(1)) {
         drive.writeFFPeriodic();
       }
-      if (xbox.getFallingEdge(1)) {
+      if (xbox.getRawButtonReleased(1)) {
         drive.FFClose();
       }
       
@@ -130,6 +130,7 @@ public class Robot extends TimedRobot {
 
       SmartDashboard.putNumber("left encoder", drive.getLeftDistance());
       SmartDashboard.putNumber("right encoder", drive.getRightDistance());
+      SmartDashboard.putNumber("right encoder v", drive.getRightSpeed());
   }
 
   @Override

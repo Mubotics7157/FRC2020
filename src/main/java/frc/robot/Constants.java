@@ -51,9 +51,9 @@ public final class Constants {
 	
 	// Autonomous Driving
 	public static final double TrackRadius = -12;
-	public static final double WheelDiameter = 6.0; //6.09; //expiermental
+	public static final double WheelDiameter = 6.18; //6.09; //expiermental
 	public static final double driveConversionFactor = WheelDiameter * Math.PI /
-	DrivetrainGearingDivisor / DrivetrainEncoderTicksPerRotation;
+	DrivetrainGearingDivisor;
 
 	public static final double MinTurningRadius = 40;
 	public static final double MinPathSpeed = 20;

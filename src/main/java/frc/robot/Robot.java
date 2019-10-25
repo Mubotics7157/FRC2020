@@ -105,7 +105,11 @@ public class Robot extends TimedRobot {
       
       if (xbox.getRawButton(1)) {
         drive.writeFFPeriodic();
-      }else{
+      }
+      else if (xbox.getRawButton(2)) {
+        drive.setRandomShit(xbox.getRawAxis(1)*10);
+      }
+      else{
         drive.jankDrive(xbox.getRawAxis(1)/2, xbox.getRawAxis(5)/2);
       }
       if (xbox.getRawButtonReleased(1)) {

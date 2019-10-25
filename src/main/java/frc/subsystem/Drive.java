@@ -456,8 +456,8 @@ public class Drive extends Threaded {
 	}
 
 	public void writeFFPeriodic() {
-		leftVoltage+=0.25*0.0005;
-		rightVoltage+=0.25*0.0005;
+		leftVoltage+=0.25/12*0.02;
+		rightVoltage+=0.25/12*0.02;
 		setWheelPower(new DriveSignal(leftVoltage, rightVoltage));
 
 		try {
@@ -489,6 +489,8 @@ public class Drive extends Threaded {
 		catch (IOException e) {
 
 		}
+		leftVoltage=0;
+		rightVoltage=0;
 	}
 
 	private void configMotors() {
@@ -562,18 +564,23 @@ public class Drive extends Threaded {
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
+		/*
 		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveHighSpeed
 				|| Math.abs(setVelocity.leftVelocity) > Constants.DriveHighSpeed) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Velocity set over " + Constants.DriveHighSpeed + " !", false);
 			return;
-		}
+		} */
 
 		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
 		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
 
 		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
 		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
+	}
+
+	public void setRandomShit(double fkinspeed) {
+		setWheelVelocity(new DriveSignal(fkinspeed, fkinspeed));
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {

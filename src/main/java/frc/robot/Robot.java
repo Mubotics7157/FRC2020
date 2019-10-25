@@ -103,12 +103,18 @@ public class Robot extends TimedRobot {
       leftStick.update();
       rightStick.update();
       
-      if (xbox.getRisingEdge(1)) {
+      if (xbox.getRawButton(1)) {
         drive.writeFFPeriodic();
+      }else{
+        drive.jankDrive(xbox.getRawAxis(1)/2, xbox.getRawAxis(5)/2);
       }
-      if (xbox.getFallingEdge(1)) {
+      if (xbox.getRawButtonReleased(1)) {
         drive.FFClose();
       }
+
+      SmartDashboard.putNumber("Velocity Left", drive.getLeftSpeed());
+      
+      SmartDashboard.putNumber("Velocity Right", drive.getRightSpeed());
       
       //boolean quickTurn = xbox.getRawButton(1) || xbox.getRawButton(2);
 
@@ -126,7 +132,7 @@ public class Robot extends TimedRobot {
       //}
 
       //TANK DRIVE
-      drive.tankDrive(leftStick.getY(), rightStick.getY());
+      //drive.jankDrive(xbox.getRawAxis(1)/2, xbox.getRawAxis(5)/2);
 
       SmartDashboard.putNumber("left encoder", drive.getLeftDistance());
       SmartDashboard.putNumber("right encoder", drive.getRightDistance());

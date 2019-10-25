@@ -12,12 +12,10 @@ public final class Constants {
 	public static final String JetsonIPv4 = "10.34.76.8";
 
 	// CAN IDs
-	public static final int DriveLeftMasterId = 3;
-	public static final int DriveLeftSlave1Id = 4;
-	public static final int DriveLeftSlave2Id = 14;//not currently used
-	public static final int DriveRightMasterId = 5;
-	public static final int DriveRightSlave1Id = 6;
-	public static final int DriveRightSlave2Id = 13;//not currently used
+	public static final int DriveLeftMasterId = 10;
+	public static final int DriveLeftSlave1Id = 20;
+	public static final int DriveRightMasterId = 11;
+	public static final int DriveRightSlave1Id = 21;
 
 	// IO IDs
 	public static final int TurretLimitId = 0;
@@ -52,12 +50,12 @@ public final class Constants {
 	// Autonomous Driving
 	public static final double TrackRadius = -12;
 	public static final double WheelDiameter = 6.0; //6.09; //expiermental
-	public static final double driveConversionFactor = WheelDiameter * Math.PI /
-	DrivetrainGearingDivisor / DrivetrainEncoderTicksPerRotation;
+	public static final double driveConversionFactor = WheelDiameter * Math.PI / DrivetrainGearingDivisor;
+	public static final double velConversionFactor = 2 * Math.PI / 60d * WheelDiameter / 2d / DrivetrainGearingDivisor;
 
 	public static final double MinTurningRadius = 40;
 	public static final double MinPathSpeed = 20;
-	public static final double MaxPathSpeed = 120; //120
+	public static final double MaxPathSpeed = 120;
 	public static final double MinLookAheadDistance = 14;
 	public static final double MaxLookAheadDistance = 30;
 	

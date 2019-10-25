@@ -96,6 +96,10 @@ public class Drive extends Threaded {
 
 	private FileWriter leftWriter;
 	private FileWriter rightWriter;
+
+	private double leftVoltage = 0;
+	private double rightVoltage = 0;
+
 	  
 
 	private Drive() {
@@ -118,8 +122,8 @@ public class Drive extends Threaded {
 
 		leftSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
 		rightSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
-		leftSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
-		rightSparkEncoder.setVelocityConversionFactor(Constants.driveConversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(Constants.velConversionFactor);
+		rightSparkEncoder.setVelocityConversionFactor(Constants.velConversionFactor);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -425,10 +429,16 @@ public class Drive extends Threaded {
 		}
 	}
 
+	public void jankDrive(double left, double right){
+		setWheelPower(new DriveSignal(left, right));
+	}
+
 	public void getFFGraph() {
+		System.out.println("ffgraph");
 		try {
-		leftWriter = new FileWriter("left.csv");
-		rightWriter = new FileWriter("right.csv");
+		leftWriter = new FileWriter("/home/lvuser/left.csv");
+		rightWriter = new FileWriter("/home/lvuser/right.csv");
+		System.out.println("inside loop");
 
 		leftWriter.append("Voltage");
 		leftWriter.append(",");
@@ -441,22 +451,22 @@ public class Drive extends Threaded {
 		rightWriter.append("\n");
 		}
 		catch (IOException e) {
-
+			System.out.println(e);
 		}
 	}
 
 	public void writeFFPeriodic() {
-		double voltage = leftSpark.getBusVoltage();
-		voltage+=0.25/0.05;
-		setWheelPower(new DriveSignal(voltage, voltage));
+		leftVoltage+=0.25*0.0005;
+		rightVoltage+=0.25*0.0005;
+		setWheelPower(new DriveSignal(leftVoltage, rightVoltage));
 
 		try {
-    	leftWriter.append(Double.toString(leftSpark.getBusVoltage()));
+		leftWriter.append(Double.toString(leftVoltage));
 		leftWriter.append(",");
     	leftWriter.append(Double.toString(leftSparkEncoder.getVelocity()));
 		leftWriter.append("\n");
 
-		rightWriter.append(Double.toString(rightSpark.getBusVoltage()));
+		rightWriter.append(Double.toString(leftVoltage));
 		rightWriter.append(",");
     	rightWriter.append(Double.toString(rightSparkEncoder.getVelocity()));
 		rightWriter.append("\n");
@@ -468,6 +478,7 @@ public class Drive extends Threaded {
 
 	public void FFClose() {
 		setWheelPower(new DriveSignal(0,0));
+		System.out.println("------------------------------");
 		try {
 		leftWriter.flush();
 		leftWriter.close();

@@ -77,14 +77,14 @@ public final class Constants {
 	public static final double kDriveLeftAutoF = 0;
 
 	//SOOPER SPECIAL FEEDFORWARD CONSTANTS
-	public static final double kLv = 0.000; //kv
+	public static final double kLv = 1/193; //kv
 	public static final double kLa = 0.000; //ka
-	public static final double kLVi = 0.000; //Vintercept
+	public static final double kLVi = 0.171; //Vintercept
 
 	
-	public static final double kRv = 0.000; //kv
+	public static final double kRv = 1/190; //kv
 	public static final double kRa = 0.000; //ka
-	public static final double kRVi = 0.000; //Vintercept
+	public static final double kRVi = 0.171; //Vintercept
 	
 
 	public static final double kDriveRightHighP = kDriveRightAutoP;

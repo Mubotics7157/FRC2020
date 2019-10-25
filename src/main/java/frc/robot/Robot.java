@@ -136,6 +136,7 @@ public class Robot extends TimedRobot {
 
       SmartDashboard.putNumber("left encoder", drive.getLeftDistance());
       SmartDashboard.putNumber("right encoder", drive.getRightDistance());
+      SmartDashboard.putNumber("right encoder v", drive.getRightSpeed());
   }
 
   @Override

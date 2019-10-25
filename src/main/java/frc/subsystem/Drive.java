@@ -489,6 +489,7 @@ public class Drive extends Threaded {
 		catch (IOException e) {
 
 		}
+		voltage=0;
 	}
 
 	private void configMotors() {

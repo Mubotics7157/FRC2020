@@ -97,9 +97,6 @@ public final class Constants {
 	public static final double DriveTeleopAccLimit = 120;
 	public static final double DriveTeleopJerkLimit = 2000;
 	public static final double DriveExpectedCurrent = 1.5;
-	public static final double DriveExpectedRPM = 0;
-	public static final double DriveExpectedPosition = 0;
-	//COMP
 	public static final double cameraYOffset = 6.36;//5.310 + 1.25;//5.310 + 1.25;
 	public static final double cameraXOffset = -4.75;//-4.815 + 1.6 - 1.0;
 

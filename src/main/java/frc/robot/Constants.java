@@ -50,8 +50,8 @@ public final class Constants {
 	// Autonomous Driving
 	public static final double TrackRadius = -12;
 	public static final double WheelDiameter = 6.0; //6.09; //expiermental
-	public static final double driveConversionFactor = WheelDiameter * Math.PI / DrivetrainGearingDivisor;
-	public static final double velConversionFactor = 2 * Math.PI / 60d * WheelDiameter / 2d / DrivetrainGearingDivisor;
+	public static final double DriveConversionFactor = WheelDiameter * Math.PI / DrivetrainGearingDivisor;
+	public static final double VelConversionFactor = 2 * Math.PI / 60d * WheelDiameter / 2d / DrivetrainGearingDivisor;
 
 	public static final double MinTurningRadius = 40;
 	public static final double MinPathSpeed = 20;
@@ -63,31 +63,27 @@ public final class Constants {
 	public static final int TimeoutMs = 10;
 	
 	// Drive
-	public static final double kDriveInchesPerSecPerRPM = 2 * Math.PI/60d * Constants.WheelDiameter / DrivetrainGearingDivisor;
 	public static final double maxTurnError = 2;
 	public static final double maxPIDStopSpeed = 8;
 	public static final double DriveSpeed = 100;
 	
-	public static final double kDriveRightAutoP = 0.00065;
+	public static final double kDriveRightAutoP = 0.00;
 	public static final double kDriveRightAutoD = 0.000;
 	public static final double kDriveRightAutoF = 0; //0.055
 
-	public static final double kDriveLeftAutoP = 0;
-	public static final double kDriveLeftAutoP = 0.00065;
+	public static final double kDriveLeftAutoP = 0.00;
 	public static final double kDriveLeftAutoD = 0.000; //0.0001
 	public static final double kDriveLeftAutoF = 0;
 
 	//SOOPER SPECIAL FEEDFORWARD CONSTANTS
 	public static final double kLv = 1/193.357502; //kv
-	public static final double kLv = 1/193d*kDriveInchesPerSecPerRPM; //kv
 	public static final double kLa = 0.000; //ka
-	public static final double kLVi = 0.171; //Vintercept
+	public static final double kLVi = 0.170875*VelConversionFactor; //Vintercept
 
 	
 	public static final double kRv = 1/190.3254636; //kv
-	public static final double kRv = 1/190d*kDriveInchesPerSecPerRPM; //kv
 	public static final double kRa = 0.000; //ka
-	public static final double kRVi = 0.171; //Vintercept
+	public static final double kRVi = 0.170875*VelConversionFactor; //Vintercept
 	
 
 	public static final double kDriveRightHighP = kDriveRightAutoP;

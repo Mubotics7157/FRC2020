@@ -111,6 +111,7 @@ public class Drive extends Threaded {
 		leftSparkSlave = new LazyCANSparkMax(Constants.DriveLeftSlave1Id, MotorType.kBrushless);
 		rightSpark = new LazyCANSparkMax(Constants.DriveRightMasterId, MotorType.kBrushless);
 		rightSparkSlave = new LazyCANSparkMax(Constants.DriveRightSlave1Id, MotorType.kBrushless);
+
 		leftSpark.setInverted(true);
 		rightSpark.setInverted(false);
 		leftSparkSlave.setInverted(true);
@@ -121,10 +122,6 @@ public class Drive extends Threaded {
 		leftSparkEncoder = leftSpark.getEncoder();
 		rightSparkEncoder = rightSpark.getEncoder();
 
-		leftSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
-		rightSparkEncoder.setPositionConversionFactor(Constants.driveConversionFactor);
-		leftSparkEncoder.setVelocityConversionFactor(Constants.velConversionFactor);
-		rightSparkEncoder.setVelocityConversionFactor(Constants.velConversionFactor);
 		configMotors();
 
 		drivePercentVbus = true;
@@ -168,8 +165,6 @@ public class Drive extends Threaded {
 		leftSparkPID.setFF(Constants.kLv,0);
 		leftSparkPID.setOutputRange(-1, 1);
 	}
-
-	boolean teleopstart =true;
 
 	synchronized public void setTeleop() {
 		driveState = DriveState.TELEOP;
@@ -262,16 +257,9 @@ public class Drive extends Threaded {
 			rightMotorSpeed = moveValue - rotateValue*0.5;
 			leftMotorSpeed *= Constants.DriveSpeed;
 			rightMotorSpeed *= Constants.DriveSpeed;
-
-		//	System.out.println("left " + (leftMotorSpeed - getLeftSpeed() ));
-			//System.out.println("right " + (rightMotorSpeed - getRightSpeed() ));
-
+			
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		}
-		//System.out.println("left motor speed " + leftMotorSpeed + " right motor speed " + rightMotorSpeed);
-		//if(teleopstart) toPrint += (Timer.getFPGATimestamp() - time) + " 12\n";
-		//System.out.print(toPrint);
-		teleopstart = false;
 	}
 
 	public void calibrateGyro() {
@@ -493,6 +481,12 @@ public class Drive extends Threaded {
 		rightSpark.setIdleMode(IdleMode.kCoast);
 		leftSparkSlave.setIdleMode(IdleMode.kCoast);
 		rightSparkSlave.setIdleMode(IdleMode.kCoast);
+
+		
+		leftSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
+		rightSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
+		rightSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
 	}
 
 	public void resetMotionProfile() {
@@ -556,21 +550,14 @@ public class Drive extends Threaded {
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
-		/*
-		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveHighSpeed
-				|| Math.abs(setVelocity.leftVelocity) > Constants.DriveHighSpeed) {
+		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveSpeed) {
 			DriverStation.getInstance();
-			DriverStation.reportError("Velocity set over " + Constants.DriveHighSpeed + " !", false);
+			DriverStation.reportError("Velocity set over " + Constants.DriveSpeed + " !", false);
 			return;
-		} */
+		}
 
-		double leftSetpoint = setVelocity.leftVelocity/Constants.kDriveInchesPerSecPerRPM;// + (Constants.kLVi + Constants.kLa)/Constants.kLv;
-		double rightSetpoint = setVelocity.rightVelocity/Constants.kDriveInchesPerSecPerRPM;// + (Constants.kRVi + Constants.kRa)/Constants.kRv;
-
-		SmartDashboard.putNumber("asdf", (Constants.kLVi + Constants.kLa)/Constants.kLv);
-		SmartDashboard.putNumber("kLv", Constants.kLv);
-		SmartDashboard.putNumber("leftSetpoint", leftSetpoint);
-		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
+		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
+		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
 
 		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
 		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
@@ -622,7 +609,7 @@ public class Drive extends Threaded {
 		//System.out.println("error: " + error);
 		deltaSpeed = turnPID.update(error);
 		deltaSpeed = Math.copySign(
-				OrangeUtility.coercedNormalize(Math.abs(deltaSpeed), 0, 180, 0, Constants.DriveHighSpeed), deltaSpeed);
+				OrangeUtility.coercedNormalize(Math.abs(deltaSpeed), 0, 180, 0, Constants.DriveSpeed), deltaSpeed);
 		if (Math.abs(error) < Constants.maxTurnError && deltaSpeed < Constants.maxPIDStopSpeed) {
 			setWheelVelocity(new DriveSignal(0, 0));
 			synchronized (this) {

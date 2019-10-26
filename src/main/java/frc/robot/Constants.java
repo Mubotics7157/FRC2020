@@ -68,11 +68,12 @@ public final class Constants {
 	public static final double maxPIDStopSpeed = 8;
 	public static final double DriveSpeed = 100;
 	
-	public static final double kDriveRightAutoP = 0; //0.00065
+	public static final double kDriveRightAutoP = 0.00065;
 	public static final double kDriveRightAutoD = 0.000;
 	public static final double kDriveRightAutoF = 0; //0.055
 
 	public static final double kDriveLeftAutoP = 0;
+	public static final double kDriveLeftAutoP = 0.00065;
 	public static final double kDriveLeftAutoD = 0.000; //0.0001
 	public static final double kDriveLeftAutoF = 0;
 

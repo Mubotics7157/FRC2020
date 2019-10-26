@@ -79,11 +79,13 @@ public final class Constants {
 
 	//SOOPER SPECIAL FEEDFORWARD CONSTANTS
 	public static final double kLv = 1/193.357502; //kv
+	public static final double kLv = 1/193d*kDriveInchesPerSecPerRPM; //kv
 	public static final double kLa = 0.000; //ka
 	public static final double kLVi = 0.171; //Vintercept
 
 	
 	public static final double kRv = 1/190.3254636; //kv
+	public static final double kRv = 1/190d*kDriveInchesPerSecPerRPM; //kv
 	public static final double kRa = 0.000; //ka
 	public static final double kRVi = 0.171; //Vintercept
 	

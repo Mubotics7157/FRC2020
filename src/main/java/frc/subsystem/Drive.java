@@ -130,13 +130,12 @@ public class Drive extends Threaded {
 		driveState = DriveState.TELEOP;
 
 		turnPID = new SynchronousPid(1.0, 0, 1.2, 0); //P=1.0 OR 0.8
-		turnPID.setOutputRange(Constants.DriveHighSpeed, -Constants.DriveHighSpeed);
+		turnPID.setOutputRange(Constants.DriveSpeed, -Constants.DriveSpeed);
 		turnPID.setSetpoint(0);
 
 		moveProfiler = new RateLimiter(Constants.DriveTeleopAccLimit);
 		turnProfiler = new RateLimiter(100);
-
-		//configHigh();
+		
 		configAuto();
 	}
 
@@ -169,13 +168,6 @@ public class Drive extends Threaded {
 		leftSparkPID.setOutputRange(-1, 1);
 	}
 
-	private void configHigh() {
-		driveMultiplier = Constants.DriveHighSpeed;
-	}
-
-	private void configLow() {
-		driveMultiplier = Constants.DriveLowSpeed;
-	}
 	boolean teleopstart =true;
 
 	synchronized public void setTeleop() {
@@ -229,8 +221,8 @@ public class Drive extends Threaded {
 		} else {
 			leftMotorSpeed = moveValue + rotateValue;
 			rightMotorSpeed = moveValue - rotateValue;
-			leftMotorSpeed *= Constants.DriveHighSpeed;
-			rightMotorSpeed *= Constants.DriveHighSpeed;
+			leftMotorSpeed *= Constants.DriveSpeed;
+			rightMotorSpeed *= Constants.DriveSpeed;
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		}
     }
@@ -267,8 +259,8 @@ public class Drive extends Threaded {
 		} else {
 			leftMotorSpeed = moveValue + rotateValue*0.5;
 			rightMotorSpeed = moveValue - rotateValue*0.5;
-			leftMotorSpeed *= Constants.DriveHighSpeed;
-			rightMotorSpeed *= Constants.DriveHighSpeed;
+			leftMotorSpeed *= Constants.DriveSpeed;
+			rightMotorSpeed *= Constants.DriveSpeed;
 
 		//	System.out.println("left " + (leftMotorSpeed - getLeftSpeed() ));
 			//System.out.println("right " + (rightMotorSpeed - getRightSpeed() ));
@@ -293,7 +285,6 @@ public class Drive extends Threaded {
 		prevPositionL = getLeftDistance();
 		prevPositionR = getRightDistance();
 		driveState = DriveState.HOLD;
-		setShiftState(true);
 	}
 
 	public void endHold() {
@@ -615,7 +606,6 @@ public class Drive extends Threaded {
 			wantedHeading = angle;
 			driveState = DriveState.TURN;
 		}
-		configHigh();
 	}
 
 	private void updateTurn() {
@@ -636,22 +626,12 @@ public class Drive extends Threaded {
 		}
 	}
 
-	public void setShiftState(boolean state) {
-		shifter.set(state);
-		if (state) {
-			configLow();
-		} else {
-			configHigh();
-		}
-	}
-
 	private void updatePurePursuit() {
 		AutoDriveSignal signal = autonomousDriver.calculate(RobotTracker.getInstance().getOdometry());
 		if (signal.isDone) {
 			synchronized (this) {
 				driveState = DriveState.DONE;
 			}
-			configHigh();
 		}
 		setWheelVelocity(signal.command);
 	}

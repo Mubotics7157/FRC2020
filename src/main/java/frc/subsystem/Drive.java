@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.LazyCANSparkMax;
 
 public class Drive extends Threaded {
@@ -572,8 +573,13 @@ public class Drive extends Threaded {
 			return;
 		} */
 
-		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
-		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
+		double leftSetpoint = setVelocity.leftVelocity/Constants.kDriveInchesPerSecPerRPM;// + (Constants.kLVi + Constants.kLa)/Constants.kLv;
+		double rightSetpoint = setVelocity.rightVelocity/Constants.kDriveInchesPerSecPerRPM;// + (Constants.kRVi + Constants.kRa)/Constants.kRv;
+
+		SmartDashboard.putNumber("asdf", (Constants.kLVi + Constants.kLa)/Constants.kLv);
+		SmartDashboard.putNumber("kLv", Constants.kLv);
+		SmartDashboard.putNumber("leftSetpoint", leftSetpoint);
+		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
 
 		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
 		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
@@ -581,6 +587,7 @@ public class Drive extends Threaded {
 
 	public void setRandomShit(double fkinspeed) {
 		setWheelVelocity(new DriveSignal(fkinspeed, fkinspeed));
+		//System.out.println("RANDOM SHIt");
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {

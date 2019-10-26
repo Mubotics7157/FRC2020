@@ -95,6 +95,7 @@ public class Robot extends TimedRobot {
     System.out.println("teleop init!");
     scheduler.resume();
     drive.getFFGraph();
+    drive.setRandomShit(0);
   }
 
   @Override
@@ -106,14 +107,18 @@ public class Robot extends TimedRobot {
       if (xbox.getRawButton(1)) {
         drive.writeFFPeriodic();
       }
-      else if (xbox.getRawButton(2)) {
-        drive.setRandomShit(xbox.getRawAxis(1)*10);
-      }
-      else{
-        drive.jankDrive(xbox.getRawAxis(1)/2, xbox.getRawAxis(5)/2);
-      }
+
       if (xbox.getRawButtonReleased(1)) {
         drive.FFClose();
+      }
+
+      if(xbox.getRawButton(2)){
+        drive.setRandomShit(6);
+      }else if(xbox.getRawAxis(3)>0.5){
+        drive.jankDrive(xbox.getRawAxis(1)/2, xbox.getRawAxis(5)/2);
+      }
+      else{
+        drive.setRandomShit(0);
       }
 
       SmartDashboard.putNumber("Velocity Left", drive.getLeftSpeed());

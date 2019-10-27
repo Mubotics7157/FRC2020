@@ -33,11 +33,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.LazyCANSparkMax;
 
 public class Drive extends Threaded {
-
+	//#region Helper structures
 	public enum DriveState {
 		TELEOP, PUREPURSUIT, TURN, HOLD, DONE
 	}
-
 	public static class DriveSignal {
 		/*
 		 * Inches per second for speed
@@ -68,7 +67,8 @@ public class Drive extends Threaded {
 			this.isDone = isDone;
 		}
 	}
-
+	//#endregion
+	//#region Variable Galore
 	private static final Drive instance = new Drive();
 
 	public static Drive getInstance() {
@@ -76,7 +76,6 @@ public class Drive extends Threaded {
 	}
 
 	private double quickStopAccumulator;
-
 	private boolean drivePercentVbus;
 
 	private AHRS gyroSensor;
@@ -95,14 +94,13 @@ public class Drive extends Threaded {
   	private CANPIDController leftSparkPID, rightSparkPID;
 	private CANEncoder leftSparkEncoder, rightSparkEncoder;
 
+	//used for logging velocity vs voltage
 	private FileWriter leftWriter;
 	private FileWriter rightWriter;
-
 	private double leftVoltage = 0;
 	private double rightVoltage = 0;
-
-	  
-
+	//#endregion
+	//#region init
 	private Drive() {
 
 		gyroSensor = new AHRS(Port.kMXP);
@@ -137,22 +135,6 @@ public class Drive extends Threaded {
 		configAuto();
 	}
 
-	public void debug() {
-		System.out.println("L enc: " + getLeftDistance()+ " velo " + getLeftSpeed()); 
-		System.out.println("R enc: " + getRightDistance() + " velo " + getRightSpeed()); 
-		System.out.println("Gyro: " + getAngle()/*getGyroAngle().getDegrees()*/);
-	}
-
-	public void debugSpeed() {
-		System.out.println("L speed " +  " actual " + getLeftSpeed());
-		System.out.println("R speed " +   " actual " + getRightSpeed());
-
-	}
-
-	public void setRight() {
-		setWheelVelocity(new DriveSignal(40, 0));
-	}
-
 	private void configAuto() {
 		rightSparkPID.setP(Constants.kDriveRightAutoP, 0);
 		rightSparkPID.setD(Constants.kDriveRightAutoD, 0);
@@ -166,12 +148,70 @@ public class Drive extends Threaded {
 		leftSparkPID.setOutputRange(-1, 1);
 	}
 
-	synchronized public void setTeleop() {
-		driveState = DriveState.TELEOP;
+	private void configMotors() {
+		leftSparkSlave.follow(leftSpark);
+		rightSparkSlave.follow(rightSpark);
+		
+		leftSpark.setIdleMode(IdleMode.kCoast);
+		rightSpark.setIdleMode(IdleMode.kCoast);
+		leftSparkSlave.setIdleMode(IdleMode.kCoast);
+		rightSparkSlave.setIdleMode(IdleMode.kCoast);
+
+		
+		leftSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
+		rightSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
+		leftSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
+		rightSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
 	}
 
-    
-    
+	@Override
+	public void update() {
+	DriveState snapDriveState;
+		synchronized (this) {
+			snapDriveState = driveState;
+		}
+		switch (snapDriveState) {
+			case TELEOP:
+				break;
+			case PUREPURSUIT:
+				//System.out.println("bad!");
+				updatePurePursuit();
+				break;
+			case TURN:
+				updateTurn();
+				break;
+			case HOLD:
+				hold();
+				break;
+		}
+		
+	}
+	//#endregion
+	//#region DEBUG
+	public void debug() {
+		System.out.println("L enc: " + getLeftDistance()+ " velo " + getLeftSpeed()); 
+		System.out.println("R enc: " + getRightDistance() + " velo " + getRightSpeed()); 
+		System.out.println("Gyro: " + getAngle()/*getGyroAngle().getDegrees()*/);
+	}
+
+	public void debugSpeed() {
+		SmartDashboard.putNumber("Left Speed", getLeftSpeed());
+		SmartDashboard.putNumber("Right Speed", getRightSpeed());
+	}
+
+	public void debugVoltage() {
+		SmartDashboard.putNumber("Avg Voltage", getVoltage());
+	}
+
+	public void printCurrent() {
+		System.out.println(leftSpark);
+	}
+
+	public void debugDriveFF() {
+		setWheelVelocity(new DriveSignal(0, 0));
+	}
+	//#endregion
+    //#region Drive Methods
     public void skidLimitingDrive(double moveValue, double rotateValue) {
 		synchronized(this) {
 			driveState = DriveState.TELEOP;
@@ -221,8 +261,8 @@ public class Drive extends Threaded {
 			rightMotorSpeed *= Constants.DriveSpeed;
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		}
-    }
-
+	}
+	
 	public void arcadeDrive(double moveValue, double rotateValue) {
 		//String toPrint="";
 		//double time = Timer.getFPGATimestamp();
@@ -260,24 +300,6 @@ public class Drive extends Threaded {
 			
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		}
-	}
-
-	public void calibrateGyro() {
-		gyroSensor.reset();;
-	}
-
-	public void printCurrent() {
-		System.out.println(leftSpark);
-	}
-
-	public void startHold() {
-		prevPositionL = getLeftDistance();
-		prevPositionR = getRightDistance();
-		driveState = DriveState.HOLD;
-	}
-
-	public void endHold() {
-		driveState = DriveState.TELEOP;
 	}
 
 	public void cheesyDrive(double moveValue, double rotateValue, boolean isQuickTurn) {
@@ -341,13 +363,6 @@ public class Drive extends Threaded {
 			setWheelVelocity(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		}
 	}
-
-	public void hold() {
-		double errorL = prevPositionL - getLeftDistance();
-		double errorR = prevPositionR - getRightDistance();
-		setWheelVelocity(new DriveSignal(errorL * Constants.kHoldP , errorR* Constants.kHoldP));
-	}
-
 	public void orangeDrive(double moveValue, double rotateValue, boolean isQuickTurn) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
@@ -388,7 +403,7 @@ public class Drive extends Threaded {
 		}
 	}
 
-	public void tankDrive(double leftValue, double rightValue) {
+	public void tankDrive(double leftValue, double rightValue, boolean vbus) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
 		}
@@ -397,7 +412,7 @@ public class Drive extends Threaded {
 
 		double leftMotorSpeed = leftValue;
 		double rightMotorSpeed = rightValue;
-		if (drivePercentVbus) {
+		if (vbus) {
 			setWheelPower(new DriveSignal(leftMotorSpeed, rightMotorSpeed));
 		} else {
 			leftMotorSpeed *= driveMultiplier;
@@ -412,83 +427,32 @@ public class Drive extends Threaded {
 	public void jankDrive(double left, double right){
 		setWheelPower(new DriveSignal(left, right));
 	}
-
-	public void getFFGraph() {
-		System.out.println("ffgraph");
-		try {
-		leftWriter = new FileWriter("/home/lvuser/left.csv");
-		rightWriter = new FileWriter("/home/lvuser/right.csv");
-		System.out.println("inside loop");
-
-		leftWriter.append("Voltage");
-		leftWriter.append(",");
-		leftWriter.append("Velocity");
-		leftWriter.append("\n");
-
-		rightWriter.append("Voltage");
-		rightWriter.append(",");
-		rightWriter.append("Velocity");
-		rightWriter.append("\n");
-		}
-		catch (IOException e) {
-			System.out.println(e);
-		}
+	//#endregion
+	//#region Public
+	synchronized public void setTeleop() {
+		driveState = DriveState.TELEOP;
+	}
+	public void calibrateGyro() {
+		gyroSensor.reset();
 	}
 
-	public void writeFFPeriodic() {
-		leftVoltage+=0.25/12*0.02;
-		rightVoltage+=0.25/12*0.02;
-		setWheelPower(new DriveSignal(leftVoltage, rightVoltage));
-
-		try {
-		leftWriter.append(Double.toString(leftVoltage));
-		leftWriter.append(",");
-    	leftWriter.append(Double.toString(leftSparkEncoder.getVelocity()));
-		leftWriter.append("\n");
-
-		rightWriter.append(Double.toString(leftVoltage));
-		rightWriter.append(",");
-    	rightWriter.append(Double.toString(rightSparkEncoder.getVelocity()));
-		rightWriter.append("\n");
-		}
-		catch (IOException e) {
-
-		}
+	public void startHold() {
+		prevPositionL = getLeftDistance();
+		prevPositionR = getRightDistance();
+		driveState = DriveState.HOLD;
 	}
 
-	public void FFClose() {
-		setWheelPower(new DriveSignal(0,0));
-		System.out.println("------------------------------");
-		try {
-		leftWriter.flush();
-		leftWriter.close();
-
-		rightWriter.flush();
-		rightWriter.close();
-		}
-		catch (IOException e) {
-
-		}
-		leftVoltage=0;
-		rightVoltage=0;
+	public void endHold() {
+		driveState = DriveState.TELEOP;
 	}
 
-	private void configMotors() {
-		leftSparkSlave.follow(leftSpark);
-		rightSparkSlave.follow(rightSpark);
-		
-		leftSpark.setIdleMode(IdleMode.kCoast);
-		rightSpark.setIdleMode(IdleMode.kCoast);
-		leftSparkSlave.setIdleMode(IdleMode.kCoast);
-		rightSparkSlave.setIdleMode(IdleMode.kCoast);
-
-		
-		leftSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
-		rightSparkEncoder.setPositionConversionFactor(Constants.DriveConversionFactor);
-		leftSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
-		rightSparkEncoder.setVelocityConversionFactor(Constants.VelConversionFactor);
+	public void hold() {
+		double errorL = prevPositionL - getLeftDistance();
+		double errorR = prevPositionR - getRightDistance();
+		setWheelVelocity(new DriveSignal(errorL * Constants.kHoldP , errorR* Constants.kHoldP));
 	}
 
+	
 	public void resetMotionProfile() {
 		moveProfiler.reset();
 	}
@@ -559,40 +523,12 @@ public class Drive extends Threaded {
 		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
 		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
 
-		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
-		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
-	}
-
-	public void setRandomShit(double fkinspeed) {
-		setWheelVelocity(new DriveSignal(fkinspeed, fkinspeed));
-		//System.out.println("RANDOM SHIt");
+		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity, 0);
+		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity, 0);
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {
 		drivePercentVbus = setting;
-	}
-
-	@Override
-	public void update() {
-	DriveState snapDriveState;
-		synchronized (this) {
-			snapDriveState = driveState;
-		}
-		switch (snapDriveState) {
-			case TELEOP:
-				break;
-			case PUREPURSUIT:
-				//System.out.println("bad!");
-				updatePurePursuit();
-				break;
-			case TURN:
-				updateTurn();
-				break;
-			case HOLD:
-				hold();
-				break;
-		}
-		
 	}
 
 	public void setRotation(Rotation2D angle) {
@@ -601,7 +537,73 @@ public class Drive extends Threaded {
 			driveState = DriveState.TURN;
 		}
 	}
+	
+	synchronized public boolean isFinished() {
+		return driveState == DriveState.DONE || driveState == DriveState.TELEOP;
+	}
+	//#endregion
+	//#region FF Graphing
+	public void getFFGraph() {
+		System.out.println("ffgraph");
+		try {
+		leftWriter = new FileWriter("/home/lvuser/left.csv");
+		rightWriter = new FileWriter("/home/lvuser/right.csv");
+		System.out.println("inside loop");
 
+		leftWriter.append("Voltage");
+		leftWriter.append(",");
+		leftWriter.append("Velocity");
+		leftWriter.append("\n");
+
+		rightWriter.append("Voltage");
+		rightWriter.append(",");
+		rightWriter.append("Velocity");
+		rightWriter.append("\n");
+		}
+		catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+
+	public void writeFFPeriodic() {
+		leftVoltage+=0.25/12*0.02;
+		rightVoltage+=0.25/12*0.02;
+		setWheelPower(new DriveSignal(leftVoltage, rightVoltage));
+
+		try {
+		leftWriter.append(Double.toString(leftVoltage));
+		leftWriter.append(",");
+    	leftWriter.append(Double.toString(leftSparkEncoder.getVelocity()));
+		leftWriter.append("\n");
+
+		rightWriter.append(Double.toString(leftVoltage));
+		rightWriter.append(",");
+    	rightWriter.append(Double.toString(rightSparkEncoder.getVelocity()));
+		rightWriter.append("\n");
+		}
+		catch (IOException e) {
+
+		}
+	}
+
+	public void FFClose() {
+		setWheelPower(new DriveSignal(0,0));
+		System.out.println("------------------------------");
+		try {
+		leftWriter.flush();
+		leftWriter.close();
+
+		rightWriter.flush();
+		rightWriter.close();
+		}
+		catch (IOException e) {
+
+		}
+		leftVoltage=0;
+		rightVoltage=0;
+	}
+	//#endregion
+	//#region Motion Control
 	private void updateTurn() {
 		double error = wantedHeading.rotateBy(RobotTracker.getInstance().getOdometry().rotationMat.inverse()).getDegrees();
 		double deltaSpeed;
@@ -630,14 +632,6 @@ public class Drive extends Threaded {
 		setWheelVelocity(signal.command);
 	}
 
-	public void resetGyro() {
-		gyroSensor.reset();
-	}
-
-	public boolean checkSubsystem() {
-		return true;
-	}
-
 	synchronized public void stopMovement() {
 		leftSpark.set(0);
 		rightSpark.set(0);
@@ -648,11 +642,5 @@ public class Drive extends Threaded {
 		driveState = DriveState.TELEOP;
 		resetMotionProfile();
 	}
-
-	synchronized public boolean isFinished() {
-		return driveState == DriveState.DONE || driveState == DriveState.TELEOP;
-	}
-
-	public void clearStickyFaults() {
-	}
+	//#endregion
 }

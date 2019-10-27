@@ -27,25 +27,17 @@ public final class Constants {
 	public static final double MinControllerOutput = 0;
 	public static final double MaxControllerOutput = 1;
 	public static final double MaxAcceleration = 1000;
-	public static final double DrivetrainEncoderTicksPerRotation = 42;
-	public static final double DrivetrainGearingDivisor = 10.71;
 	
 	
 	// General
-	public static final double EncoderTicksPerRotation = 4096;
+	public static final double DrivetrainGearingDivisor = 10.71;
+	public static final double EncoderTicksPerRotation = 42;
 	public static final double DegreesPerEncoderTick = 360 * (1d / EncoderTicksPerRotation);
 	public static final double EncoderTicksPerDegree = (1d / 360) * EncoderTicksPerRotation;
 
 	public static final double ExpectedCurrentTolerance = 0;
 	public static final double ExpectedRPMTolerance = 0;
 	public static final double ExpectedPositionTolerance = 0;
-
-	// Game
-	public static final double RocketBaseHeight = 27.5;
-	public static final double RocketMiddleHeight = 55.5;
-	public static final double RocketTopHeight = 83.5;
-
-	public static final double HatchPanelHeight = 2 + (1 / 6); // The height of each hatch panel
 	
 	// Autonomous Driving
 	public static final double TrackRadius = -12;

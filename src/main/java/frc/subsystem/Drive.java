@@ -207,8 +207,8 @@ public class Drive extends Threaded {
 		System.out.println(leftSpark);
 	}
 
-	public void debugDriveFF() {
-		setWheelVelocity(new DriveSignal(0, 0));
+	public void debugDriveFF(double lSpeed, double rSpeed) {
+		setWheelVelocity(new DriveSignal(lSpeed, rSpeed));
 	}
 	//#endregion
     //#region Drive Methods
@@ -505,7 +505,7 @@ public class Drive extends Threaded {
 	}
 
 	public double getVoltage() {
-		return (leftSpark.getBusVoltage() + rightSpark.getBusVoltage()) / 2;
+		return (Math.abs(leftSpark.getAppliedOutput()) + Math.abs(rightSpark.getAppliedOutput())) / 2;
 	}
 
 	private void setWheelPower(DriveSignal setVelocity) {
@@ -517,11 +517,14 @@ public class Drive extends Threaded {
 		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveSpeed) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Velocity set over " + Constants.DriveSpeed + " !", false);
+			
 			return;
 		}
+		double leftSetpoint = setVelocity.leftVelocity + Math.copySign((Constants.kLVi + Constants.kLa)/Constants.kLv, setVelocity.leftVelocity);
+		double rightSetpoint = setVelocity.rightVelocity + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.leftVelocity);
 
-		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
-		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
+		SmartDashboard.putNumber("leftSetpoint", leftSetpoint);
+		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
 
 		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity, 0);
 		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity, 0);

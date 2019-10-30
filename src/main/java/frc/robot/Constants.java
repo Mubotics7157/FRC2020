@@ -57,25 +57,25 @@ public final class Constants {
 	// Drive
 	public static final double maxTurnError = 2;
 	public static final double maxPIDStopSpeed = 8;
-	public static final double DriveSpeed = 100;
+	public static final double DriveSpeed = 120;
 	
-	public static final double kDriveRightAutoP = 0.00;
+	public static final double kDriveRightAutoP = 0.00869420;
 	public static final double kDriveRightAutoD = 0.000;
 	public static final double kDriveRightAutoF = 0; //0.055
 
-	public static final double kDriveLeftAutoP = 0.00;
+	public static final double kDriveLeftAutoP = 0.00869420;
 	public static final double kDriveLeftAutoD = 0.000; //0.0001
 	public static final double kDriveLeftAutoF = 0;
 
 	//SOOPER SPECIAL FEEDFORWARD CONSTANTS
 	public static final double kLv = 1/193.357502; //kv
 	public static final double kLa = 0.000; //ka
-	public static final double kLVi = 0.170875*VelConversionFactor; //Vintercept
+	public static final double kLVi = 0.196969420*VelConversionFactor;//0.170875*VelConversionFactor; //Vintercept
 
 	
 	public static final double kRv = 1/190.3254636; //kv
 	public static final double kRa = 0.000; //ka
-	public static final double kRVi = 0.170875*VelConversionFactor; //Vintercept
+	public static final double kRVi = 0.196969420*VelConversionFactor;//0.170875*VelConversionFactor; //Vintercept
 	
 
 	public static final double kDriveRightHighP = kDriveRightAutoP;

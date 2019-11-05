@@ -146,9 +146,17 @@ public class Drive extends Threaded {
 		leftSparkPID.setD(Constants.kDriveLeftAutoD, 0);
 		leftSparkPID.setFF(Constants.kLv,0);
 		leftSparkPID.setOutputRange(-1, 1);
+
+		
+		leftSpark.setIdleMode(IdleMode.kBrake);
+		rightSpark.setIdleMode(IdleMode.kBrake);
+		leftSparkSlave.setIdleMode(IdleMode.kBrake);
+		rightSparkSlave.setIdleMode(IdleMode.kBrake);
+		leftSparkEncoder.setPosition(0);
+		rightSparkEncoder.setPosition(0);
 	}
 
-	private void configMotors() {
+	public void configMotors() {
 		leftSparkSlave.follow(leftSpark);
 		rightSparkSlave.follow(rightSpark);
 		
@@ -197,6 +205,12 @@ public class Drive extends Threaded {
 	public void debugSpeed() {
 		SmartDashboard.putNumber("Left Speed", getLeftSpeed());
 		SmartDashboard.putNumber("Right Speed", getRightSpeed());
+	}
+
+	
+	public void debugDistance() {
+		SmartDashboard.putNumber("Left Distance", getLeftDistance());
+		SmartDashboard.putNumber("Right Distance", getRightDistance());
 	}
 
 	public void debugVoltage() {

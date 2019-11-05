@@ -2,6 +2,7 @@
 
 package frc.subsystem;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.CircularQueue;
 import frc.utility.Threaded;
 import frc.utility.math.InterpolablePair;
@@ -101,5 +102,10 @@ public class RobotTracker extends Threaded {
 	synchronized public void setInitialTranslation(Translation2D offset) {
 		this.translationOffset = offset;
 		resetOdometry();
+	}
+
+	public void debugOdometry() {
+		SmartDashboard.putNumber("X", this.currentOdometry.translationMat.getX());
+		SmartDashboard.putNumber("Y", this.currentOdometry.translationMat.getY());
 	}
 }

@@ -96,10 +96,11 @@ public class AutoRoutineGenerator {
 		Path initialPath;
 		initialDrive = new AutoRoutine();
         System.out.println("start left");
-        RobotTracker.getInstance().setInitialTranslation(robotLeftStartPosition);
+        RobotTracker.getInstance().setInitialTranslation(new Translation2D(0,0));
         
         initialPath = new Path(new Translation2D(0,0));
-        initialPath.addPoint(0, 60, 120); //80
+        initialPath.addPoint(0, 60, 100); //80
+
 
         initialDrive.addCommands(new SetDrivePath(initialPath, false));
         overallRoutine.addRoutines(initialDrive);

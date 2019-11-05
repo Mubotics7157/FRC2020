@@ -58,13 +58,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    robotTracker.debugOdometry();
   }
 
   boolean autoDone;
   @Override
   public void autonomousInit() {
     scheduler.resume();
-    AutoRoutine option = AutoRoutineGenerator.generate3();
+    AutoRoutine option = AutoRoutineGenerator.generate2();
     auto = new Thread(option);
     auto.start();
   }
@@ -74,6 +75,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    drive.debugSpeed();
   }
 
   @Override 
@@ -99,12 +101,12 @@ public class Robot extends TimedRobot {
         drive.debugSpeed();
       }else if(xbox.getRawButton(3)){
         drive.debugDriveFF(-10, -10);
-        drive.debugSpeed();
       }else {
         drive.setSimpleDrive(true);
         drive.jankDrive(xbox.getRawAxis(1), xbox.getRawAxis(5));
       }
-
+      drive.debugDistance();
+      drive.debugSpeed();
       drive.debugVoltage();
   }
 
@@ -121,6 +123,7 @@ public class Robot extends TimedRobot {
     if(auto != null){
       auto.stop();
     }
+    drive.configMotors();
   }
   
   @Override

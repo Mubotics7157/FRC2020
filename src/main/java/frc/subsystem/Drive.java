@@ -152,8 +152,6 @@ public class Drive extends Threaded {
 		rightSpark.setIdleMode(IdleMode.kBrake);
 		leftSparkSlave.setIdleMode(IdleMode.kBrake);
 		rightSparkSlave.setIdleMode(IdleMode.kBrake);
-		leftSparkEncoder.setPosition(0);
-		rightSparkEncoder.setPosition(0);
 	}
 
 	public void configMotors() {

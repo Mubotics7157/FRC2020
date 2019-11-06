@@ -82,9 +82,9 @@ public class PurePursuitController {
 			robotSpeed -= Math.copySign(maxSpeed - Constants.MaxPathSpeed, robotSpeed);
 		}
         
-        double leftSpeed = leftProfiler.update(robotSpeed + deltaSpeed);
-        double rightSpeed = rightProfiler.update(robotSpeed - deltaSpeed);     
-		return new AutoDriveSignal(new DriveSignal(rightSpeed, leftSpeed), false);
+        double leftSpeed = leftProfiler.update(robotSpeed - deltaSpeed);
+        double rightSpeed = rightProfiler.update(robotSpeed + deltaSpeed);     
+		return new AutoDriveSignal(new DriveSignal(leftSpeed, rightSpeed), false);
 	}
 
 	private double getRadius(Translation2D robotToLookAheadPoint) {

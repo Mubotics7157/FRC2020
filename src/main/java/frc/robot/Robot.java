@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     scheduler.resume();
-    AutoRoutine option = AutoRoutineGenerator.generate2();
+    AutoRoutine option = AutoRoutineGenerator.shit();
     auto = new Thread(option);
     auto.start();
   }

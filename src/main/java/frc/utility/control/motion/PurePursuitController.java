@@ -22,11 +22,17 @@ public class PurePursuitController {
 	private Path robotPath;
 	private boolean isReversed;
 	private RateLimiter speedProfiler;
+	private RateLimiter leftProfiler;
+	private RateLimiter rightProfiler;
 
 	public PurePursuitController(Path robotPath, boolean isReversed) {
 		this.robotPath = robotPath;
 		this.isReversed = isReversed;
 		speedProfiler = new RateLimiter(100, 1000); //100, 10000
+        
+        //two new profilers
+		leftProfiler = new RateLimiter(100, 1000);
+		rightProfiler = new RateLimiter(100, 1000);
 		if (robotPath.isEmpty()) {
 		}
 	}
@@ -52,35 +58,21 @@ public class PurePursuitController {
 											// distance is 0
 			return new AutoDriveSignal(new DriveSignal(0, 0), true);
 		}
+        
+        double robotSpeed = data.maxSpeed;
+        /*
+        Limit wheel speeds after
 		double robotSpeed = speedProfiler.update(data.maxSpeed, data.remainingDist);
 		if (robotSpeed < 20) {
 			robotSpeed = 20;
 		}
+        */
 		Translation2D robotToLookAhead = getRobotToLookAheadPoint(robotPose, data.lookAheadPoint);
-		//System.out.println("desired point " + robotToLookAhead.getX() + ", " + robotToLookAhead.getY());
+        
 		double radius;
 		radius = getRadius(robotToLookAhead);
 		double delta = (robotSpeed / radius);
 		double deltaSpeed = Constants.TrackRadius * delta;
-
-		/*
-		JSONObject message = new JSONObject();
-		JSONArray pose = new JSONArray();
-		JSONArray lookAhead = new JSONArray();
-		JSONArray closest = new JSONArray();
-
-		if (Constants.LOGGING) {
-			closest.add(data.closestPoint.getX());
-			closest.add(data.closestPoint.getY());
-			lookAhead.add(data.lookAheadPoint.getX());
-			lookAhead.add(data.lookAheadPoint.getY());
-			pose.add(robotPose.translationMat.getX());
-			pose.add(robotPose.translationMat.getY());
-			message.put("closest", closest);
-			message.put("lookAhead", lookAhead);
-			message.put("pose", pose);
-			UDP.getInstance().send("10.34.76.5", message.toJSONString(), 5801);
-		}*/
 
 		if (isReversed) {
 			robotSpeed *= -1;
@@ -89,7 +81,10 @@ public class PurePursuitController {
 		if (maxSpeed > Constants.MaxPathSpeed) {
 			robotSpeed -= Math.copySign(maxSpeed - Constants.MaxPathSpeed, robotSpeed);
 		}
-		return new AutoDriveSignal(new DriveSignal(robotSpeed + deltaSpeed, robotSpeed - deltaSpeed), false);
+        
+        double leftSpeed = leftProfiler.update(robotSpeed + deltaSpeed);
+        double rightSpeed = rightProfiler.update(robotSpeed - deltaSpeed);     
+		return new AutoDriveSignal(new DriveSignal(rightSpeed, leftSpeed), false);
 	}
 
 	private double getRadius(Translation2D robotToLookAheadPoint) {

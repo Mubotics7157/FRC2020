@@ -439,6 +439,9 @@ public class Drive extends Threaded {
 	}
 
 	public void jankDrive(double left, double right){
+		synchronized(this){
+			driveState = DriveState.TELEOP;
+		}
 		setWheelPower(new DriveSignal(left, right));
 	}
 	//#endregion
@@ -528,6 +531,7 @@ public class Drive extends Threaded {
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
+		System.out.println("poopy");
 		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveSpeed) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Velocity set over " + Constants.DriveSpeed + " !", false);

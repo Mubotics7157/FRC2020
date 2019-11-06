@@ -107,6 +107,20 @@ public class AutoRoutineGenerator {
 		return overallRoutine;
 	}
 
+	public static AutoRoutine shit(){
+		AutoRoutine overallRoutine = new AutoRoutine();
+		Path initialPath;
+		initialPath = new Path(new Translation2D(0, 0));
+		initialDrive = new AutoRoutine();
+		RobotTracker.getInstance().setInitialTranslation(new Translation2D(0, 0));
+		initialPath.addPoint(24, 12, 100);
+
+		
+		initialDrive.addCommands(new SetDrivePath(initialPath, false));
+		overallRoutine.addRoutines(initialDrive);
+		return overallRoutine;
+	}
+
 	public static AutoRoutine generate3() {
 		AutoRoutine overallRoutine = new AutoRoutine();
 		Path initialPath;

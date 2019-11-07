@@ -2,6 +2,7 @@
 
 package frc.utility.control.motion;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.subsystem.Drive;
 import frc.subsystem.Drive.AutoDriveSignal;
@@ -73,6 +74,7 @@ public class PurePursuitController {
 		radius = getRadius(robotToLookAhead);
 		double delta = (robotSpeed / radius);
 		double deltaSpeed = Constants.TrackRadius * delta;
+		SmartDashboard.putNumber("deltaSpeed", deltaSpeed);
 
 		if (isReversed) {
 			robotSpeed *= -1;

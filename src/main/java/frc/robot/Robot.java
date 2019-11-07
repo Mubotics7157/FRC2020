@@ -58,7 +58,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    robotTracker.debugOdometry();
   }
 
   boolean autoDone;
@@ -75,6 +74,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    robotTracker.debugOdometry();
     drive.debugSpeed();
   }
 
@@ -107,6 +107,7 @@ public class Robot extends TimedRobot {
       }
       drive.debugDistance();
       drive.debugSpeed();
+      robotTracker.debugOdometry();
       drive.debugVoltage();
   }
 

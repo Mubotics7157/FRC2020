@@ -113,7 +113,7 @@ public class AutoRoutineGenerator {
 		initialPath = new Path(new Translation2D(0, 0));
 		initialDrive = new AutoRoutine();
 		RobotTracker.getInstance().setInitialTranslation(new Translation2D(0, 0));
-		initialPath.addPoint(60, 0, 100);
+		initialPath.addPoint(60, 0, 30);
 
 		
 		initialDrive.addCommands(new SetDrivePath(initialPath, false));

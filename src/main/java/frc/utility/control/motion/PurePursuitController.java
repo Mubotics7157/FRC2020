@@ -2,6 +2,7 @@
 
 package frc.utility.control.motion;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.subsystem.Drive;
 import frc.subsystem.Drive.AutoDriveSignal;
@@ -71,8 +72,13 @@ public class PurePursuitController {
         
 		double radius;
 		radius = getRadius(robotToLookAhead);
+		SmartDashboard.putNumber("robotLookAheadx", robotToLookAhead.getX());
+		SmartDashboard.putNumber("robotLookAheady", robotToLookAhead.getY());
 		double delta = (robotSpeed / radius);
 		double deltaSpeed = Constants.TrackRadius * delta;
+		SmartDashboard.putNumber("delta v", deltaSpeed);
+		SmartDashboard.putNumber("radius", radius);
+		SmartDashboard.putNumber("speed", robotSpeed);
 
 		if (isReversed) {
 			robotSpeed *= -1;
@@ -81,9 +87,8 @@ public class PurePursuitController {
 		if (maxSpeed > Constants.MaxPathSpeed) {
 			robotSpeed -= Math.copySign(maxSpeed - Constants.MaxPathSpeed, robotSpeed);
 		}
-        
         double leftSpeed = leftProfiler.update(robotSpeed - deltaSpeed);
-        double rightSpeed = rightProfiler.update(robotSpeed + deltaSpeed);     
+        double rightSpeed = rightProfiler.update(robotSpeed + deltaSpeed);
 		return new AutoDriveSignal(new DriveSignal(leftSpeed, rightSpeed), false);
 	}
 

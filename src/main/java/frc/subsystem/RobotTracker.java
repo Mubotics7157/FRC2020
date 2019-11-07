@@ -105,7 +105,7 @@ public class RobotTracker extends Threaded {
 	}
 
 	public void debugOdometry() {
-		SmartDashboard.putNumber("X", this.currentOdometry.translationMat.getX());
-		SmartDashboard.putNumber("Y", this.currentOdometry.translationMat.getY());
+		SmartDashboard.putNumber("Xt", this.currentOdometry.translationMat.getX());
+		SmartDashboard.putNumber("Yt", this.currentOdometry.translationMat.getY());
 	}
 }

@@ -46,8 +46,8 @@ public final class Constants {
 	public static final double VelConversionFactor = 2 * Math.PI / 60d * WheelDiameter / 2d / DrivetrainGearingDivisor;
 
 	public static final double MinTurningRadius = 40;
-	public static final double MinPathSpeed = 20;
-	public static final double MaxPathSpeed = 120;
+	public static final double MinPathSpeed = 80;
+	public static final double MaxPathSpeed = 100;
 	public static final double MinLookAheadDistance = 14;
 	public static final double MaxLookAheadDistance = 30;
 	

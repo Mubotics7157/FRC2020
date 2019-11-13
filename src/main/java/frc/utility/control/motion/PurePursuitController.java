@@ -29,11 +29,11 @@ public class PurePursuitController {
 	public PurePursuitController(Path robotPath, boolean isReversed) {
 		this.robotPath = robotPath;
 		this.isReversed = isReversed;
-		speedProfiler = new RateLimiter(100, 1000); //100, 10000
+		speedProfiler = new RateLimiter(Constants.PathAccel, Constants.PathJerk); //100, 10000
         
         //two new profilers
-		leftProfiler = new RateLimiter(100, 1000);
-		rightProfiler = new RateLimiter(100, 1000);
+		leftProfiler = new RateLimiter(Constants.PathAccel, Constants.PathJerk);
+		rightProfiler = new RateLimiter(Constants.PathAccel, Constants.PathJerk);
 		if (robotPath.isEmpty()) {
 		}
 	}
@@ -89,7 +89,7 @@ public class PurePursuitController {
 		}
         double leftSpeed = leftProfiler.update(robotSpeed - deltaSpeed);
         double rightSpeed = rightProfiler.update(robotSpeed + deltaSpeed);
-		return new AutoDriveSignal(new DriveSignal(leftSpeed, rightSpeed), false);
+		return new AutoDriveSignal(new DriveSignal(leftSpeed, leftProfiler.getAccel(), rightSpeed, rightProfiler.getAccel()), false);
 	}
 
 	private double getRadius(Translation2D robotToLookAheadPoint) {

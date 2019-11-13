@@ -536,14 +536,15 @@ public class Drive extends Threaded {
 			
 			return;
 		}
-		double leftSetpoint = setVelocity.leftVelocity + Math.copySign((Constants.kLVi + Constants.kLa)/Constants.kLv, setVelocity.leftVelocity);
-		double rightSetpoint = setVelocity.rightVelocity + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.leftVelocity);
+		//setpoints = desired voltage
+		double leftSetpoint = setVelocity.leftVelocity;
+		double rightSetpoint = setVelocity.rightVelocity;
 
 		SmartDashboard.putNumber("leftSetpoint", leftSetpoint);
 		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
 
-		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity, 0);
-		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity, 0);
+		leftSparkPID.setReference(leftSetpoint + Math.copySign((Constants.kLVi + Constants.kLa)/Constants.kLv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
+		rightSparkPID.setReference(rightSetpoint + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {

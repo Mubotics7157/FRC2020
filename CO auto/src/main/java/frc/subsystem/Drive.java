@@ -146,9 +146,15 @@ public class Drive extends Threaded {
 		leftSparkPID.setD(Constants.kDriveLeftAutoD, 0);
 		leftSparkPID.setFF(Constants.kLv,0);
 		leftSparkPID.setOutputRange(-1, 1);
+
+		
+		leftSpark.setIdleMode(IdleMode.kBrake);
+		rightSpark.setIdleMode(IdleMode.kBrake);
+		leftSparkSlave.setIdleMode(IdleMode.kBrake);
+		rightSparkSlave.setIdleMode(IdleMode.kBrake);
 	}
 
-	private void configMotors() {
+	public void configMotors() {
 		leftSparkSlave.follow(leftSpark);
 		rightSparkSlave.follow(rightSpark);
 		
@@ -199,6 +205,12 @@ public class Drive extends Threaded {
 		SmartDashboard.putNumber("Right Speed", getRightSpeed());
 	}
 
+	
+	public void debugDistance() {
+		SmartDashboard.putNumber("Left Distance", getLeftDistance());
+		SmartDashboard.putNumber("Right Distance", getRightDistance());
+	}
+
 	public void debugVoltage() {
 		SmartDashboard.putNumber("Avg Voltage", getVoltage());
 	}
@@ -207,8 +219,8 @@ public class Drive extends Threaded {
 		System.out.println(leftSpark);
 	}
 
-	public void debugDriveFF() {
-		setWheelVelocity(new DriveSignal(0, 0));
+	public void debugDriveFF(double lSpeed, double rSpeed) {
+		setWheelVelocity(new DriveSignal(lSpeed, rSpeed));
 	}
 	//#endregion
     //#region Drive Methods
@@ -425,6 +437,9 @@ public class Drive extends Threaded {
 	}
 
 	public void jankDrive(double left, double right){
+		synchronized(this){
+			driveState = DriveState.TELEOP;
+		}
 		setWheelPower(new DriveSignal(left, right));
 	}
 	//#endregion
@@ -505,7 +520,7 @@ public class Drive extends Threaded {
 	}
 
 	public double getVoltage() {
-		return (leftSpark.getBusVoltage() + rightSpark.getBusVoltage()) / 2;
+		return (Math.abs(leftSpark.getAppliedOutput()) + Math.abs(rightSpark.getAppliedOutput())) / 2;
 	}
 
 	private void setWheelPower(DriveSignal setVelocity) {
@@ -514,17 +529,22 @@ public class Drive extends Threaded {
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
+		System.out.println("poopy");
 		if (Math.abs(setVelocity.rightVelocity) > Constants.DriveSpeed) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Velocity set over " + Constants.DriveSpeed + " !", false);
+			
 			return;
 		}
+		//setpoints = desired voltage
+		double leftSetpoint = setVelocity.leftVelocity;
+		double rightSetpoint = setVelocity.rightVelocity;
 
-		double leftSetpoint = setVelocity.leftVelocity + (Constants.kLVi + Constants.kLa)/Constants.kLv;
-		double rightSetpoint = setVelocity.rightVelocity + (Constants.kRVi + Constants.kRa)/Constants.kRv;
+		SmartDashboard.putNumber("leftSetpoint", leftSetpoint);
+		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
 
-		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity, 0);
-		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity, 0);
+		leftSparkPID.setReference(leftSetpoint + Math.copySign((Constants.kLVi + Constants.kLa)/Constants.kLv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
+		rightSparkPID.setReference(rightSetpoint + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {

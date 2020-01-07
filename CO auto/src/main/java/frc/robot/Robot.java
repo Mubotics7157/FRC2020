@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     scheduler.resume();
-    AutoRoutine option = AutoRoutineGenerator.generate();
+    AutoRoutine option = AutoRoutineGenerator.shit();
     auto = new Thread(option);
     auto.start();
   }
@@ -74,10 +74,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    robotTracker.debugOdometry();
+    drive.debugSpeed();
   }
 
   @Override 
   public void teleopInit() {
+    if(auto != null)
+      auto.stop();
     System.out.println("teleop init!");
     scheduler.resume();
     drive.getFFGraph();
@@ -90,12 +94,20 @@ public class Robot extends TimedRobot {
       rightStick.update();
 
       if(xbox.getRawButton(2)){
-        drive.debugDriveFF();
+        drive.debugDriveFF(0, 0);
+        drive.debugSpeed();
+      }else if(xbox.getRawButton(1)){
+        drive.debugDriveFF(10, 10);
+        drive.debugSpeed();
+      }else if(xbox.getRawButton(3)){
+        drive.debugDriveFF(-10, -10);
+      }else {
+        drive.setSimpleDrive(true);
+        drive.jankDrive(xbox.getRawAxis(1), xbox.getRawAxis(5));
       }
-      else {
-        drive.orangeDrive(-xbox.getRawAxis(1), -xbox.getRawAxis(4), xbox.getRawAxis(2) > .3);
-      }
-
+      drive.debugDistance();
+      drive.debugSpeed();
+      robotTracker.debugOdometry();
       drive.debugVoltage();
   }
 
@@ -109,6 +121,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    if(auto != null){
+      auto.stop();
+    }
+    drive.configMotors();
   }
   
   @Override

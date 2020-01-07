@@ -52,24 +52,24 @@ public class AutoRoutineGenerator {
         RobotTracker.getInstance().setInitialTranslation(robotLeftStartPosition);
         
         initialPath = new Path(robotLeftStartPosition);
-        initialPath.addPoint(180, 115, 120); //80
-        initialPath.addPoint(270, 90, 120); //60
+        initialPath.addPoint(180, 115, 30); //80
+        initialPath.addPoint(270, 90, 30); //60
 
         initialDrive.addCommands(new SetDrivePath(initialPath, false));
         initialDrive.addCommands(new SetDriveAngle(new Translation2D(231, 80)));
         Path secondPath = new Path(new Translation2D(270, 90));
-        secondPath.addPoint(228, 80, 50);
+        secondPath.addPoint(228, 80, 30);
         
         Path thirdPath = new Path(new Translation2D(228, 78));
-        thirdPath.addPoint(271, 97, 110); //change speed to 60
+        thirdPath.addPoint(271, 97, 30); //change speed to 60
         
         Path fourthPath = new Path(new Translation2D(271, 97));
         fourthPath.addPoint(228, 87, 100); //240 87
-        fourthPath.addPoint(213, 58, 45); //CHANGE THIS SPEED TO 50, POS 225, 56 | 219 56
+        fourthPath.addPoint(213, 58, 30); //CHANGE THIS SPEED TO 50, POS 225, 56 | 219 56
         
         
         Path fifthPath = new Path(new Translation2D(218, 56)); //225 62
-        fifthPath.addPoint(271, 97, 100);  //CHANGE THIS SPEED TO 50
+        fifthPath.addPoint(271, 97, 30);  //CHANGE THIS SPEED TO 50
         
         //end of 3 cube
         
@@ -86,6 +86,57 @@ public class AutoRoutineGenerator {
         overallRoutine.addCommands(new SetDrivePath(fifthPath, true));
         overallRoutine.addCommands(new SetDriveAngle(Rotation2D.fromDegrees(-55))); //-55
         overallRoutine.addCommands(new Delay(3.0));
+        
+		return overallRoutine;
+	}
+
+	
+	public static AutoRoutine generate2() {
+		AutoRoutine overallRoutine = new AutoRoutine();
+		Path initialPath;
+		initialDrive = new AutoRoutine();
+        System.out.println("start left");
+        RobotTracker.getInstance().setInitialTranslation(new Translation2D(0,0));
+        
+        initialPath = new Path(new Translation2D(0,0));
+        initialPath.addPoint(0, 60, 100); //80
+
+
+        initialDrive.addCommands(new SetDrivePath(initialPath, false));
+        overallRoutine.addRoutines(initialDrive);
+		return overallRoutine;
+	}
+
+	public static AutoRoutine shit(){
+		AutoRoutine overallRoutine = new AutoRoutine();
+		Path initialPath;
+		initialPath = new Path(new Translation2D(0, 0));
+		initialDrive = new AutoRoutine();
+		RobotTracker.getInstance().setInitialTranslation(new Translation2D(0, 0));
+		initialPath.addPoint(60, 0, 30);
+
+		
+		initialDrive.addCommands(new SetDrivePath(initialPath, false));
+		overallRoutine.addRoutines(initialDrive);
+		return overallRoutine;
+	}
+
+	public static AutoRoutine generate3() {
+		AutoRoutine overallRoutine = new AutoRoutine();
+		Path initialPath;
+		initialDrive = new AutoRoutine();
+		System.out.println("start left");
+		Translation2D startPos = new Translation2D(0, 0);
+		double robotVel = 60;
+        RobotTracker.getInstance().setInitialTranslation(startPos);
+        
+        initialPath = new Path(startPos);
+        initialPath.addPoint(0, 36, robotVel); //80
+        initialPath.addPoint(0, 36 + 36, robotVel*1.5); //60
+		initialDrive.addCommands(new SetDrivePath(initialPath, false));
+		//drive forward 3 feet, drive forward 3 feet again faster
+        
+        overallRoutine.addRoutines(initialDrive);
         
 		return overallRoutine;
 	}

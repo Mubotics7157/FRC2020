@@ -110,11 +110,14 @@ public class AutoRoutineGenerator {
 	public static AutoRoutine shit(){
 		AutoRoutine overallRoutine = new AutoRoutine();
 		Path initialPath;
+		Path secondPath;
 		initialPath = new Path(new Translation2D(0, 0));
 		initialDrive = new AutoRoutine();
 		RobotTracker.getInstance().setInitialTranslation(new Translation2D(0, 0));
 		initialPath.addPoint(60, 0, 30);
-
+		initialPath.addPoint(60, 60, 30);
+		initialPath.addPoint(0, 60, 30);
+		initialPath.addPoint(0, 0, 30);
 		
 		initialDrive.addCommands(new SetDrivePath(initialPath, false));
 		overallRoutine.addRoutines(initialDrive);

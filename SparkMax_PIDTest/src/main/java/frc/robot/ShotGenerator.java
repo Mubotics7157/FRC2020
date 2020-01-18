@@ -7,14 +7,67 @@
 
 package frc.robot;
 
-import frc.Constants.ShooterSpeed;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Add your docs here.
  */
 public class ShotGenerator {
+    public enum BACKSPINRATIOS{
+        NORMAL(0),
+        FLOATY(1),
+        SINKY(2);
 
-    public static ShooterSpeed getShot(double distance, double angle) {
-        return new Shoo
+        private final int value;
+
+        BACKSPINRATIOS(final int newValue) {
+            value = newValue;
+        }
+        public int getValue() { return value; }
+    }
+
+
+    public class ShooterSpeed {
+
+        public final double topSpeed;
+        public final double bottomSpeed; 
+        public ShooterSpeed(double topSpeed, double bottomSpeed) { 
+          this.topSpeed = topSpeed; 
+          this.bottomSpeed = bottomSpeed;
+        } 
+    }
+
+    //log data as {top wheel RPM, distance it made it in}
+    public Double[][] normal = {
+        {0d,1d}
+    };
+    
+    public Double[][] floaty = {
+        {0d,1d}
+    };
+    
+    public Double[][] sinky = {
+        {0d,1d}
+    };
+
+    public ShooterSpeed getShot(double distance, double angle, BACKSPINRATIOS backSpin) {
+        SplineInterpolator interpolator;
+        switch (backSpin) {
+            case NORMAL:
+                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(normal[1]), Arrays.asList(normal[0]));
+                break;
+            case FLOATY:
+                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[1]), Arrays.asList(floaty[0]));
+                break;
+            case SINKY:
+                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(sinky[1]), Arrays.asList(sinky[0]));
+                break;
+            default:
+                return null;
+        }
+
+        double rpm = interpolator.interpolate(distance);
+        return new ShooterSpeed(rpm, rpm/backSpin.getValue());
     }
 }

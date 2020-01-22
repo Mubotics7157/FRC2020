@@ -37,7 +37,7 @@ import frc.robot.Constants.TrajectoryConstants;
 /**
  * DriveTrainSubsystem
  */
-public class Drive extends SubsystemBase {
+public class Drive extends SubsystemBase{
 
   private final TalonFX leftMaster = new TalonFX(DEVICE_ID_LEFT_MASTER);
   private final TalonFX leftSlave = new TalonFX(DEVICE_ID_LEFT_SLAVE);

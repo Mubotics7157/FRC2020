@@ -17,6 +17,8 @@ import static frc.robot.Constants.TrajectoryConstants.VOLTAGE_CONSTRAINT;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -36,6 +38,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.TeleDriveCommand;
 import frc.robot.subsystems.Drive;
+import frc.robot.zooms.VisionInterface;
+import frc.utility.ThreadScheduler;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -51,6 +55,10 @@ public class RobotContainer {
   private final XboxController operatorConsole = new XboxController(PORT_ID_OPERATOR_CONSOLE);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final VisionInterface vision = new VisionInterface();
+
+  ExecutorService executor = Executors.newFixedThreadPool(2);
+  ThreadScheduler scheduler = new ThreadScheduler();
 
   public RobotContainer() {
     // Configure the button bindings
@@ -110,5 +118,9 @@ public class RobotContainer {
 
   public void resetOdometry() {
     new InstantCommand(driveTrainSubsystem::resetOdometry, driveTrainSubsystem).schedule();
+  }
+
+  public void ThreadInit() {
+    scheduler.schedule(vision, executor);
   }
 }

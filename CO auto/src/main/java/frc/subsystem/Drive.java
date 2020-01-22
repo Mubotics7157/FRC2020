@@ -544,7 +544,7 @@ public class Drive extends Threaded {
 		SmartDashboard.putNumber("rightSetpoint", rightSetpoint);
 
 		leftSparkPID.setReference(leftSetpoint + Math.copySign((Constants.kLVi + Constants.kLa)/Constants.kLv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
-		rightSparkPID.setReference(rightSetpoint + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.leftVelocity), ControlType.kVelocity, 0);
+		rightSparkPID.setReference(rightSetpoint + Math.copySign((Constants.kRVi + Constants.kRa)/Constants.kRv, setVelocity.rightVelocity), ControlType.kVelocity, 0);
 	}
 
 	public synchronized void setSimpleDrive(boolean setting) {

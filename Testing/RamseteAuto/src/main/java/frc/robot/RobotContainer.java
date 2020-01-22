@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -36,8 +37,10 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.AlignTurret;
 import frc.robot.commands.TeleDriveCommand;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Turret;
 import frc.robot.zooms.VisionInterface;
 import frc.utility.ThreadScheduler;
 
@@ -51,7 +54,9 @@ import frc.utility.ThreadScheduler;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drive driveTrainSubsystem = new Drive();
-  private final XboxController driverController = new XboxController(PORT_ID_DRIVER_CONTROLLER);
+  private final Turret turretSubsystem = new Turret();
+  private final Joystick driveL = new Joystick(0);
+  private final Joystick driveR = new Joystick(1);
   private final XboxController operatorConsole = new XboxController(PORT_ID_OPERATOR_CONSOLE);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -84,9 +89,9 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driverController, XboxController.Button.kBumperLeft.value)
+    new JoystickButton(driveL, 1)
        .whenPressed(driveTrainSubsystem::saveCurrentPose);
-    new JoystickButton(driverController, XboxController.Button.kBumperRight.value).whenPressed(() ->
+    new JoystickButton(driveL, 2).whenPressed(() ->
       driveTrainSubsystem.createCommandForTrajectory(
           TrajectoryGenerator.generateTrajectory(
             driveTrainSubsystem.getCurrentPose(),
@@ -96,10 +101,12 @@ public class RobotContainer {
                 .setKinematics(DRIVE_KINEMATICS)
                 .addConstraint(VOLTAGE_CONSTRAINT)))
       .schedule());
+    new JoystickButton(driveL, 3).whenPressed(() -> 
+      new AlignTurret(turretSubsystem, vision).schedule());
   }
 
   private void configureSubsystemCommands() {
-    driveTrainSubsystem.setDefaultCommand(new TeleDriveCommand(driverController, driveTrainSubsystem));
+    driveTrainSubsystem.setDefaultCommand(new TeleDriveCommand(driveL, driveR, driveTrainSubsystem));
   }
 
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {

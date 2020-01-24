@@ -8,7 +8,6 @@
 package frc.robot;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Add your docs here.
@@ -17,7 +16,8 @@ public class ShotGenerator {
     public enum BACKSPINRATIOS{
         NORMAL(0),
         FLOATY(1),
-        SINKY(2);
+        SINKY(2),
+        POOPY(3);
 
         private final int value;
 

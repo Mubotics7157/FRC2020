@@ -2,23 +2,16 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.auton.*;
 import frc.subsystem.*;
 //import frc.robot.subsystem.Drive;
-import frc.utility.math.*;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import java.util.concurrent.*;
 
 
 import frc.utility.ThreadScheduler;
 import frc.utility.Controller;
-import frc.utility.VisionTarget;
 
 public class Robot extends TimedRobot {
   //Controllers
@@ -58,7 +51,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     scheduler.resume();
     m_autoSelected = m_chooser.getSelected();
-    AutoRoutine option = AutoRoutineGenerator.shit();
+    AutoRoutine option = AutoRoutineGenerator.generate3();
     auto = new Thread(option);
     auto.start();
   }

@@ -37,26 +37,18 @@ public class AutoRoutineGenerator {
 		toMidFieldRightReverse = new AutoRoutine(); // Drives to Mid Field Right
 													// Position from Current
 													// Location
-		toMidFieldRightReverse.addCommands(new DriveToPoints(reverseSpeed, true, midFieldRightPosition));
-
-		toMidFieldLeftReverse = new AutoRoutine();
-		toMidFieldLeftReverse.addCommands(new DriveToPoints(reverseSpeed, true, midFieldLeftPosition));
 	}
 
 	public static AutoRoutine generate3() {
 		AutoRoutine overallRoutine = new AutoRoutine();
-		Trajectory initialPath;
 		initialDrive = new AutoRoutine();
 		System.out.println("start left");
 		Translation2d startPos = new Translation2d(0, 0);
 		double robotVel = 60;
-        RobotTracker.getInstance().setInitialTranslation(startPos);
-        
-        initialPath = new Trajectory;
-        initialPath.addPoint(0, 36, robotVel); //80
-        initialPath.addPoint(0, 36 + 36, robotVel*1.5); //60
-		initialDrive.addCommands(new SetDrivePath(initialPath, false));
-		//drive forward 3 feet, drive forward 3 feet again faster
+		
+		initialDrive.addCommands(new DriveToPoints(3, false, RobotTracker.getInstance().getOdometry().getRotation(), 
+		new Translation2d(0,1),
+		new Translation2d(0,2)));
         
         overallRoutine.addRoutines(initialDrive);
         

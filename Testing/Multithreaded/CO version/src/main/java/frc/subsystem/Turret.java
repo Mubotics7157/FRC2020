@@ -23,7 +23,6 @@ public class Turret extends Threaded {
   public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
 
   public Turret() {
-    turretMotor.configSelectedFeedbackSensor(RemoteFeedbackDevice.SoftwareEmulatedSensor);
     turretPID.setOutputRange(1, -1);
     turretPID.setSetpoint(0);
   }

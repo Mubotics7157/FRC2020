@@ -87,8 +87,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Feed Forward", kFF);
     SmartDashboard.putNumber("Max Output", kMaxOutput);
     SmartDashboard.putNumber("Min Output", kMinOutput);
-    SmartDashboard.putNumber("Ratio Driven", 0);
-    SmartDashboard.putNumber("SetPoint", 0);
+    SmartDashboard.putNumber("Top Wheel", 0);
+    SmartDashboard.putNumber("Bot Wheel", 0);
     m_motorR.setIdleMode(IdleMode.kCoast);
     m_motorL.setIdleMode(IdleMode.kCoast);
 
@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
 
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { m_pidControllerL.setP(p); kP = p; }
-    if((i != kI)) { m_pidControllerL.setI(i); kI = i; }
+    if((i != kI)) { m_pidControllerL.setI(i); m_pidControllerR.setI(i);kI = i; }
     if((d != kD)) { m_pidControllerL.setD(d); kD = d; }
     if((iz != kIz)) { m_pidControllerL.setIZone(iz); kIz = iz; }
     if((ff != kFF)) { m_pidControllerL.setFF(ff); kFF = ff; }
@@ -132,16 +132,25 @@ public class Robot extends TimedRobot {
       m_pidControllerL.setOutputRange(min, max); 
       kMinOutput = min; kMaxOutput = max; 
     }
-    double setPoint = SmartDashboard.getNumber("SetPoint", 0);
-    if (setPoint == 0) {
-      m_motorL.set(0);
-      m_motorR.set(0);
-      return;
+    double topSpeed = SmartDashboard.getNumber("Top Wheel", 0);
+    double botSpeed = SmartDashboard.getNumber("Bot Wheel", 0);
+    SmartDashboard.putNumber("Backspin Ratio", topSpeed / botSpeed);
+
+    if (botSpeed != 0) {
+    m_pidControllerL.setReference(-botSpeed, ControlType.kVelocity);
     }
-    double ratio = SmartDashboard.getNumber("Ratio Driven", 0);
-    m_pidControllerL.setReference(setPoint, ControlType.kVelocity);
-    m_pidControllerR.setReference(setPoint*ratio, ControlType.kVelocity);
-    
+    else {
+      m_motorL.set(0);
+    }
+
+    if (topSpeed != 0) {
+    m_pidControllerR.setReference(topSpeed, ControlType.kVelocity);
+    }
+    else {
+      m_motorR.set(0);
+    }
+
     SmartDashboard.putNumber("ProcessVariable", m_encoderL.getVelocity());
+    SmartDashboard.putNumber("ProcessVariable2", m_encoderR.getVelocity());
   }
 }

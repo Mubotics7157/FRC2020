@@ -53,7 +53,7 @@ import frc.utility.ThreadScheduler;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drive driveTrainSubsystem = new Drive();
+  //private final Drive driveTrainSubsystem = new Drive();
   private final Turret turretSubsystem = new Turret();
   private final Joystick driveL = new Joystick(0);
   private final Joystick driveR = new Joystick(1);
@@ -74,8 +74,8 @@ public class RobotContainer {
       var straightTrajectory = loadTrajectory("Straight");
       Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
       Trajectory newTrajectory = straightTrajectory.transformBy(transform);
-      var straightPathCommand = driveTrainSubsystem.createCommandForTrajectory(newTrajectory);
-      autoChooser.setDefaultOption("Straight", straightPathCommand);
+      //var straightPathCommand = driveTrainSubsystem.createCommandForTrajectory(newTrajectory);
+      //autoChooser.setDefaultOption("Straight", straightPathCommand);
     } catch (IOException e) {
       DriverStation.reportError("Failed to load auto trajectory: Straight", false);
     }
@@ -89,6 +89,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    /*
     new JoystickButton(driveL, 1)
        .whenPressed(driveTrainSubsystem::saveCurrentPose);
     new JoystickButton(driveL, 2).whenPressed(() ->
@@ -100,13 +101,13 @@ public class RobotContainer {
             new TrajectoryConfig(MAX_SPEED_AUTO, MAX_ACCELERATION_AUTO)
                 .setKinematics(DRIVE_KINEMATICS)
                 .addConstraint(VOLTAGE_CONSTRAINT)))
-      .schedule());
+      .schedule()); */
     new JoystickButton(driveL, 3).whenPressed(() -> 
       new AlignTurret(turretSubsystem, vision).schedule());
   }
 
   private void configureSubsystemCommands() {
-    driveTrainSubsystem.setDefaultCommand(new TeleDriveCommand(driveL, driveR, driveTrainSubsystem));
+    //driveTrainSubsystem.setDefaultCommand(new TeleDriveCommand(driveL, driveR, driveTrainSubsystem));
   }
 
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
@@ -124,7 +125,7 @@ public class RobotContainer {
   }
 
   public void resetOdometry() {
-    new InstantCommand(driveTrainSubsystem::resetOdometry, driveTrainSubsystem).schedule();
+    //new InstantCommand(driveTrainSubsystem::resetOdometry, driveTrainSubsystem).schedule();
   }
 
   public void ThreadInit() {

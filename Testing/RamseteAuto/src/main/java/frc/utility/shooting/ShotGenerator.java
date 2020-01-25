@@ -50,7 +50,7 @@ public class ShotGenerator {
         {0d,1d}
     };
 
-    public ShooterSpeed getShot(double distance, double angle, BACKSPINRATIOS backSpin) {
+    public ShooterSpeed getShot(double distance, BACKSPINRATIOS backSpin) {
         SplineInterpolator interpolator;
         switch (backSpin) {
             case NORMAL:

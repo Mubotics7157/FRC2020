@@ -7,7 +7,6 @@
 
 package frc.subsystem;
 
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.utility.Threaded;
 import frc.utility.control.SynchronousPid;
@@ -22,6 +21,13 @@ public class Turret extends Threaded {
   private TalonSRX turretMotor = new TalonSRX(TurretConstants.DEVICE_ID_TURRET);
   public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
 
+  
+	private static final Turret trackingInstance = new Turret();
+
+	public static Turret getInstance() {
+		return Turret.trackingInstance;
+  }
+  
   public Turret() {
     turretPID.setOutputRange(1, -1);
     turretPID.setSetpoint(0);
@@ -29,6 +35,7 @@ public class Turret extends Threaded {
 
   @Override
   public void update() {
+    if (isHoming)
     turretPID.update(getTurretPositionDegrees());
   }
 

@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  SynchronousPid controller = new SynchronousPid(0.03, 0, 0, 0);  
+  SynchronousPid controller = new SynchronousPid(0.06, 0, 0, 0);  
   TalonSRX motor = new TalonSRX(30);
   Joystick joy = new Joystick(0);
   double lastPos = 0;
@@ -48,7 +48,6 @@ public class Robot extends TimedRobot {
   private CANPIDController m_pidControllerL, m_pidControllerR;
   private CANEncoder m_encoderL, m_encoderR;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
-  private double speed = 0;
 
   double ratio = 0.5d;
 
@@ -184,8 +183,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    controller.setSetpoint(0);
-    motor.set(ControlMode.PercentOutput, controller.update(getYaw()));
+    if(joy.getRawButton(4)){
+      controller.setSetpoint(0);
+      motor.set(ControlMode.PercentOutput, controller.update(getYaw()));
+    }
+    //controller.setSetpoint(0);
+    //motor.set(ControlMode.PercentOutput, controller.update(getYaw()));
     double topSpeed = SmartDashboard.getNumber("Top Wheel", 0);
     
     if (topSpeed == 0) {
@@ -193,11 +196,14 @@ public class Robot extends TimedRobot {
       m_motorR.set(0);
       return;
     }
-    double botSpeed = topSpeed/0.5f;
+    double botSpeed = topSpeed*4;
     m_pidControllerL.setReference(topSpeed, ControlType.kVelocity);
-    m_pidControllerR.setReference(topSpeed, ControlType.kVelocity);
+    m_pidControllerR.setReference(-botSpeed, ControlType.kVelocity);
     
-    SmartDashboard.putNumber("ProcessVariable", m_encoderL.getVelocity());
+    SmartDashboard.putNumber("EncoderL", m_encoderL.getVelocity());
+    SmartDashboard.putNumber("EncoderR", m_encoderR.getVelocity());
+    SmartDashboard.putNumber("TopSpeed", topSpeed);
+    SmartDashboard.putNumber("BotSpeed", botSpeed);
   }
 
   /**
@@ -222,8 +228,8 @@ public class Robot extends TimedRobot {
   }
 
   public double getYaw(){
-    yaw = chameleon.getSubTable("Microsoft LifeCam HD-3000").getEntry("yaw");
-    if(chameleon.getSubTable("Microsoft LifeCam HD-3000").getEntry("is_valid").getBoolean(false)){
+    yaw = chameleon.getSubTable("USB Camera-B4.09.24.1").getEntry("yaw");
+    if(chameleon.getSubTable("USB Camera-B4.09.24.1").getEntry("is_valid").getBoolean(false)){
       return yaw.getDouble(0);
     }else{
       return 0;

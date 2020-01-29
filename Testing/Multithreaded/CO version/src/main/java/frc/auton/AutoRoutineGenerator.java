@@ -18,13 +18,6 @@ public class AutoRoutineGenerator {
 	private static AutoRoutine toMidFieldLeftReverse;
 	private static AutoRoutine initialDrive;
 
-	private static Position switchPos;
-	private static Position scalePos;
-
-	public enum Position {
-		LEFT, RIGHT
-	}
-
 	public enum PathOption {
 		SCALE, SWITCH, BOTH, FORWARD, NONE
 	}
@@ -45,8 +38,8 @@ public class AutoRoutineGenerator {
 		System.out.println("start left");
 		Translation2d startPos = new Translation2d(0, 0);
 		double robotVel = 60;
-		
-		initialDrive.addCommands(new DriveToPoints(3, false, RobotTracker.getInstance().getOdometry().getRotation(), 
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands(new DriveToPoints(robotVel, false, RobotTracker.getInstance().getOdometry().getRotation(), 
 		new Translation2d(0,1),
 		new Translation2d(0,2)));
         

@@ -4,6 +4,7 @@ package frc.subsystem;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.InterpolablePoseCircularQueue;
@@ -43,6 +44,12 @@ public class RobotTracker extends Threaded {
 		lastPose = new Pose2d(0, 0, Rotation2d.fromDegrees(drive.getHeading()));
 		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
 	  }
+
+	synchronized public void setOdometry(Translation2d loc) {
+		drive.zeroSensors();
+		lastPose = new Pose2d(loc, Rotation2d.fromDegrees(drive.getHeading()));
+		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
+	}
 
 	/**
 	 * Integrates the encoders and gyro to figure out robot position. A constant

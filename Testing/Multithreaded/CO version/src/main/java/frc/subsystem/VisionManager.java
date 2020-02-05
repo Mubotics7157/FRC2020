@@ -14,10 +14,7 @@ public class VisionManager extends Threaded {
     private VisionTarget lastTarget;
 	private VisionManager() {
 	}
-	/**
-	 * Integrates the encoders and gyro to figure out robot position. A constant
-	 * curvature is assumed
-	 */
+	
 	@Override
 	public void update() {
     }

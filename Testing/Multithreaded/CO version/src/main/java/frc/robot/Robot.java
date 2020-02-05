@@ -22,8 +22,8 @@ public class Robot extends TimedRobot {
   //Subsystems 
   RobotTracker robotTracker = RobotTracker.getInstance();
   Drive drive = Drive.getInstance();
-  VisionManager vision = VisionManager.getInstance();
-  Turret turret = Turret.getInstance();
+  //VisionManager vision = VisionManager.getInstance();
+  //Turret turret = Turret.getInstance();
 
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
@@ -41,8 +41,8 @@ public class Robot extends TimedRobot {
     //Schedule subsystems
     scheduler.schedule(drive, executor);
     scheduler.schedule(robotTracker, executor);
-    scheduler.schedule(turret, executor);
-    scheduler.schedule(vision, executor);
+    //scheduler.schedule(turret, executor);
+    //scheduler.schedule(vision, executor);
     m_chooser.addOption("idk", 0);
   }
 
@@ -77,7 +77,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
   }
 
   @Override

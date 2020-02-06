@@ -3,6 +3,7 @@
 package frc.subsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.utility.Threaded;
 import frc.utility.VisionTarget;
 import frc.robot.Constants.VisionConstants;
@@ -18,6 +19,7 @@ public class VisionManager extends Threaded {
     
     private VisionTarget lastTarget;
 	private VisionManager() {
+		chameleon = NetworkTableInstance.getDefault().getTable("chameleon-vision");
 	}
 	
 	@Override

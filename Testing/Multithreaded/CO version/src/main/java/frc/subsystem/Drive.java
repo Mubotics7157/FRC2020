@@ -10,8 +10,7 @@ import static frc.robot.Constants.DriveTrainConstants.SENSOR_UNITS_PER_ROTATION;
 import static frc.robot.Constants.DriveTrainConstants.WHEEL_CIRCUMFERENCE_METERS;
 import static frc.robot.Constants.TeleConstants.MAX_ANGULAR_VEL;
 import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
-import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_DEGREES;
-import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_METERS;
+import static frc.robot.Constants.TrajectoryConstants;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -126,8 +125,8 @@ public class Drive extends Threaded{
   public synchronized void setAutoPath(Trajectory path) {
     currentTrajectory = path;
     driveState = DriveState.PUREPURSUIT;
-    ramseteController.setTolerance(new Pose2d(new Translation2d(TOLERANCE_METERS, TOLERANCE_METERS)
-      , Rotation2d.fromDegrees(TOLERANCE_DEGREES)));
+    ramseteController.setTolerance(new Pose2d(new Translation2d(TrajectoryConstants.TOLERANCE_METERS, TrajectoryConstants.TOLERANCE_METERS)
+      , Rotation2d.fromDegrees(TrajectoryConstants.TOLERANCE_DEGREES)));
     updatePathController();
   }
   

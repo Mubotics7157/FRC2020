@@ -95,4 +95,8 @@ public final class Constants {
     public static final double kD = 0.001;
   }
 
+  public static final class VisionConstants {
+    public static final String CAMERA_NAME = "USB Camera-B4.09.24.1";
+  }
+
 }

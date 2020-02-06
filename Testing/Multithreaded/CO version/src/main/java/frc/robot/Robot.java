@@ -2,11 +2,13 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.auton.*;
 import frc.subsystem.*;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
 
+import java.time.Duration;
 import java.util.concurrent.*;
 
 
@@ -38,6 +40,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drive.calibrateGyro();
+    drive.setPeriod(Duration.ofMillis(20));
+    robotTracker.setPeriod(Duration.ofMillis(5));
+
     //Schedule subsystems
     scheduler.schedule(drive, executor);
     scheduler.schedule(robotTracker, executor);
@@ -48,6 +53,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    SmartDashboard.putNumber("encoderL", Drive.getInstance().getLeftEncoderDistance());
+    SmartDashboard.putNumber("encoderR", Drive.getInstance().getRightEncoderDistance());
   }
 
   boolean autoDone;
@@ -77,6 +84,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    Drive.getInstance().tankDriveVolts(-0.7, -0.7);
   }
 
   @Override

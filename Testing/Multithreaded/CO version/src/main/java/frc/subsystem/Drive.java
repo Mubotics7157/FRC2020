@@ -13,6 +13,8 @@ import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
 import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_DEGREES;
 import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_METERS;
 
+import java.time.Duration;
+
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -82,12 +84,14 @@ public class Drive extends Threaded{
 
     rightMaster.configAllSettings(talonConfig);
     leftMaster.configAllSettings(talonConfig);
+    leftMaster.setNeutralMode(NeutralMode.Coast);
+    rightMaster.setNeutralMode(NeutralMode.Coast);
+    rightSlave.setNeutralMode(NeutralMode.Coast);
+    leftSlave.setNeutralMode(NeutralMode.Coast);
 
     leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
     rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
-
-    setNeutralMode(NeutralMode.Brake);
-
+    
     rightMaster.setInverted(true);
     rightSlave.setInverted(true);
     rightMaster.setSensorPhase(true);
@@ -234,6 +238,11 @@ public class Drive extends Threaded{
     tankDrive(leftSpeed, rightSpeed, false);
   }
 
+  public void tankDriveVolts(double leftSpeed, double rightSpeed) {
+    leftMaster.set(TalonFXControlMode.PercentOutput,leftSpeed);
+    rightMaster.set(TalonFXControlMode.PercentOutput, rightSpeed);
+  }
+
   /**
    * Drives the robot by individually addressing the left and right side of the
    * drive train
@@ -321,8 +330,8 @@ public class Drive extends Threaded{
    * @param rightVelocity right velocity
    */
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity())) / 20;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity())) / 20;
+    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity())) / 5;
+    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity())) / 5;
     
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);

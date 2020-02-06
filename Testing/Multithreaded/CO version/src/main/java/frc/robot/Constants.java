@@ -22,12 +22,13 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 0;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 1;
-    public static final int DEVICE_ID_LEFT_MASTER = 2;
+    public static final int DEVICE_ID_RIGHT_MASTER = 2;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 0;
+    public static final int DEVICE_ID_LEFT_MASTER = 1;
     public static final int DEVICE_ID_LEFT_SLAVE = 3;
 
-    public static final int SENSOR_UNITS_PER_ROTATION = 4096;
+    public static final int SENSOR_UNITS_PER_ROTATION = 2048;
+    public static final double GEAR_DIVISOR = 9.6666666;
     public static final double WHEEL_DIAMETER_INCHES = 6d;
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
@@ -78,6 +79,9 @@ public final class Constants {
     // Baseline values for a RAMSETE follower in units of meters and seconds
     public static final double RAMSETE_B = 2;
     public static final double RAMSETE_ZETA = 0.7;
+
+    public static final double TOLERANCE_DEGREES = 2;
+    public static final double TOLERANCE_METERS = 0.02;
   }
 
   public static final class TeleConstants {

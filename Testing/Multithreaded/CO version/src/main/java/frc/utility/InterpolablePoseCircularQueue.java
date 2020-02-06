@@ -3,7 +3,6 @@ package frc.utility;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import frc.subsystem.Drive;
 
 public class InterpolablePoseCircularQueue extends CircularQueue<Pose2d> {
     public InterpolablePoseCircularQueue(int size) {
@@ -41,9 +40,10 @@ public class InterpolablePoseCircularQueue extends CircularQueue<Pose2d> {
     
 	public Pose2d interpolate(Pose2d initial, Pose2d other, double percentage) {
 		Translation2d delta = new Translation2d(initial.getTranslation().getX() - other.getTranslation().getX(), initial.getTranslation().getY() - other.getTranslation().getY());
+		Rotation2d deltaR = initial.getRotation().minus(other.getRotation());
 		return new Pose2d(
-			new Translation2d(initial.getTranslation().getX() + delta.getX() * percentage, initial.getTranslation().getY() + delta.getY() * percentage),
-			initial.getRotation().plus(Rotation2d.fromDegrees(Drive.getInstance().getYawRate()).times(percentage))
-		);
+			new Translation2d(initial.getTranslation().getX() + delta.getX() * percentage, 
+							  initial.getTranslation().getY() + delta.getY() * percentage),
+							  initial.getRotation().plus(deltaR.times(percentage)));
 	}
 }

@@ -92,12 +92,12 @@ public class Turret extends Threaded {
     fieldRelativeSetpoint = 0;
 
     if (isHoming){
-      fieldRelativeSetpoint = vision.getTarget().getYaw();
-      lastFieldRelativeSetpoint = fieldRelativeSetpoint;
+      realSetpoint = vision.getTarget().getYaw();
+      lastFieldRelativeSetpoint = realSetpoint + driveTrainHeading;
     }else{
-      fieldRelativeSetpoint = lastFieldRelativeSetpoint;
+      realSetpoint = lastFieldRelativeSetpoint - driveTrainHeading;   
     }
-    realSetpoint = fieldRelativeSetpoint - driveTrainHeading;    
+     
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
 		double targetPos = realSetpoint * 4096 / 360.0f;
 		turretMotor.set(ControlMode.MotionMagic, targetPos);

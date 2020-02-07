@@ -12,8 +12,7 @@ import static frc.robot.Constants.DriveTrainConstants.SENSOR_UNITS_PER_ROTATION;
 import static frc.robot.Constants.DriveTrainConstants.WHEEL_CIRCUMFERENCE_METERS;
 import static frc.robot.Constants.TeleConstants.MAX_ANGULAR_VEL;
 import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
-import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_DEGREES;
-import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_METERS;
+import static frc.robot.Constants.TrajectoryConstants;
 
 import java.time.Duration;
 

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.Drive;
 import frc.subsystem.RobotTracker;
@@ -36,14 +37,17 @@ public class DriveToPoints extends AutoCommand {
 		TrajectoryConfig config = new TrajectoryConfig(speed, TrajectoryConstants.MAX_ACCELERATION_AUTO);
 		config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
 		config.setReversed(isReversed);
+		Translation2d end = points.get(points.size()-1);
+		points.remove(end);
 		Trajectory drivePath = TrajectoryGenerator.generateTrajectory(
 			RobotTracker.getInstance().getOdometry(),
 			points,
-			new Pose2d(points.get(-1), endAngle),
+			new Pose2d(end, endAngle),
 			config
 			);
 		Drive.getInstance().setAutoPath(drivePath);
 	}
+	
 
 	@Override
 	public boolean isFinished() {

@@ -3,12 +3,23 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.auton.*;
+import frc.robot.Constants.DriveTrainConstants;
+import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.*;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 
@@ -41,7 +52,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     drive.calibrateGyro();
     drive.setPeriod(Duration.ofMillis(20));
-    robotTracker.setPeriod(Duration.ofMillis(5));
+    robotTracker.setPeriod(Duration.ofMillis(20));
 
     //Schedule subsystems
     scheduler.schedule(drive, executor);
@@ -61,10 +72,28 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     scheduler.resume();
-    m_autoSelected = m_chooser.getSelected();
-    AutoRoutine option = AutoRoutineGenerator.generate3();
-    auto = new Thread(option);
-    auto.start();
+    // m_autoSelected = m_chooser.getSelected();
+    // AutoRoutine option = AutoRoutineGenerator.generate3();
+    // auto = new Thread(option);
+    // auto.start();
+  TrajectoryConfig config = new TrajectoryConfig(1, 0.4);
+  config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
+  config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
+  config.setReversed(false);
+  robotTracker.setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+  Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+    // Start at the origin facing the +X direction
+    new Pose2d(0, 0, new Rotation2d(0)),
+    // Pass through these two interior waypoints, making an 's' curve path
+    List.of(
+        new Translation2d(1, 1),
+        new Translation2d(2, -1)
+    ),
+    // End 3 meters straight ahead of where we started, facing forward
+    new Pose2d(3, 0, new Rotation2d(0)),
+    // Pass config
+    config);
+    drive.setAutoPath(exampleTrajectory);
   }
 
   /**
@@ -84,7 +113,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    Drive.getInstance().tankDriveVolts(-0.7, -0.7);
+
   }
 
   @Override
@@ -92,7 +121,7 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void testPeriodic() {
-  
+    drive.shift(1);
   }
 
   @Override

@@ -41,14 +41,13 @@ public class RobotTracker extends Threaded {
 
 	synchronized public void resetOdometry() {
 		drive.zeroSensors();
-		lastPose = new Pose2d(0, 0, Rotation2d.fromDegrees(drive.getHeading()));
+		lastPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
 	  }
 
-	synchronized public void setOdometry(Translation2d loc) {
+	synchronized public void setOdometry(Pose2d loc) {
 		drive.zeroSensors();
-		lastPose = new Pose2d(loc, Rotation2d.fromDegrees(drive.getHeading()));
-		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
+		differentialDriveOdometry.resetPosition(loc, Rotation2d.fromDegrees(drive.getHeading()));
 	}
 
 	/**

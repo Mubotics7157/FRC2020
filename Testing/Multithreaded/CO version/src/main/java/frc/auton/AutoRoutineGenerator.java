@@ -2,6 +2,8 @@ package frc.auton;
 import java.util.ArrayList;
 import java.util.Set;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.subsystem.RobotTracker;
@@ -33,18 +35,16 @@ public class AutoRoutineGenerator {
 	}
 
 	public static AutoRoutine generate3() {
-		AutoRoutine overallRoutine = new AutoRoutine();
 		initialDrive = new AutoRoutine();
 		System.out.println("start left");
-		Translation2d startPos = new Translation2d(0, 0);
-		double robotVel = 60;
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		double robotVel = 3;
 		RobotTracker.getInstance().setOdometry(startPos);
-		initialDrive.addCommands(new DriveToPoints(robotVel, false, RobotTracker.getInstance().getOdometry().getRotation(), 
-		new Translation2d(0,1),
+		initialDrive.addCommands(new DriveToPoints(robotVel, false, 
+		Rotation2d.fromDegrees(0), 
+		new Translation2d(0,0),
 		new Translation2d(0,2)));
         
-        overallRoutine.addRoutines(initialDrive);
-        
-		return overallRoutine;
+		return initialDrive;
 	}
 }

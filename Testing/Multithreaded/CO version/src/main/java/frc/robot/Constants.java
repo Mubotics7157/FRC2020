@@ -22,10 +22,10 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 2;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 0;
-    public static final int DEVICE_ID_LEFT_MASTER = 1;
-    public static final int DEVICE_ID_LEFT_SLAVE = 3;
+    public static final int DEVICE_ID_RIGHT_MASTER = 1;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 3;
+    public static final int DEVICE_ID_LEFT_MASTER = 2;
+    public static final int DEVICE_ID_LEFT_SLAVE = 0;
     public static final int DEVICE_ID_LEFT_SHIFTER = 0;
     public static final int DEVICE_ID_RIGHT_SHIFTER = 1;
 
@@ -52,7 +52,7 @@ public final class Constants {
 
     public static final double DEADBAND = 0;
 
-    public static final double kP = 0.03;
+    public static final double kP = 0.05;
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;
@@ -82,8 +82,6 @@ public final class Constants {
     public static final double RAMSETE_B = 2;
     public static final double RAMSETE_ZETA = 0.7;
 
-    public static final double TOLERANCE_DEGREES = 2;
-    public static final double TOLERANCE_METERS = 0.02;
   }
 
   public static final class TeleConstants {

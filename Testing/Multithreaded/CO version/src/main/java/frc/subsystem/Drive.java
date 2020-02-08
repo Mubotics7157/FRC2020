@@ -101,8 +101,8 @@ public class Drive extends Threaded{
     leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
     rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
     
-    rightMaster.setInverted(true);
-    rightSlave.setInverted(true);
+    leftMaster.setInverted(true);
+    leftSlave.setInverted(true);
     rightMaster.setSensorPhase(true);
     leftMaster.setSensorPhase(true);
     rightMaster.overrideLimitSwitchesEnable(false);
@@ -362,9 +362,15 @@ public class Drive extends Threaded{
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
     SmartDashboard.putNumber("L Vel", leftVelocity);
     SmartDashboard.putNumber("R Vel", rightVelocity);
-    
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity())) / .20;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity())) / .20;
+
+    var actualLeftVel = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
+    var actualRightVel = stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity());
+
+    SmartDashboard.putNumber("Actual L Vel", actualLeftVel);
+    SmartDashboard.putNumber("Actual R Vel", actualRightVel);
+
+    var leftAccel = (leftVelocity - actualLeftVel) / .20;
+    var rightAccel = (rightVelocity - actualRightVel) / .20;
     
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);

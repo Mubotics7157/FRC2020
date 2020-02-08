@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
     // AutoRoutine option = AutoRoutineGenerator.generate3();
     // auto = new Thread(option);
     // auto.start();
-  TrajectoryConfig config = new TrajectoryConfig(1, 0.4);
+  TrajectoryConfig config = new TrajectoryConfig(1, 1);
   config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
   config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
   config.setReversed(false);
@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
         new Translation2d(2, 0)
     ),
     // End 3 meters straight ahead of where we started, facing forward
-    new Pose2d(3, 0, new Rotation2d(0)),
+    new Pose2d(2, 1, new Rotation2d(0)),
     // Pass config
     config);
     drive.setAutoPath(exampleTrajectory);
@@ -114,7 +114,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drive.driveTeleOp(leftStick.getY(), rightStick.getY());
+    //drive.driveTeleOp(leftStick.getY(), rightStick.getY());
+    drive.tankDriveVelocity(1.3, 1);
   }
 
   @Override

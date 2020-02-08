@@ -200,11 +200,12 @@ public class Drive extends Threaded{
 
   public void updatePathController() {
     double curTime = ramseteTimer.get();
+    SmartDashboard.putNumber("path tim", curTime);
     double dt = curTime - ramsetePrevTime;
     Trajectory.State goal = currentTrajectory.sample(curTime);
     ChassisSpeeds adjustedSpeeds = ramseteController.calculate(RobotTracker.getInstance().getOdometry(), goal);
     DifferentialDriveWheelSpeeds wheelSpeeds = DRIVE_KINEMATICS.toWheelSpeeds(adjustedSpeeds);
-    double left = -wheelSpeeds.leftMetersPerSecond;
+    double left = wheelSpeeds.leftMetersPerSecond;
     double right = wheelSpeeds.rightMetersPerSecond;
     boolean isFinished = ramseteTimer.hasPeriodPassed(currentTrajectory.getTotalTimeSeconds());
     if (isFinished) {
@@ -215,7 +216,7 @@ public class Drive extends Threaded{
         driveState = DriveState.DONE;
       }
     }
-    tankDriveVelocity(left, right, dt);
+    tankDriveVelocity(left, right);
     ramsetePrevTime = curTime;
   }
 

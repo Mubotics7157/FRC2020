@@ -12,9 +12,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import frc.robot.Constants.TurretConstants;
 import frc.utility.Threaded;
 import frc.utility.VisionTarget;
+import frc.robot.Constants.FieldConstants;
 
 public class Turret extends Threaded {
   /**
@@ -113,9 +115,14 @@ public class Turret extends Threaded {
     return (turretMotor.getSensorCollection().getPulseWidthRiseToFallUs() - 1024) / 8f;
   }
 
+  public double getAngleToInnerPort() {
+    double distToPort = 10; //stand-in
+    double curTheta = VisionManager.getInstance().yaw.getDouble(0);
+    return Math.atan(distToPort * Math.sin(curTheta) / (distToPort * Math.cos(curTheta)
+       + FieldConstants.INTERPORT_METERS));
+  }
+
   public double getTurretPositionDegrees() {
     return (getTurretPosition() / 4095f) * 360f;
   }
-
-
 }

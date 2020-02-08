@@ -109,4 +109,11 @@ public final class Constants {
     public static final String CAMERA_NAME = "USB Camera-B4.09.24.1";
   }
 
+  public static final class FieldConstants {
+    public static final double LENGTH_METERS = 15.98;
+    public static final double WIDTH_METERS = 8.21;
+    public static final double INTERPORT_METERS = 1; //placeholder
+    public static final double HORZ_DIST_TO_PORT = 8; //placeholder
+  }
+
 }

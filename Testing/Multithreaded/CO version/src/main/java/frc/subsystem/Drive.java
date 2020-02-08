@@ -110,7 +110,7 @@ public class Drive extends Threaded{
       }
       switch (snapDriveState) {
         case TELEOP:
-          //updateTeleOp();
+          updateTeleOp();
           break;
         case PUREPURSUIT:
           updatePathController();
@@ -152,8 +152,14 @@ public class Drive extends Threaded{
     }
   }
 
-  private void updateTeleOp(double leftVelocity, double rightVelocity) {
-    tankDriveVelocity(leftVelocity, rightVelocity);
+  private void updateTeleOp() {
+
+  }
+
+  public void driveTeleOp(double l, double r) {
+    if (driveState == DriveState.TELEOP) {
+      tankDrive(l, r);
+    }
   }
 
   public void setTeleOp() {

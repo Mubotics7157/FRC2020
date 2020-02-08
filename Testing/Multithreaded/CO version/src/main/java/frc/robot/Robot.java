@@ -80,11 +80,12 @@ public class Robot extends TimedRobot {
       auto.interrupt();
     System.out.println("teleop init!");
     scheduler.resume();
+    Drive.getInstance().setTeleOp();
   }
 
   @Override
   public void teleopPeriodic() {
-    Drive.getInstance().tankDriveVolts(-0.7, -0.7);
+    drive.driveTeleOp(leftStick.getY(), rightStick.getY());
   }
 
   @Override

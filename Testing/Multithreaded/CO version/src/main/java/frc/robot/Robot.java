@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.auton.*;
 import frc.robot.Constants.DriveTrainConstants;
@@ -76,9 +77,11 @@ public class Robot extends TimedRobot {
     // AutoRoutine option = AutoRoutineGenerator.generate3();
     // auto = new Thread(option);
     // auto.start();
-  TrajectoryConfig config = new TrajectoryConfig(1, 1);
+  TrajectoryConfig config = new TrajectoryConfig(4, 1);
   config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
   config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
+  DifferentialDriveKinematicsConstraint kkk = new DifferentialDriveKinematicsConstraint(DriveTrainConstants.DRIVE_KINEMATICS, 3);
+  config.addConstraint(kkk);
   config.setReversed(false);
   robotTracker.setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
   Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -86,11 +89,13 @@ public class Robot extends TimedRobot {
     new Pose2d(0, 0, new Rotation2d(0)),
     // Pass through these two interior waypoints, making an 's' curve path
     List.of(
-        new Translation2d(1, 0),
-        new Translation2d(2, 0)
+        new Translation2d(2, 0),
+        new Translation2d(3, 2),
+        new Translation2d(4, -2),
+        new Translation2d(5, 0)
     ),
     // End 3 meters straight ahead of where we started, facing forward
-    new Pose2d(2, 1, new Rotation2d(0)),
+    new Pose2d(0, 0, new Rotation2d(0)),
     // Pass config
     config);
     drive.setAutoPath(exampleTrajectory);
@@ -115,7 +120,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //drive.driveTeleOp(leftStick.getY(), rightStick.getY());
-    drive.tankDriveVelocity(1.3, 1);
+    drive.tankDriveVelocity(1, 1);
   }
 
   @Override

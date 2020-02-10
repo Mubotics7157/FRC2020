@@ -201,7 +201,7 @@ public class Drive extends Threaded{
   public void updatePathController() {
     double curTime = ramseteTimer.get();
     SmartDashboard.putNumber("path tim", curTime);
-    double dt = curTime - ramsetePrevTime;
+    double dt = (curTime - ramsetePrevTime) * 10;
     Trajectory.State goal = currentTrajectory.sample(curTime);
     ChassisSpeeds adjustedSpeeds = ramseteController.calculate(RobotTracker.getInstance().getOdometry(), goal);
     DifferentialDriveWheelSpeeds wheelSpeeds = DRIVE_KINEMATICS.toWheelSpeeds(adjustedSpeeds);
@@ -210,13 +210,11 @@ public class Drive extends Threaded{
     boolean isFinished = ramseteTimer.hasPeriodPassed(currentTrajectory.getTotalTimeSeconds());
     if (isFinished) {
       ramseteTimer.stop();
-      left = 0;
-      right = 0;
       synchronized (this) {
         driveState = DriveState.DONE;
       }
     }
-    tankDriveVelocity(left, right);
+    tankDriveVelocity(left, right, dt);
     ramsetePrevTime = curTime;
   }
 
@@ -368,6 +366,8 @@ public class Drive extends Threaded{
 
     SmartDashboard.putNumber("Actual L Vel", actualLeftVel);
     SmartDashboard.putNumber("Actual R Vel", actualRightVel);
+    SmartDashboard.putNumber("errorL", actualLeftVel - leftVelocity);
+    SmartDashboard.putNumber("errorR", actualRightVel - rightVelocity);
 
     var leftAccel = (leftVelocity - actualLeftVel) / .20;
     var rightAccel = (rightVelocity - actualRightVel) / .20;
@@ -390,9 +390,17 @@ public class Drive extends Threaded{
   public void tankDriveVelocity(double leftVelocity, double rightVelocity, double dt) {
     SmartDashboard.putNumber("L Vel", leftVelocity);
     SmartDashboard.putNumber("R Vel", rightVelocity);
-    
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity())) / dt;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity())) / dt;
+
+    var actualLeftVel = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
+    var actualRightVel = stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity());
+
+    SmartDashboard.putNumber("Actual L Vel", actualLeftVel);
+    SmartDashboard.putNumber("Actual R Vel", actualRightVel);
+    SmartDashboard.putNumber("errorL", actualLeftVel - leftVelocity);
+    SmartDashboard.putNumber("errorR", actualRightVel - rightVelocity);
+
+    var leftAccel = (leftVelocity - actualLeftVel) / dt;
+    var rightAccel = (rightVelocity - actualRightVel) / dt;
     
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);

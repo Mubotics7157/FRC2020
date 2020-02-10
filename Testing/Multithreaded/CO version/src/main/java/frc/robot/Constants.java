@@ -35,24 +35,24 @@ public final class Constants {
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
-    public static final double TRACK_WIDTH_METERS = 0.7528398375553692;
+    public static final double TRACK_WIDTH_METERS = 2.01325014;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = 0.145;
+    public static final double kS = 0.174;
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 2.21;
+    public static final double kV = 2.22;
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = 0.23;
+    public static final double kA = 0.149;
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
     public static final double DEADBAND = 0;
 
-    public static final double kP = 0.05;
+    public static final double kP = 0.000252;
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;

@@ -7,7 +7,7 @@ static class Node
 	int data; 
 	Node next; 
 }; 
-
+//jhgjhghjg
 static Node addToEmpty(Node last, int data) 
 { 
 	// This function is only for empty list 

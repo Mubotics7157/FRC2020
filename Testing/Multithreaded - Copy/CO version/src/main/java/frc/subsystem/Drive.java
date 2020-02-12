@@ -10,8 +10,11 @@ import static frc.robot.Constants.DriveTrainConstants.SENSOR_UNITS_PER_ROTATION;
 import static frc.robot.Constants.DriveTrainConstants.WHEEL_CIRCUMFERENCE_METERS;
 import static frc.robot.Constants.TeleConstants.MAX_ANGULAR_VEL;
 import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
+import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_DEGREES;
+import static frc.robot.Constants.TrajectoryConstants.TOLERANCE_METERS;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -21,10 +24,13 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.utility.OrangeUtility;
@@ -101,13 +107,16 @@ public class Drive extends Threaded{
       }
       switch (snapDriveState) {
         case TELEOP:
+          //updateTeleOp();
           break;
         case PUREPURSUIT:
+          updatePathController();
           break;
         case TURN:
           updateTurn();
           break;
         case HOLD:
+          updateHold();
           break;
         case DONE:
           break;
@@ -117,6 +126,8 @@ public class Drive extends Threaded{
   public synchronized void setAutoPath(Trajectory path) {
     currentTrajectory = path;
     driveState = DriveState.PUREPURSUIT;
+    ramseteController.setTolerance(new Pose2d(new Translation2d(TOLERANCE_METERS, TOLERANCE_METERS)
+      , Rotation2d.fromDegrees(TOLERANCE_DEGREES)));
     updatePathController();
   }
   
@@ -125,6 +136,27 @@ public class Drive extends Threaded{
 			wantedHeading = angle;
 			driveState = DriveState.TURN;
 		}
+  }
+
+  private void updateHold() {
+    leftMaster.set(ControlMode.Position, leftMaster.getSelectedSensorPosition());
+    rightMaster.set(ControlMode.Position, rightMaster.getSelectedSensorPosition());
+  }
+
+  public void setHold() {
+    synchronized (this) {
+      driveState = DriveState.HOLD;
+    }
+  }
+
+  private void updateTeleOp(double leftVelocity, double rightVelocity) {
+    tankDriveVelocity(leftVelocity, rightVelocity);
+  }
+
+  public void setTeleOp() {
+    synchronized (this) {
+      driveState = DriveState.TELEOP;
+    }
   }
   
   private void updateTurn() {
@@ -141,7 +173,8 @@ public class Drive extends Threaded{
 		} else {
 			tankDriveVelocity(-deltaSpeed, deltaSpeed);
 		}
-	}
+  }
+  
 
   public void updatePathController() {
     Trajectory.State goal = currentTrajectory.sample(3.4);
@@ -149,6 +182,7 @@ public class Drive extends Threaded{
     DifferentialDriveWheelSpeeds wheelSpeeds = DRIVE_KINEMATICS.toWheelSpeeds(adjustedSpeeds);
     double left = wheelSpeeds.leftMetersPerSecond;
     double right = wheelSpeeds.rightMetersPerSecond;
+
     if (ramseteController.atReference()) {
       synchronized (this) {
         driveState = DriveState.DONE;

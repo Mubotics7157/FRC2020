@@ -41,14 +41,15 @@ public class RobotTracker extends Threaded {
 
 	synchronized public void resetOdometry() {
 		drive.zeroSensors();
-		lastPose = new Pose2d(0, 0, Rotation2d.fromDegrees(drive.getHeading()));
+		lastPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
-	  }
+		currentPose = differentialDriveOdometry.getPoseMeters();
+	}
 
-	synchronized public void setOdometry(Translation2d loc) {
+	synchronized public void setOdometry(Pose2d loc) {
 		drive.zeroSensors();
-		lastPose = new Pose2d(loc, Rotation2d.fromDegrees(drive.getHeading()));
-		differentialDriveOdometry.resetPosition(lastPose, Rotation2d.fromDegrees(drive.getHeading()));
+		differentialDriveOdometry.resetPosition(loc, Rotation2d.fromDegrees(drive.getHeading()));
+		currentPose = differentialDriveOdometry.getPoseMeters();
 	}
 
 	/**
@@ -67,7 +68,9 @@ public class RobotTracker extends Threaded {
 				leftDist,
 				rightDist);
 			currentPose = differentialDriveOdometry.getPoseMeters();
-			SmartDashboard.putString("Pose", differentialDriveOdometry.getPoseMeters().toString());
+			SmartDashboard.putNumber("PoseX", differentialDriveOdometry.getPoseMeters().getTranslation().getX());
+			SmartDashboard.putNumber("PoseY", differentialDriveOdometry.getPoseMeters().getTranslation().getY());
+			SmartDashboard.putNumber("PoseR", differentialDriveOdometry.getPoseMeters().getRotation().getDegrees());
 			vehicleHistory.add(new InterpolablePair<>(System.nanoTime(), currentPose));
 		}
 	}

@@ -78,6 +78,9 @@ public final class Constants {
     // Baseline values for a RAMSETE follower in units of meters and seconds
     public static final double RAMSETE_B = 2;
     public static final double RAMSETE_ZETA = 0.7;
+
+    public static final double TOLERANCE_DEGREES = 2;
+    public static final double TOLERANCE_METERS = 0.02;
   }
 
   public static final class TeleConstants {

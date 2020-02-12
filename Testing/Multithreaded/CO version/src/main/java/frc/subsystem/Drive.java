@@ -1,6 +1,8 @@
 package frc.subsystem;
 
 import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_LEFT_MASTER;
+import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_LEFT_SHIFTER;
+import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_RIGHT_SHIFTER;
 import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_LEFT_SLAVE;
 import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_RIGHT_MASTER;
 import static frc.robot.Constants.DriveTrainConstants.DEVICE_ID_RIGHT_SLAVE;
@@ -10,8 +12,12 @@ import static frc.robot.Constants.DriveTrainConstants.SENSOR_UNITS_PER_ROTATION;
 import static frc.robot.Constants.DriveTrainConstants.WHEEL_CIRCUMFERENCE_METERS;
 import static frc.robot.Constants.TeleConstants.MAX_ANGULAR_VEL;
 import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
+import static frc.robot.Constants.TrajectoryConstants;
+
+import java.time.Duration;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -20,11 +26,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.utility.OrangeUtility;
@@ -40,12 +52,16 @@ public class Drive extends Threaded{
   private final TalonFX leftSlave = new TalonFX(DEVICE_ID_LEFT_SLAVE);
   private final TalonFX rightMaster = new TalonFX(DEVICE_ID_RIGHT_MASTER);
   private final TalonFX rightSlave = new TalonFX(DEVICE_ID_RIGHT_SLAVE);
+  private final Servo leftShifter = new Servo(DEVICE_ID_LEFT_SHIFTER);
+  private final Servo rightShifter = new Servo(DEVICE_ID_RIGHT_SHIFTER);
 
   private final AHRS gyro = new AHRS(SPI.Port.kMXP);
   private RamseteController ramseteController = new RamseteController();
+  private double ramsetePrevTime = 0;
+  private final Timer ramseteTimer;
   private SynchronousPid turnPID = new SynchronousPid(0.01, 0, 0, 0);
   
-	private static final Drive instance = new Drive();
+	private static final Drive instance = new Drive(); 
 
 	public static Drive getInstance() {
 		return instance;
@@ -60,11 +76,12 @@ public class Drive extends Threaded{
   Rotation2d wantedHeading;
 
   public Drive() {
+    ramseteTimer = new Timer();
     zeroDriveTrainEncoders();
     gyro.zeroYaw();
 
     TalonFXConfiguration talonConfig = new TalonFXConfiguration();
-    talonConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
+    talonConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
     talonConfig.neutralDeadband = DriveTrainConstants.DEADBAND;
     talonConfig.slot0.kP = DriveTrainConstants.kP;
     talonConfig.slot0.kI = 0.0;
@@ -76,14 +93,16 @@ public class Drive extends Threaded{
 
     rightMaster.configAllSettings(talonConfig);
     leftMaster.configAllSettings(talonConfig);
+    leftMaster.setNeutralMode(NeutralMode.Coast);
+    rightMaster.setNeutralMode(NeutralMode.Coast);
+    rightSlave.setNeutralMode(NeutralMode.Coast);
+    leftSlave.setNeutralMode(NeutralMode.Coast);
 
     leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
     rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
-
-    setNeutralMode(NeutralMode.Brake);
-
-    rightMaster.setInverted(true);
-    rightSlave.setInverted(true);
+    
+    leftMaster.setInverted(true);
+    leftSlave.setInverted(true);
     rightMaster.setSensorPhase(true);
     leftMaster.setSensorPhase(true);
     rightMaster.overrideLimitSwitchesEnable(false);
@@ -91,6 +110,7 @@ public class Drive extends Threaded{
 
     leftSlave.follow(leftMaster);
     rightSlave.follow(rightMaster);
+    gyro.reset();
   }
 
   @Override
@@ -101,20 +121,27 @@ public class Drive extends Threaded{
       }
       switch (snapDriveState) {
         case TELEOP:
+          updateTeleOp();
           break;
-        case PUREPURSUIT:
+        case PUREPURSUIT:          
+        SmartDashboard.putString("Drive State", "Pure Pursuit");
+        updatePathController();
           break;
         case TURN:
           updateTurn();
           break;
         case HOLD:
+          updateHold();
           break;
         case DONE:
+        SmartDashboard.putString("Drive State", "Done");
           break;
       }
   }
 
   public synchronized void setAutoPath(Trajectory path) {
+    ramseteTimer.reset();
+    ramseteTimer.start();
     currentTrajectory = path;
     driveState = DriveState.PUREPURSUIT;
     updatePathController();
@@ -125,6 +152,33 @@ public class Drive extends Threaded{
 			wantedHeading = angle;
 			driveState = DriveState.TURN;
 		}
+  }
+
+  private void updateHold() {
+    leftMaster.set(ControlMode.Position, leftMaster.getSelectedSensorPosition());
+    rightMaster.set(ControlMode.Position, rightMaster.getSelectedSensorPosition());
+  }
+
+  public void setHold() {
+    synchronized (this) {
+      driveState = DriveState.HOLD;
+    }
+  }
+
+  private void updateTeleOp() {
+
+  }
+
+  public void driveTeleOp(double l, double r) {
+    if (driveState == DriveState.TELEOP) {
+      tankDrive(l, r);
+    }
+  }
+
+  public void setTeleOp() {
+    synchronized (this) {
+      driveState = DriveState.TELEOP;
+    }
   }
   
   private void updateTurn() {
@@ -141,20 +195,27 @@ public class Drive extends Threaded{
 		} else {
 			tankDriveVelocity(-deltaSpeed, deltaSpeed);
 		}
-	}
+  }
+  
 
   public void updatePathController() {
-    Trajectory.State goal = currentTrajectory.sample(3.4);
+    double curTime = ramseteTimer.get();
+    SmartDashboard.putNumber("path tim", curTime);
+    double dt = (curTime - ramsetePrevTime) * 10;
+    Trajectory.State goal = currentTrajectory.sample(curTime);
     ChassisSpeeds adjustedSpeeds = ramseteController.calculate(RobotTracker.getInstance().getOdometry(), goal);
     DifferentialDriveWheelSpeeds wheelSpeeds = DRIVE_KINEMATICS.toWheelSpeeds(adjustedSpeeds);
     double left = wheelSpeeds.leftMetersPerSecond;
     double right = wheelSpeeds.rightMetersPerSecond;
-    if (ramseteController.atReference()) {
+    boolean isFinished = ramseteTimer.hasPeriodPassed(currentTrajectory.getTotalTimeSeconds());
+    if (isFinished) {
+      ramseteTimer.stop();
       synchronized (this) {
         driveState = DriveState.DONE;
       }
     }
-    tankDriveVelocity(left, right);
+    tankDriveVelocity(left, right, dt);
+    ramsetePrevTime = curTime;
   }
 
   public boolean isFinished() {
@@ -200,6 +261,11 @@ public class Drive extends Threaded{
     tankDrive(leftSpeed, rightSpeed, false);
   }
 
+  public void tankDriveVolts(double leftSpeed, double rightSpeed) {
+    leftMaster.set(TalonFXControlMode.PercentOutput,leftSpeed);
+    rightMaster.set(TalonFXControlMode.PercentOutput, rightSpeed);
+  }
+
   /**
    * Drives the robot by individually addressing the left and right side of the
    * drive train
@@ -228,6 +294,11 @@ public class Drive extends Threaded{
     leftSlave.setNeutralMode(neutralMode);
     rightMaster.setNeutralMode(neutralMode);
     rightSlave.setNeutralMode(neutralMode);
+  }
+
+  public void shift(int gear) {
+    leftShifter.set(gear);
+    rightShifter.set(gear);
   }
 
   /**
@@ -287,8 +358,49 @@ public class Drive extends Threaded{
    * @param rightVelocity right velocity
    */
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity())) / 20;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity())) / 20;
+    SmartDashboard.putNumber("L Vel", leftVelocity);
+    SmartDashboard.putNumber("R Vel", rightVelocity);
+
+    var actualLeftVel = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
+    var actualRightVel = stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity());
+
+    SmartDashboard.putNumber("Actual L Vel", actualLeftVel);
+    SmartDashboard.putNumber("Actual R Vel", actualRightVel);
+    SmartDashboard.putNumber("errorL", actualLeftVel - leftVelocity);
+    SmartDashboard.putNumber("errorR", actualRightVel - rightVelocity);
+
+    var leftAccel = (leftVelocity - actualLeftVel) / .20;
+    var rightAccel = (rightVelocity - actualRightVel) / .20;
+    
+    var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
+    var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);
+
+    leftMaster.set(
+        TalonFXControlMode.Velocity, 
+        metersPerSecToStepsPerDecisec(leftVelocity), 
+        DemandType.ArbitraryFeedForward,
+        leftFeedForwardVolts / 12);
+    rightMaster.set(
+        TalonFXControlMode.Velocity,
+        metersPerSecToStepsPerDecisec(rightVelocity),
+        DemandType.ArbitraryFeedForward,
+        rightFeedForwardVolts / 12);
+  }
+
+  public void tankDriveVelocity(double leftVelocity, double rightVelocity, double dt) {
+    SmartDashboard.putNumber("L Vel", leftVelocity);
+    SmartDashboard.putNumber("R Vel", rightVelocity);
+
+    var actualLeftVel = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
+    var actualRightVel = stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity());
+
+    SmartDashboard.putNumber("Actual L Vel", actualLeftVel);
+    SmartDashboard.putNumber("Actual R Vel", actualRightVel);
+    SmartDashboard.putNumber("errorL", actualLeftVel - leftVelocity);
+    SmartDashboard.putNumber("errorR", actualRightVel - rightVelocity);
+
+    var leftAccel = (leftVelocity - actualLeftVel) / dt;
+    var rightAccel = (rightVelocity - actualRightVel) / dt;
     
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);
@@ -312,7 +424,9 @@ public class Drive extends Threaded{
    * @return meters
    */
   public static double stepsToMeters(int steps) {
-    return (WHEEL_CIRCUMFERENCE_METERS / SENSOR_UNITS_PER_ROTATION) * steps;
+    double encoderConstant =
+        (0.1524 * Math.PI) / 199.0879514239766 / 100;
+    return steps * encoderConstant;
   }
 
   /**
@@ -330,7 +444,7 @@ public class Drive extends Threaded{
    * @return encoder units
    */
   public static double metersToSteps(double meters) {
-    return (meters / WHEEL_CIRCUMFERENCE_METERS) * SENSOR_UNITS_PER_ROTATION;
+    return (meters / 0.1524 / Math.PI) * 100 * 199.0879514239766;
   }
 
   /**

@@ -22,35 +22,38 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 0;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 1;
+    public static final int DEVICE_ID_RIGHT_MASTER = 1;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 3;
     public static final int DEVICE_ID_LEFT_MASTER = 2;
-    public static final int DEVICE_ID_LEFT_SLAVE = 3;
+    public static final int DEVICE_ID_LEFT_SLAVE = 0;
+    public static final int DEVICE_ID_LEFT_SHIFTER = 0;
+    public static final int DEVICE_ID_RIGHT_SHIFTER = 1;
 
-    public static final int SENSOR_UNITS_PER_ROTATION = 4096;
+    public static final int SENSOR_UNITS_PER_ROTATION = 2048;
+    public static final double GEAR_DIVISOR = 9.6666666;
     public static final double WHEEL_DIAMETER_INCHES = 6d;
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
-    public static final double TRACK_WIDTH_METERS = 0.555625;
+    public static final double TRACK_WIDTH_METERS = 2.01325014;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = 0.829;
+    public static final double kS = 0.174;
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 3.04;
+    public static final double kV = 2.22;
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = 0.676;
+    public static final double kA = 0.149;
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
-    public static final double DEADBAND = 0.11;
+    public static final double DEADBAND = 0;
 
-    public static final double kP = 1.0;
-    public static final double kD = 0.11;
+    public static final double kP = 0.000252;
+    public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;
     public static final double OPEN_LOOP_RAMP = .25;
@@ -78,6 +81,7 @@ public final class Constants {
     // Baseline values for a RAMSETE follower in units of meters and seconds
     public static final double RAMSETE_B = 2;
     public static final double RAMSETE_ZETA = 0.7;
+
   }
 
   public static final class TeleConstants {
@@ -93,6 +97,21 @@ public final class Constants {
     public static final double kP = 0.001;
     public static final double kI = 0.001;
     public static final double kD = 0.001;
+    public static final double kF = 0.001;
+    public static final int kTimeoutMs = 30;
+    public static final int kSlotIdx = 0;
+  	public static final int kPIDLoopIdx = 0;
+  }
+
+  public static final class VisionConstants {
+    public static final String CAMERA_NAME = "USB Camera-B4.09.24.1";
+  }
+
+  public static final class FieldConstants {
+    public static final double LENGTH_METERS = 15.98;
+    public static final double WIDTH_METERS = 8.21;
+    public static final double INTERPORT_METERS = 1; //placeholder
+    public static final double HORZ_DIST_TO_PORT = 8; //placeholder
   }
 
 }

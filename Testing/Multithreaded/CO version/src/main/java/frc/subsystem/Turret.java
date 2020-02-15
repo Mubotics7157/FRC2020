@@ -26,6 +26,7 @@ public class Turret extends Threaded {
   private TalonSRX turretMotor = new TalonSRX(TurretConstants.DEVICE_ID_TURRET);
   private double fieldRelativeSetpoint;
   private double realSetpoint;
+  private double lastRealSetpoint;
   private double driveTrainHeading;
   private double lastFieldRelativeSetpoint;
   private int smoothing = 0;
@@ -36,6 +37,11 @@ public class Turret extends Threaded {
   
   private static final Turret trackingInstance = new Turret();
   
+  private enum TurretState{
+    OFF, FIELD_LOCK, TARGET_LOCK, RETURNING
+  }
+
+  TurretState turretState = TurretState.OFF;
 
 	public static Turret getInstance() {
 		return Turret.trackingInstance;
@@ -46,7 +52,7 @@ public class Turret extends Threaded {
     //turretPID.setSetpoint(0);
     turretMotor.configFactoryDefault();
 
-		/* Configure Sensor Source for Pirmary PID */
+		/* Configure Sensor Source for Primary PID */
 		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, TurretConstants.kPIDLoopIdx,
 				TurretConstants.kTimeoutMs);
 
@@ -91,23 +97,63 @@ public class Turret extends Threaded {
   @Override
   public void update() {
     driveTrainHeading = Drive.getInstance().getHeading();
-    fieldRelativeSetpoint = 0;
+    
+    switch(turretState){
+      case OFF:
+        break;
+      case FIELD_LOCK:
+        updateFieldLock();
+        break;
+      case TARGET_LOCK:
+        realSetpoint = vision.getTarget().getYaw() + driveTrainHeading;
+        break;
+      case RETURNING:
+        
+    }
+
+    if(realSetpoint >= 180 && lastRealSetpoint < 180){
+      
+    }
+    lastRealSetpoint = realSetpoint;
+    
+
+    /*fieldRelativeSetpoint = 0;
 
     if (isHoming){
       realSetpoint = vision.getTarget().getYaw();
       lastFieldRelativeSetpoint = realSetpoint + driveTrainHeading;
     }else{
       realSetpoint = lastFieldRelativeSetpoint - driveTrainHeading;   
-    }
+    }*/
      
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
-		double targetPos = realSetpoint * 4096 / 360.0f;
-		turretMotor.set(ControlMode.MotionMagic, targetPos);
+    if(turretState != TurretState.OFF){
+      double targetPos = realSetpoint * 4096 / 360.0f;
+      turretMotor.set(ControlMode.MotionMagic, targetPos);
+    }
+		
     //turretPID.update(getTurretPositionDegrees());
+  }
+
+  private void updateFieldLock(){
+    fieldRelativeSetpoint = 0;
+    realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
   }
 
   public void SetHoming(boolean homing) {
     isHoming = homing;
+  }
+
+  public synchronized void setTargetLock(){
+    turretState = TurretState.TARGET_LOCK;
+  }
+
+  public synchronized void setOff(){
+    turretState = TurretState.OFF;
+  }
+
+  public synchronized void setFieldLock(){
+    turretState = TurretState.FIELD_LOCK;
   }
 
   public double getTurretPosition() {

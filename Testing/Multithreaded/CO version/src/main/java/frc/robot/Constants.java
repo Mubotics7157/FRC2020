@@ -114,4 +114,7 @@ public final class Constants {
     public static final double HORZ_DIST_TO_PORT = 8; //placeholder
   }
 
+  public static final class LidarConstants {
+    public static final double CALIBRATION_OFFSET = -18;
+  }
 }

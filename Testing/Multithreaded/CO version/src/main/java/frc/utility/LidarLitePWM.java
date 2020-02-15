@@ -4,7 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-package frc.subsystem;
+package frc.utility;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalSource;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.Threaded;
 import frc.robot.Constants.LidarConstants;
 
-public class LidarLitePWM extends Threaded{
+public class LidarLitePWM{
     /*
     * Adjust the Calibration Offset to compensate for differences in each unit.
     * We've found this is a reasonably constant value for readings in the 25 cm to 600 cm range.
@@ -35,9 +35,6 @@ public class LidarLitePWM extends Threaded{
         counter.reset();
     }
 
-    public void update(){
-        SmartDashboard.putNumber("LidarDistance(cm)", getDistance());
-    }
 
     /**
      * Take a measurement and return the distance in cm

@@ -116,7 +116,9 @@ public final class Constants {
 
   public static final class LidarConstants {
     public static final double CALIBRATION_OFFSET = -18;
+    public static final int DIO_PORT = 0;
   }
+
   public static final class IndexerConstants {
     public static final int DEVICE_ID_INDEXER_CONVEYOR = 0;
     public static final int DEVICE_ID_INDEXER_SLAVE = 0;

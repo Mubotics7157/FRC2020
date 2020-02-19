@@ -16,12 +16,10 @@ import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import frc.robot.Constants.TurretConstants;
-import frc.utility.LidarLitePWM;
 import frc.utility.Threaded;
 import frc.utility.VisionTarget;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.LidarConstants;
 
 public class Turret extends Threaded {
   /**
@@ -48,7 +46,6 @@ public class Turret extends Threaded {
   }
 
   TurretState turretState = TurretState.OFF;
-  LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(LidarConstants.DIO_PORT));
 
 	public static Turret getInstance() {
 		return Turret.trackingInstance;

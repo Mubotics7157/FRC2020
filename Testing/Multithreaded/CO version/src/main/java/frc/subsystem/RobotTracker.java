@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.utility.InterpolablePoseCircularQueue;
 import frc.utility.LidarLitePWM;
 import frc.utility.Threaded;
@@ -14,7 +15,7 @@ import frc.utility.math.InterpolablePair;
 public class RobotTracker extends Threaded {
 
 	private static final RobotTracker trackingInstance = new RobotTracker();
-	private static final LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(0));
+	private static final LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
 
 	public static RobotTracker getInstance() {
 		return RobotTracker.trackingInstance;

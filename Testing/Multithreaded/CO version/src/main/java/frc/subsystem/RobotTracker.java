@@ -37,8 +37,14 @@ public class RobotTracker extends Threaded {
 		return vehicleHistory.getInterpolatedPose(time).getRotation();
 	}
 
-	synchronized public double getDistance(){
+	synchronized public double getDistance() {
 		return lidar.getDistance(); //returns distance in CM
+	}
+
+	synchronized public Pose2d getOdometryFromLidar() {
+		//assuming bot facing driverstation is angle 0, and bot is facing target
+		double angle = currentPose.getRotation().getDegrees();
+		return new Pose2d(lidar.getDistance() * Math.sin(angle - 180), lidar.getDistance() * Math.cos(angle - 180), currentPose.getRotation());
 	}
 
 	synchronized public Pose2d getOdometry() {

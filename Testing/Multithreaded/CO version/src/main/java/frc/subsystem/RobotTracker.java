@@ -2,16 +2,19 @@
 
 package frc.subsystem;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.InterpolablePoseCircularQueue;
+import frc.utility.LidarLitePWM;
 import frc.utility.Threaded;
 import frc.utility.math.InterpolablePair;
 public class RobotTracker extends Threaded {
 
 	private static final RobotTracker trackingInstance = new RobotTracker();
+	private static final LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(0));
 
 	public static RobotTracker getInstance() {
 		return RobotTracker.trackingInstance;
@@ -32,6 +35,10 @@ public class RobotTracker extends Threaded {
 
 	synchronized public Rotation2d getGyroAngle(long time) {
 		return vehicleHistory.getInterpolatedPose(time).getRotation();
+	}
+
+	synchronized public double getDistance(){
+		return lidar.getDistance(); //returns distance in CM
 	}
 
 	synchronized public Pose2d getOdometry() {

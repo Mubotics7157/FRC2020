@@ -173,7 +173,7 @@ public class Turret extends Threaded {
   }
 
   public double getAngleToInnerPort() {
-    double distToPort = 10; //stand-in
+    double distToPort = RobotTracker.getInstance().getDistance();
     double curTheta = VisionManager.getInstance().yaw.getDouble(0);
     return Math.atan(distToPort * Math.sin(curTheta) / (distToPort * Math.cos(curTheta)
        + FieldConstants.INTERPORT_METERS));

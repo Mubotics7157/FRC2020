@@ -36,13 +36,15 @@ public class Turret extends Threaded {
   private double lastFieldRelativeSetpoint;
   private int smoothing = 0;
   private int pov = -1;
-  private VisionManager vision = VisionManager.getInstance();
+  private VisionManager vision;
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
   
   private enum TurretState{
-    OFF, FIELD_LOCK, TARGET_LOCK, RETURNING
+    OFF, //kys
+    FIELD_LOCK, //field relative
+    TARGET_LOCK, //vision
   }
 
   TurretState turretState = TurretState.OFF;
@@ -58,7 +60,7 @@ public class Turret extends Threaded {
     turretMotor.configFactoryDefault();
 
 		/* Configure Sensor Source for Primary PID */
-		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, TurretConstants.kPIDLoopIdx,
+		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, TurretConstants.kPIDLoopIdx,
 				TurretConstants.kTimeoutMs);
 
 		/* set deadband to super small 0.001 (0.1 %).
@@ -95,13 +97,13 @@ public class Turret extends Threaded {
 		turretMotor.configMotionAcceleration(6000, TurretConstants.kTimeoutMs);
 
 		/* Zero the sensor once on robot boot up */
-		turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
-
+    turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
+    
+    vision = VisionManager.getInstance();
   }
 
   @Override
   public void update() {
-    
 
     driveTrainHeading = Drive.getInstance().getHeading();
     
@@ -114,8 +116,6 @@ public class Turret extends Threaded {
       case TARGET_LOCK:
         realSetpoint = vision.getTarget().getYaw() + driveTrainHeading;
         break;
-      case RETURNING:
-        
     }
 
     if(realSetpoint >= 180 && lastRealSetpoint < 180){
@@ -151,6 +151,10 @@ public class Turret extends Threaded {
     isHoming = homing;
   }
 
+  public double getFieldRelativeHeading() {
+    return Math.IEEEremainder(getTurretHeading() + Drive.getInstance().getHeading(), 360);
+  }
+
   public synchronized void setTargetLock(){
     turretState = TurretState.TARGET_LOCK;
   }
@@ -163,7 +167,7 @@ public class Turret extends Threaded {
     turretState = TurretState.FIELD_LOCK;
   }
 
-  public double getTurretPosition() {
+  public double getTurretHeading() {
     //between 0 and 4095
     return (turretMotor.getSensorCollection().getPulseWidthRiseToFallUs() - 1024) / 8f;
   }
@@ -173,9 +177,5 @@ public class Turret extends Threaded {
     double curTheta = VisionManager.getInstance().yaw.getDouble(0);
     return Math.atan(distToPort * Math.sin(curTheta) / (distToPort * Math.cos(curTheta)
        + FieldConstants.INTERPORT_METERS));
-  }
-
-  public double getTurretPositionDegrees() {
-    return (getTurretPosition() / 4095f) * 360f;
   }
 }

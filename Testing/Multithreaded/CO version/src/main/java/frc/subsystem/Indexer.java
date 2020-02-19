@@ -6,8 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
-
-import com.cuforge.libcu.Lasershark;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -22,10 +20,11 @@ import frc.utility.Threaded;
 public class Indexer extends Threaded{
     private static final Indexer instance = new Indexer();
     CANSparkMax intakeMotor;
-    CANSparkMax slamMotor, slamSlave;
-    CANSparkMax whooshMotor;
+    CANSparkMax slamLeft, slamRight; // as facing intake
+    CANSparkMax whooshMotor; // chute
+    CANSparkMax soapBar; // shooter conveyor
     DoubleSolenoid intakeSolenoid;
-    Lasershark lemonCounter;
+    Shooter shooter;
 
     private int lemons = 0;
     public static Indexer getInstance() {
@@ -35,6 +34,7 @@ public class Indexer extends Threaded{
     public enum IndexerState {
         INTAKING, // want me some balls
         FULL, // keep balls in me
+        SHOOTING, // POOPOO
         NOPE // virgin bot
     }
 
@@ -42,62 +42,13 @@ public class Indexer extends Threaded{
 
     public Indexer() {
         intakeMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_INTAKE, MotorType.kBrushless);
-        slamMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
-        slamSlave = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
+        slamLeft = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
+        slamRight = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
         whooshMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
-        lemonCounter = new Lasershark(1);
-        slamSlave.follow(slamMotor);
+        shooter = Shooter.getInstance();
     }
-
-    public synchronized IndexerState getIndexerState() {
-        return indexerState;
-    }
-
-    public void setHungry(boolean hungry) {
-        intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
-        intakeMotor.set(-1);
-    }
-
-    public void toggleHungry() {
-        intakeSolenoid.set(intakeSolenoid.get() == Value.kForward ? Value.kReverse : Value.kForward);
-    }
-
-    public void chew() {
-        slamMotor.set(1);
-    }
-
-    public void spit() {
-        slamMotor.set(-1);
-    }
-
-    public void swallow() {
-        whooshMotor.set(-1);
-    }
-
-    public void salivate() {
-        indexerState = IndexerState.INTAKING;
-        setHungry(true); // deploy intake
-    }
-
-    public void feast() {
-        if (lemons > 5) {
-            indexerState = IndexerState.FULL;
-            return;
-        }
-        if (lemonCounter.getDistanceInches() >= 5) //make sure that a ball isn't indexed before running the conveyor again
-        chew(); // run conveyor
-        swallow(); // run chute
-    }
-
-    public synchronized int getLemonCount() {
-        return lemons;
-    }
-
-    public void countLemons() {
-        
-    }
-
+    
     @Override
     public void update() {
         IndexerState snapIndexerState;
@@ -112,6 +63,69 @@ public class Indexer extends Threaded{
                 break;
             case FULL:
                 break;
+            case SHOOTING:
+                break;
         }
+    }
+
+    public synchronized IndexerState getIndexerState() {
+        return indexerState;
+    }
+
+    public void setHungry(boolean hungry) {
+        intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
+        intakeMotor.set(-1);
+        indexerState = IndexerState.INTAKING;
+    }
+
+    public void toggleHungry() {
+        boolean hungry = intakeSolenoid.get() == Value.kForward;
+        intakeSolenoid.set(hungry ? Value.kReverse : Value.kForward);
+        if (hungry) indexerState = IndexerState.INTAKING;
+        else return;
+    }
+
+    public void chew() {
+        slamLeft.set(1);
+        slamRight.set(1);
+    }
+
+    public void spit() {
+        slamLeft.set(-1);
+        slamRight.set(1);
+    }
+
+    public void swallow() {
+        whooshMotor.set(-1);
+    }
+
+    public void dropSoap() {
+        soapBar.set(-1);
+    }
+
+    public void holdSoap() {
+        soapBar.set(1);
+    }
+
+    public void feast() {
+        if (lemons > 5) {
+            indexerState = IndexerState.FULL;
+            return;
+        }
+        chew(); // run conveyor
+        swallow(); // run chute
+        holdSoap();
+    }
+
+    public void setShooting() {
+        indexerState = IndexerState.SHOOTING;
+    }
+
+    public void shoot() {
+        dropSoap();
+    }
+
+    public synchronized int getLemonCount() {
+        return lemons;
     }
 }

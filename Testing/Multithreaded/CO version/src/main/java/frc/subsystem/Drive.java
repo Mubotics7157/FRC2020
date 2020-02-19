@@ -154,6 +154,10 @@ public class Drive extends Threaded{
 		}
   }
 
+  public synchronized double getPathPercentage() {
+    return ramseteTimer.get() / currentTrajectory.getTotalTimeSeconds();
+  }
+
   private void updateHold() {
     leftMaster.set(ControlMode.Position, leftMaster.getSelectedSensorPosition());
     rightMaster.set(ControlMode.Position, rightMaster.getSelectedSensorPosition());

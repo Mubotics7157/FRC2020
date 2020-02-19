@@ -127,4 +127,12 @@ public final class Constants {
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
   }
 
+  public static final class ShooterConstants {
+    public static int DEVICE_ID_SHOOTER_TOP = 0;
+    public static int DEVICE_ID_SHOOTER_BOTTOM = 0;
+    public static double kP = 0.00045;
+    public static double kI = 0.00045;
+    public static double kD = 0.00045;
+    public static double kFF = 0.00045;
+  }
 }

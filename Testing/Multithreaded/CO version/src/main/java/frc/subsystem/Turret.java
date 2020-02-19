@@ -31,9 +31,9 @@ public class Turret extends Threaded {
   private TalonSRX turretMotor = new TalonSRX(TurretConstants.DEVICE_ID_TURRET);
   private double fieldRelativeSetpoint;
   private double realSetpoint;
-  private double lastRealSetpoint;
+  private double lastRealSetpoint = 0;
   private double driveTrainHeading;
-  private double lastFieldRelativeSetpoint;
+  private double lastFieldRelativeSetpoint = 0;
   private int smoothing = 0;
   private int pov = -1;
   private VisionManager vision;
@@ -118,21 +118,9 @@ public class Turret extends Threaded {
         break;
     }
 
-    if(realSetpoint >= 180 && lastRealSetpoint < 180){
-      
-    }
     lastRealSetpoint = realSetpoint;
-    
+    lastFieldRelativeSetpoint = fieldRelativeSetpoint;
 
-    /*fieldRelativeSetpoint = 0;
-
-    if (isHoming){
-      realSetpoint = vision.getTarget().getYaw();
-      lastFieldRelativeSetpoint = realSetpoint + driveTrainHeading;
-    }else{
-      realSetpoint = lastFieldRelativeSetpoint - driveTrainHeading;   
-    }*/
-     
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
     if(turretState != TurretState.OFF){
       double targetPos = realSetpoint * 4096 / 360.0f;
@@ -143,8 +131,7 @@ public class Turret extends Threaded {
   }
 
   private void updateFieldLock(){
-    fieldRelativeSetpoint = 0;
-    realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
+    realSetpoint = lastFieldRelativeSetpoint - driveTrainHeading;
   }
 
   public void SetHoming(boolean homing) {

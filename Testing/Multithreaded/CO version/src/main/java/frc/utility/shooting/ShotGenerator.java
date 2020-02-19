@@ -14,16 +14,16 @@ import java.util.Arrays;
  */
 public class ShotGenerator {
     public enum BACKSPINRATIOS{
-        NORMAL(0),
-        FLOATY(1),
-        SINKY(2);
+        NORMAL(1),
+        FLOATY(0.5),
+        SINKY(0.225);
 
-        private final int value;
+        private final double value;
 
-        BACKSPINRATIOS(final int newValue) {
+        BACKSPINRATIOS(final double newValue) {
             value = newValue;
         }
-        public int getValue() { return value; }
+        public double getValue() { return value; }
     }
 
 
@@ -36,6 +36,7 @@ public class ShotGenerator {
           this.bottomSpeed = bottomSpeed;
         } 
     }
+
 
     //log data as {top wheel RPM, distance it made it in}
     public Double[][] normal = {
@@ -50,23 +51,27 @@ public class ShotGenerator {
         {0d,1d}
     };
 
+    SplineInterpolator normalInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(normal[1]), Arrays.asList(normal[0]));
+    SplineInterpolator floatyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[1]), Arrays.asList(sinky[0]));
+    SplineInterpolator sinkyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(sinky[1]), Arrays.asList(sinky[0]));
+
     public ShooterSpeed getShot(double distance, BACKSPINRATIOS backSpin) {
         SplineInterpolator interpolator;
         switch (backSpin) {
             case NORMAL:
-                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(normal[1]), Arrays.asList(normal[0]));
+                interpolator = normalInterpolator;
                 break;
             case FLOATY:
-                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[1]), Arrays.asList(floaty[0]));
+                interpolator = floatyInterpolator;
                 break;
             case SINKY:
-                interpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(sinky[1]), Arrays.asList(sinky[0]));
+                interpolator = sinkyInterpolator;
                 break;
             default:
                 return null;
         }
 
         double rpm = interpolator.interpolate(distance);
-        return new ShooterSpeed(rpm, rpm/backSpin.getValue());
+        return new ShooterSpeed(rpm, rpm*backSpin.getValue());
     }
 }

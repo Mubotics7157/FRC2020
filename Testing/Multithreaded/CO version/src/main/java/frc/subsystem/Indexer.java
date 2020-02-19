@@ -122,6 +122,7 @@ public class Indexer extends Threaded{
     }
 
     public void shoot() {
+        
         dropSoap();
     }
 

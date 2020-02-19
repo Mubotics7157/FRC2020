@@ -15,6 +15,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.ShooterConstants;
 import frc.utility.Threaded;
+import frc.utility.shooting.ShotGenerator;
 
 /**
  * Add your docs here.
@@ -23,6 +24,7 @@ public class Shooter {
     private static final Shooter instance = new Shooter();
     private CANSparkMax botWheel;
     private CANSparkMax topWheel;
+    private ShotGenerator shotGen;
     public static Shooter getInstance() {
         return instance;
     }
@@ -42,6 +44,7 @@ public class Shooter {
         topController.setI(ShooterConstants.kI);
         topController.setD(ShooterConstants.kD);
         botController.setFF(ShooterConstants.kFF);
+        shotGen = new ShotGenerator();
     }
 
     public void setSpeed(double bottom, double top) {

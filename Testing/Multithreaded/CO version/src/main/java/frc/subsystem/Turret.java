@@ -123,8 +123,6 @@ public class Turret extends Threaded {
       double targetPos = realSetpoint * 4096 / 360.0f;
       turretMotor.set(ControlMode.MotionMagic, targetPos);
     }
-		
-    //turretPID.update(getTurretPositionDegrees());
   }
 
   private void updateFieldLock(){

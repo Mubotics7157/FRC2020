@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.Constants.IndexerConstants;
 import frc.utility.Threaded;
+import frc.utility.shooting.ShotGenerator;
+import frc.utility.shooting.ShotGenerator.BACKSPINRATIOS;
+import frc.utility.shooting.ShotGenerator.ShooterSpeed;
 
 /**
  * Add your docs here.
@@ -25,6 +28,8 @@ public class Indexer extends Threaded{
     CANSparkMax soapBar; // shooter conveyor
     DoubleSolenoid intakeSolenoid;
     Shooter shooter;
+    ShotGenerator shotGen;
+    BACKSPINRATIOS backSpin = BACKSPINRATIOS.NORMAL;
 
     private int lemons = 0;
     public static Indexer getInstance() {
@@ -46,7 +51,8 @@ public class Indexer extends Threaded{
         slamRight = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
         whooshMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
-        shooter = Shooter.getInstance();
+        shooter = new Shooter();
+        shotGen = new ShotGenerator();
     }
     
     @Override
@@ -64,6 +70,7 @@ public class Indexer extends Threaded{
             case FULL:
                 break;
             case SHOOTING:
+                shoot(backSpin);
                 break;
         }
     }
@@ -117,13 +124,18 @@ public class Indexer extends Threaded{
         holdSoap();
     }
 
-    public void setShooting() {
+    public void setShooting(BACKSPINRATIOS backSpin) {
         indexerState = IndexerState.SHOOTING;
+        this.backSpin = backSpin;
     }
 
-    public void shoot() {
-        
+    public void shoot(BACKSPINRATIOS backSpin) {
+        ShooterSpeed shot = shotGen.getShot(RobotTracker.getInstance().getDistance(), backSpin);
+        if (shooter.atSpeed(shot.bottomSpeed, shot.topSpeed)) {
         dropSoap();
+        chew();
+        swallow();
+        }
     }
 
     public synchronized int getLemonCount() {

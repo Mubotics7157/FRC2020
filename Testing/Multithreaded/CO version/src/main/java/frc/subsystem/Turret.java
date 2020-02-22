@@ -134,8 +134,6 @@ public class Turret extends Threaded {
       turretMotor.set(ControlMode.MotionMagic, targetPos);
       SmartDashboard.putNumber("targetPos", targetPos);
     }
-		
-    //turretPID.update(getTurretPositionDegrees());
   }
 
   private void updateFieldLock(){

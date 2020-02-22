@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.TurretConstants;
 import frc.utility.Threaded;
 import frc.utility.VisionTarget;
@@ -27,8 +28,8 @@ public class Turret extends Threaded {
    */
   private boolean isHoming = false;
   private TalonSRX turretMotor = new TalonSRX(TurretConstants.DEVICE_ID_TURRET);
-  private double fieldRelativeSetpoint;
-  private double realSetpoint;
+  private double fieldRelativeSetpoint = 0;
+  private double realSetpoint = 0;
   private double lastRealSetpoint = 0;
   private double driveTrainHeading;
   private double lastFieldRelativeSetpoint = 0;
@@ -79,8 +80,8 @@ public class Turret extends Threaded {
 		/* Set the peak and nominal outputs */
 		turretMotor.configNominalOutputForward(0, TurretConstants.kTimeoutMs);
 		turretMotor.configNominalOutputReverse(0, TurretConstants.kTimeoutMs);
-		turretMotor.configPeakOutputForward(1, TurretConstants.kTimeoutMs);
-		turretMotor.configPeakOutputReverse(-1, TurretConstants.kTimeoutMs);
+		turretMotor.configPeakOutputForward(0.5, TurretConstants.kTimeoutMs);
+		turretMotor.configPeakOutputReverse(-0.5, TurretConstants.kTimeoutMs);
 
 		/* Set Motion Magic gains in slot0 - see documentation */
 		turretMotor.selectProfileSlot(TurretConstants.kSlotIdx, TurretConstants.kPIDLoopIdx);
@@ -94,14 +95,19 @@ public class Turret extends Threaded {
 		turretMotor.configMotionAcceleration(6000, TurretConstants.kTimeoutMs);
 
 		/* Zero the sensor once on robot boot up */
-    turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
+    //turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
+
+    //turretMotor.configForwardSoftLimitEnable(true);
+    //turretMotor.configReverseSoftLimitEnable(true);
+    //turretMotor.configForwardSoftLimitThreshold(4096 / 2);
+    //turretMotor.configReverseSoftLimitThreshold(-4096 / 2);
     
     vision = VisionManager.getInstance();
   }
 
   @Override
   public void update() {
-
+    //System.out.println("updating");
     driveTrainHeading = Drive.getInstance().getHeading();
     
     switch(turretState){
@@ -118,17 +124,23 @@ public class Turret extends Threaded {
     lastRealSetpoint = realSetpoint;
     lastFieldRelativeSetpoint = fieldRelativeSetpoint;
 
+    SmartDashboard.putNumber("realSetpoint", realSetpoint);
+    SmartDashboard.putNumber("fieldRelativeSetpoint", fieldRelativeSetpoint);
+    SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition());
+
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
     if(turretState != TurretState.OFF){
       double targetPos = realSetpoint * 4096 / 360.0f;
       turretMotor.set(ControlMode.MotionMagic, targetPos);
+      SmartDashboard.putNumber("targetPos", targetPos);
     }
 		
     //turretPID.update(getTurretPositionDegrees());
   }
 
   private void updateFieldLock(){
-    realSetpoint = lastFieldRelativeSetpoint - driveTrainHeading;
+    fieldRelativeSetpoint = 0;
+    realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
   }
 
   public void SetHoming(boolean homing) {

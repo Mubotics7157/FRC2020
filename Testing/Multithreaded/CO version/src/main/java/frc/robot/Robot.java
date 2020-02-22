@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
   RobotTracker robotTracker = RobotTracker.getInstance();
   Drive drive = Drive.getInstance();
   //VisionManager vision = VisionManager.getInstance();
-  //Turret turret = Turret.getInstance();
+  Turret turret = Turret.getInstance();
 
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
     //Schedule subsystems
     scheduler.schedule(drive, executor);
     scheduler.schedule(robotTracker, executor);
-    //scheduler.schedule(turret, executor);
+    scheduler.schedule(turret, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("idk", 0);
   }
@@ -120,7 +120,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //drive.driveTeleOp(leftStick.getY(), rightStick.getY());
-    drive.tankDriveVelocity(1, 1);
+    //drive.tankDriveVelocity(1, 1);
+    if(xbox.getRawButtonPressed(1)){
+      System.out.println("Setting TurretState to FieldLock");
+      turret.setFieldLock();
+    }
   }
 
   @Override

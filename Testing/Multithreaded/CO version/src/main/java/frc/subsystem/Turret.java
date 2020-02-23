@@ -97,10 +97,10 @@ public class Turret extends Threaded {
 		/* Zero the sensor once on robot boot up */
     turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
 
-    //turretMotor.configForwardSoftLimitEnable(true);
-    //turretMotor.configReverseSoftLimitEnable(true);
-    //turretMotor.configForwardSoftLimitThreshold(4096 / 2);
-    //turretMotor.configReverseSoftLimitThreshold(-4096 / 2);
+    turretMotor.configForwardSoftLimitEnable(true);
+    turretMotor.configReverseSoftLimitEnable(true);
+    turretMotor.configForwardSoftLimitThreshold(4096);
+    turretMotor.configReverseSoftLimitThreshold(0);
     
     vision = VisionManager.getInstance();
   }
@@ -141,7 +141,7 @@ public class Turret extends Threaded {
   }
 
   private void updateFieldLock(){
-    fieldRelativeSetpoint = 0;
+    fieldRelativeSetpoint = 180;
     realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
   }
 

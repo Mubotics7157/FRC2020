@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
     // AutoRoutine option = AutoRoutineGenerator.generate3();
     // auto = new Thread(option);
     // auto.start();
-  TrajectoryConfig config = new TrajectoryConfig(4, 1);
+  TrajectoryConfig config = new TrajectoryConfig(1, 1);
   config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
   config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
   DifferentialDriveKinematicsConstraint kkk = new DifferentialDriveKinematicsConstraint(DriveTrainConstants.DRIVE_KINEMATICS, 3);
@@ -89,10 +89,8 @@ public class Robot extends TimedRobot {
     new Pose2d(0, 0, new Rotation2d(0)),
     // Pass through these two interior waypoints, making an 's' curve path
     List.of(
-        new Translation2d(2, 0),
-        new Translation2d(3, 2),
-        new Translation2d(4, -2),
-        new Translation2d(5, 0)
+        new Translation2d(1, 0),
+        new Translation2d(1, 1)
     ),
     // End 3 meters straight ahead of where we started, facing forward
     new Pose2d(0, 0, new Rotation2d(0)),

@@ -26,8 +26,8 @@ public final class Constants {
     public static final int DEVICE_ID_RIGHT_SLAVE = 1;
     public static final int DEVICE_ID_LEFT_MASTER = 2;
     public static final int DEVICE_ID_LEFT_SLAVE = 0;
-    public static final int DEVICE_ID_LEFT_SHIFTER = 0;
-    public static final int DEVICE_ID_RIGHT_SHIFTER = 1;
+    public static final int DEVICE_ID_LEFT_SHIFTER = 8;
+    public static final int DEVICE_ID_RIGHT_SHIFTER = 9;
 
     public static final int SENSOR_UNITS_PER_ROTATION = 2048;
     public static final double GEAR_DIVISOR = 9.6666666;
@@ -35,24 +35,24 @@ public final class Constants {
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
-    public static final double TRACK_WIDTH_METERS = 2.01325014;
+    public static final double TRACK_WIDTH_METERS = .70979231;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = 0.174;
+    public static final double kS = 0.293;
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 2.22;
+    public static final double kV = 2.2;
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = 0.149;
+    public static final double kA = 0.272;
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
     public static final double DEADBAND = 0;
 
-    public static final double kP = 0.000252;
+    public static final double kP = 0.0003;
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;

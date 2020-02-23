@@ -46,7 +46,7 @@ public class Turret extends Threaded {
     TARGET_LOCK, //vision
   }
 
-  TurretState turretState = TurretState.OFF;
+  TurretState turretState = TurretState.FIELD_LOCK;
 
 	public static Turret getInstance() {
 		return Turret.trackingInstance;
@@ -70,7 +70,7 @@ public class Turret extends Threaded {
 		 * have green LEDs when driving Talon Forward / Requesting Postiive Output Phase
 		 * sensor to have positive increment when driving Talon Forward (Green LED)
 		 */
-		turretMotor.setSensorPhase(false);
+		turretMotor.setSensorPhase(true);
 		turretMotor.setInverted(false);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
@@ -80,8 +80,8 @@ public class Turret extends Threaded {
 		/* Set the peak and nominal outputs */
 		turretMotor.configNominalOutputForward(0, TurretConstants.kTimeoutMs);
 		turretMotor.configNominalOutputReverse(0, TurretConstants.kTimeoutMs);
-		turretMotor.configPeakOutputForward(0.5, TurretConstants.kTimeoutMs);
-		turretMotor.configPeakOutputReverse(-0.5, TurretConstants.kTimeoutMs);
+		turretMotor.configPeakOutputForward(1, TurretConstants.kTimeoutMs);
+		turretMotor.configPeakOutputReverse(-1, TurretConstants.kTimeoutMs);
 
 		/* Set Motion Magic gains in slot0 - see documentation */
 		turretMotor.selectProfileSlot(TurretConstants.kSlotIdx, TurretConstants.kPIDLoopIdx);
@@ -91,11 +91,11 @@ public class Turret extends Threaded {
 		turretMotor.config_kD(TurretConstants.kSlotIdx, TurretConstants.kD, TurretConstants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		turretMotor.configMotionCruiseVelocity(15000, TurretConstants.kTimeoutMs);
-		turretMotor.configMotionAcceleration(6000, TurretConstants.kTimeoutMs);
+		turretMotor.configMotionCruiseVelocity(200, TurretConstants.kTimeoutMs);
+		turretMotor.configMotionAcceleration(200, TurretConstants.kTimeoutMs);
 
 		/* Zero the sensor once on robot boot up */
-    //turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
+    turretMotor.setSelectedSensorPosition(0, TurretConstants.kPIDLoopIdx, TurretConstants.kTimeoutMs);
 
     //turretMotor.configForwardSoftLimitEnable(true);
     //turretMotor.configReverseSoftLimitEnable(true);
@@ -126,13 +126,17 @@ public class Turret extends Threaded {
 
     SmartDashboard.putNumber("realSetpoint", realSetpoint);
     SmartDashboard.putNumber("fieldRelativeSetpoint", fieldRelativeSetpoint);
-    SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition() / 4096.0f * 360);
+    SmartDashboard.putNumber("sensorVelocity", turretMotor.getSelectedSensorVelocity());
 
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
     if(turretState != TurretState.OFF){
       double targetPos = realSetpoint * 4096 / 360.0f;
       turretMotor.set(ControlMode.MotionMagic, targetPos);
+      //turretMotor.set(ControlMode.PercentOutput, 1);
       SmartDashboard.putNumber("targetPos", targetPos);
+      SmartDashboard.putNumber("error", turretMotor.getSelectedSensorPosition() / 4096.0f * 360 - realSetpoint);
+
     }
   }
 

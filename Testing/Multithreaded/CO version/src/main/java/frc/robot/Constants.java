@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 1;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 3;
+    public static final int DEVICE_ID_RIGHT_MASTER = 3;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 1;
     public static final int DEVICE_ID_LEFT_MASTER = 2;
     public static final int DEVICE_ID_LEFT_SLAVE = 0;
     public static final int DEVICE_ID_LEFT_SHIFTER = 0;
@@ -93,10 +93,10 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int DEVICE_ID_TURRET = 2;
-    public static final double kP = 0.001;
+    public static final int DEVICE_ID_TURRET = 4;
+    public static final double kP = 60;
     public static final double kI = 0.00;
-    public static final double kD = 0.00;
+    public static final double kD = 240;
     public static final double kF = 0.00;
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;

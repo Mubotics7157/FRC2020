@@ -17,7 +17,7 @@ public abstract class AutoCommand {
 		start();
 		if (isBlocking) {
 			while (!isFinished() && DriverStation.getInstance().isAutonomous()) {
-
+				
 			}
 		}
 	}

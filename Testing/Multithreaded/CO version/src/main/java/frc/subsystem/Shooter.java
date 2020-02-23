@@ -23,7 +23,6 @@ import frc.utility.shooting.ShotGenerator;
 public class Shooter {
     private CANSparkMax botWheel;
     private CANSparkMax topWheel;
-    private ShotGenerator shotGen;
 
     public Shooter() {
         botWheel = new CANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless);
@@ -40,7 +39,6 @@ public class Shooter {
         topController.setI(ShooterConstants.kI);
         topController.setD(ShooterConstants.kD);
         botController.setFF(ShooterConstants.kFF);
-        shotGen = new ShotGenerator();
     }
 
     public boolean atSpeed(double bottom, double top) {

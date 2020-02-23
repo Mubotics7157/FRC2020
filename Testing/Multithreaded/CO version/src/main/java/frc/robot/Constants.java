@@ -120,10 +120,10 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final int DEVICE_ID_INDEXER_CONVEYOR = 0;
-    public static final int DEVICE_ID_INDEXER_SLAVE = 0;
-    public static final int DEVICE_ID_CHUTE = 0;
-    public static final int DEVICE_ID_INTAKE = 0;
+    public static final int DEVICE_ID_INDEXER_CONVEYOR = 41;
+    public static final int DEVICE_ID_INDEXER_SLAVE = 42;
+    public static final int DEVICE_ID_CHUTE = 61;
+    public static final int DEVICE_ID_INTAKE = 51;
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
   }
 
@@ -131,9 +131,9 @@ public final class Constants {
     public static int DEVICE_ID_SHOOTER_TOP = 0;
     public static int DEVICE_ID_SHOOTER_BOTTOM = 0;
     public static int MAX_ALLOWABLE_ERROR_RPM = 3;
-    public static double kP = 0.00045;
-    public static double kI = 0.00045;
-    public static double kD = 0.00045;
-    public static double kFF = 0.00045;
+    public static double kP = 0.00;
+    public static double kI = 0.00;
+    public static double kD = 0.00;
+    public static double kFF = 0.00;
   }
 }

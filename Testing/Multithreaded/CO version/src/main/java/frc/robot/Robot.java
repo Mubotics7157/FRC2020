@@ -12,6 +12,9 @@ import frc.auton.*;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.*;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Compressor;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -42,7 +45,10 @@ public class Robot extends TimedRobot {
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
   ThreadScheduler scheduler = new ThreadScheduler();
+  AddressableLED harshalsdick = new AddressableLED(6);
   Thread auto;
+
+  Compressor c = new Compressor();
 
   
 
@@ -51,6 +57,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    c.start();
     drive.calibrateGyro();
     drive.setPeriod(Duration.ofMillis(20));
     robotTracker.setPeriod(Duration.ofMillis(20));
@@ -61,6 +68,13 @@ public class Robot extends TimedRobot {
     scheduler.schedule(turret, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("idk", 0);
+    harshalsdick.setLength(150);
+    AddressableLEDBuffer buff = new AddressableLEDBuffer(150);
+    for (var i = 0; i < buff.getLength(); i++) {
+      buff.setRGB(i, 255, 0, 0);
+   }
+    harshalsdick.setData(buff);
+    harshalsdick.start();
   }
 
   @Override

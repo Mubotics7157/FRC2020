@@ -10,6 +10,9 @@ import static frc.robot.Constants.DriveTrainConstants.DRIVE_KINEMATICS;
 import static frc.robot.Constants.DriveTrainConstants.FEED_FORWARD;
 import static frc.robot.Constants.TeleConstants.MAX_ANGULAR_VEL;
 import static frc.robot.Constants.TeleConstants.MAX_SPEED_TELE;
+
+import java.util.ArrayList;
+
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -28,6 +31,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import frc.auton.PathTrigger;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.utility.OrangeUtility;
@@ -65,6 +69,7 @@ public class Drive extends Threaded{
   DriveState driveState = DriveState.TELEOP;
   Trajectory currentTrajectory;
   Rotation2d wantedHeading;
+  private ArrayList<PathTrigger> triggers = new ArrayList<>();
 
   public Drive() {
     ramseteTimer = new Timer();
@@ -130,6 +135,15 @@ public class Drive extends Threaded{
       }
   }
 
+  public synchronized void setAutoPath(Trajectory path, ArrayList<PathTrigger> triggers) {
+    ramseteTimer.reset();
+    ramseteTimer.start();
+    currentTrajectory = path;
+    driveState = DriveState.PUREPURSUIT;
+    updatePathController();
+    this.triggers = triggers;
+  }
+
   public synchronized void setAutoPath(Trajectory path) {
     ramseteTimer.reset();
     ramseteTimer.start();
@@ -145,7 +159,7 @@ public class Drive extends Threaded{
 		}
   }
 
-  public synchronized double getPathPercentage() {
+  private double getPathPercentage() {
     return ramseteTimer.get() / currentTrajectory.getTotalTimeSeconds();
   }
 
@@ -195,6 +209,15 @@ public class Drive extends Threaded{
 
   public void updatePathController() {
     double curTime = ramseteTimer.get();
+
+    //play commands we pass
+    while (!triggers.isEmpty()) {
+			if (triggers.get(0).getPercentage() <= getPathPercentage()) {
+				triggers.remove(0).playTrigger();
+			} else {
+				break;
+			}
+		}
     SmartDashboard.putNumber("path tim", curTime);
     double dt = (curTime - ramsetePrevTime) * 10;
     Trajectory.State goal = currentTrajectory.sample(curTime);

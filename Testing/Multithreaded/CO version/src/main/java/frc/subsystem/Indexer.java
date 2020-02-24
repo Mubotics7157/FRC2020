@@ -85,6 +85,11 @@ public class Indexer extends Threaded{
         indexerState = IndexerState.INTAKING;
     }
 
+    public void setSalivation(boolean ww3) {
+        intakeSolenoid.set(ww3 ? Value.kReverse : Value.kForward);
+        indexerState = IndexerState.NOPE;
+    }
+
     public void toggleHungry() {
         boolean hungry = intakeSolenoid.get() == Value.kForward;
         intakeSolenoid.set(hungry ? Value.kReverse : Value.kForward);
@@ -127,6 +132,10 @@ public class Indexer extends Threaded{
     public void setShooting(BACKSPINRATIOS backSpin) {
         indexerState = IndexerState.SHOOTING;
         this.backSpin = backSpin;
+    }
+    
+    public void setShooting() {
+        indexerState = IndexerState.SHOOTING;
     }
 
     public void shoot(BACKSPINRATIOS backSpin) {

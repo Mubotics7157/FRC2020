@@ -1,21 +1,16 @@
 // Copyright 2019 FRC Team 3476 Code Orange
 
 package frc.subsystem;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.utility.InterpolablePoseCircularQueue;
-import frc.utility.LidarLitePWM;
 import frc.utility.Threaded;
 import frc.utility.math.InterpolablePair;
 public class RobotTracker extends Threaded {
 
 	private static final RobotTracker trackingInstance = new RobotTracker();
-	private static final LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
 
 	public static RobotTracker getInstance() {
 		return RobotTracker.trackingInstance;
@@ -36,16 +31,6 @@ public class RobotTracker extends Threaded {
 
 	synchronized public Rotation2d getGyroAngle(long time) {
 		return vehicleHistory.getInterpolatedPose(time).getRotation();
-	}
-
-	synchronized public double getDistance() {
-		return lidar.getDistance(); //returns distance in CM
-	}
-
-	synchronized public Pose2d getOdometryFromLidar() {
-		//assuming bot facing driverstation is angle 0, and bot is facing target
-		double angle = currentPose.getRotation().getDegrees();
-		return new Pose2d(lidar.getDistance() * Math.sin(angle - 180), lidar.getDistance() * Math.cos(angle - 180), currentPose.getRotation());
 	}
 
 	synchronized public Pose2d getOdometry() {

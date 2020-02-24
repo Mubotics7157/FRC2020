@@ -12,13 +12,13 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.TurretConstants;
+import frc.utility.LidarLitePWM;
 import frc.utility.Threaded;
-import frc.utility.VisionTarget;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 
@@ -26,16 +26,14 @@ public class Turret extends Threaded {
   /**
    * Creates a new Turret.
    */
-  private boolean isHoming = false;
   private TalonSRX turretMotor = new TalonSRX(TurretConstants.DEVICE_ID_TURRET);
   private double fieldRelativeSetpoint = 0;
   private double realSetpoint = 0;
   private double lastRealSetpoint = 0;
   private double driveTrainHeading;
   private double lastFieldRelativeSetpoint = 0;
-  private int smoothing = 0;
-  private int pov = -1;
   private VisionManager vision;
+	private LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
@@ -140,15 +138,22 @@ public class Turret extends Threaded {
     }
   }
 
+  public synchronized double getDistanceToWall() {
+    return lidar.getDistance();
+  }
+
+	synchronized public Pose2d getOdometryFromLidar() {
+    //assuming bot facing driverstation is angle 0, and bot is facing target
+    Rotation2d rot = RobotTracker.getInstance().getOdometry().getRotation();
+		double angle = rot.getDegrees();
+		return new Pose2d(lidar.getDistance() * Math.sin(angle - 180), lidar.getDistance() * Math.cos(angle - 180), rot);
+	}
+
   private void updateFieldLock(){
     fieldRelativeSetpoint = 180;
     realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
   }
-
-  public void SetHoming(boolean homing) {
-    isHoming = homing;
-  }
-
+  
   public double getFieldRelativeHeading() {
     return Math.IEEEremainder(getTurretHeading() + Drive.getInstance().getHeading(), 360);
   }
@@ -171,7 +176,7 @@ public class Turret extends Threaded {
   }
 
   public double getAngleToInnerPort() {
-    double distToPort = RobotTracker.getInstance().getDistance();
+    double distToPort = getDistanceToWall();
     double curTheta = VisionManager.getInstance().yaw.getDouble(0);
     return Math.atan(distToPort * Math.sin(curTheta) / (distToPort * Math.cos(curTheta)
        + FieldConstants.INTERPORT_METERS));

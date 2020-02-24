@@ -8,8 +8,6 @@ package frc.utility;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalSource;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.utility.Threaded;
 import frc.robot.Constants.LidarConstants;
 
 public class LidarLitePWM{

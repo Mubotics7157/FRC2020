@@ -6,16 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
-
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.ShooterConstants;
-import frc.utility.Threaded;
-import frc.utility.shooting.ShotGenerator;
 
 /**
  * Add your docs here.

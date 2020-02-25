@@ -14,9 +14,9 @@ import java.util.Arrays;
  */
 public class ShotGenerator {
     public enum BACKSPINRATIOS{
-        NORMAL(1),
-        FLOATY(0.5),
-        SINKY(0.225);
+        NORMAL(2),
+        FLOATY(4),
+        SINKY(0.5);
 
         private final double value;
 
@@ -40,15 +40,18 @@ public class ShotGenerator {
 
     //log data as {top wheel RPM, distance it made it in}
     public Double[][] normal = {
-        {0d,1d}
+        {0d,1d,3d}, // X (distance)
+        {0d,1d,2d} // Y (RPM)
     };
     
     public Double[][] floaty = {
-        {0d,1d}
+        {0d,1d,3d}, // X (distance)
+        {0d,1d,2d} // Y (RPM)
     };
     
     public Double[][] sinky = {
-        {0d,1d}
+        {0d,1d,3d}, // X (distance)
+        {0d,1d,2d} // Y (RPM)
     };
 
     SplineInterpolator normalInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(normal[1]), Arrays.asList(normal[0]));

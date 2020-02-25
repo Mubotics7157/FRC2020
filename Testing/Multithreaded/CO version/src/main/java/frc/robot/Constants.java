@@ -132,7 +132,7 @@ public final class Constants {
   public static final class ShooterConstants {
     public static int DEVICE_ID_SHOOTER_TOP = 0;
     public static int DEVICE_ID_SHOOTER_BOTTOM = 0;
-    public static int MAX_ALLOWABLE_ERROR_RPM = 3;
+    public static int MAX_ALLOWABLE_ERROR_RPM = 1;
     public static double kP = 0.00;
     public static double kI = 0.00;
     public static double kD = 0.00;

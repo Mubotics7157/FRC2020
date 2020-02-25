@@ -100,7 +100,9 @@ public final class Constants {
     public static final double kF = 0.00;
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;
-  	public static final int kPIDLoopIdx = 0;
+    public static final int kPIDLoopIdx = 0;
+    public static final int FORWARD_LIMIT_DEGREES = 190;
+    public static final int REVERSE_LIMIT_DEGREES = -190;
   }
 
   public static final class VisionConstants {

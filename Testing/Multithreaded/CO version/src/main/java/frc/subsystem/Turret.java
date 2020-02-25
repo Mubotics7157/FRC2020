@@ -99,8 +99,8 @@ public class Turret extends Threaded {
 
     turretMotor.configForwardSoftLimitEnable(true);
     turretMotor.configReverseSoftLimitEnable(true);
-    turretMotor.configForwardSoftLimitThreshold(4096);
-    turretMotor.configReverseSoftLimitThreshold(0);
+    turretMotor.configForwardSoftLimitThreshold(TurretConstants.FORWARD_LIMIT_DEGREES / 360 * 4096);
+    turretMotor.configReverseSoftLimitThreshold(TurretConstants.REVERSE_LIMIT_DEGREES / 360 * 4096);
     
     vision = VisionManager.getInstance();
   }
@@ -117,7 +117,7 @@ public class Turret extends Threaded {
         updateFieldLock();
         break;
       case TARGET_LOCK:
-        realSetpoint = vision.getTarget().getYaw() + driveTrainHeading;
+        updateTargetLock();
         break;
     }
 
@@ -141,8 +141,12 @@ public class Turret extends Threaded {
   }
 
   private void updateFieldLock(){
-    fieldRelativeSetpoint = 180;
+    fieldRelativeSetpoint = 0;
     realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
+  }
+
+  private void updateTargetLock(){
+    realSetpoint = vision.getTarget().getYaw() + driveTrainHeading;
   }
 
   public void SetHoming(boolean homing) {

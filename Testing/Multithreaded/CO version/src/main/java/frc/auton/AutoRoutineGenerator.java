@@ -34,17 +34,7 @@ public class AutoRoutineGenerator {
 	}
 
 	public static AutoRoutine generate() {
-		TrajectoryConfig config = new TrajectoryConfig(2, 1);
-		config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
-		config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
-		DifferentialDriveKinematicsConstraint kkk = new DifferentialDriveKinematicsConstraint
-		(
-			DriveTrainConstants.DRIVE_KINEMATICS, 
-			TrajectoryConstants.MAX_SPEED_AUTO
-		);
-		config.addConstraint(kkk);
-		config.setReversed(false);
-		
+		TrajectoryConfig config = createConfig(2,1, false);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
@@ -70,5 +60,19 @@ public class AutoRoutineGenerator {
 								new SetDrivePath(shootToIntake3, true,
 												PathTrigger.create(new SetIntaking(true, true), 0.3)));
 		return initialDrive;
+	}
+
+	private static TrajectoryConfig createConfig(double v, double a, boolean reversed) {
+		TrajectoryConfig config = new TrajectoryConfig(v, a);
+		config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);
+		config.setKinematics(DriveTrainConstants.DRIVE_KINEMATICS);
+		DifferentialDriveKinematicsConstraint kkk = new DifferentialDriveKinematicsConstraint
+		(
+			DriveTrainConstants.DRIVE_KINEMATICS, 
+			TrajectoryConstants.MAX_SPEED_AUTO
+		);
+		config.addConstraint(kkk);
+		config.setReversed(reversed);
+		return config;
 	}
 }

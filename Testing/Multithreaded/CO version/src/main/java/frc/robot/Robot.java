@@ -4,6 +4,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import frc.auton.AutoRoutine;
+import frc.auton.AutoRoutineGenerator;
 import frc.subsystem.*;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -41,8 +43,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drive.calibrateGyro();
-    drive.setPeriod(Duration.ofMillis(20));
-    robotTracker.setPeriod(Duration.ofMillis(20));
+    drive.setPeriod(Duration.ofMillis(5));
+    robotTracker.setPeriod(Duration.ofMillis(5));
+    turret.setPeriod(Duration.ofMillis(20));
 
     //Schedule subsystems
     scheduler.schedule(drive, executor);
@@ -63,9 +66,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     scheduler.resume();
     // m_autoSelected = m_chooser.getSelected();
-    // AutoRoutine option = AutoRoutineGenerator.generate3();
-    // auto = new Thread(option);
-    // auto.start();
+    AutoRoutine option = AutoRoutineGenerator.generate();
+    auto = new Thread(option);
+    auto.start();
   }
 
   /**
@@ -81,7 +84,6 @@ public class Robot extends TimedRobot {
       auto.interrupt();
     System.out.println("teleop init!");
     scheduler.resume();
-    drive.setAutoPath(traj2);
     //Drive.getInstance().setTeleOp();
   }
 

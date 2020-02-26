@@ -145,6 +145,7 @@ public class Indexer extends Threaded{
         chew();
         swallow();
         }
+        else holdSoap();
     }
 
     public synchronized int getLemonCount() {

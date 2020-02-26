@@ -51,6 +51,7 @@ public class Indexer extends Threaded{
         slamRight = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
         whooshMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
+        soapBar = new CANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooter = new Shooter();
         shotGen = new ShotGenerator();
     }
@@ -81,8 +82,18 @@ public class Indexer extends Threaded{
 
     public synchronized void setHungry(boolean hungry) {
         intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
-        intakeMotor.set(-1);
-        indexerState = IndexerState.INTAKING;
+
+        if(hungry){
+            intakeMotor.set(-1);
+            chew();
+            swallow();
+            dropSoap();
+            testShoot();
+            indexerState = IndexerState.INTAKING;
+        }else{
+            indexerState = IndexerState.NOPE;
+        }
+        
     }
 
     public synchronized void setSalivation(boolean ww3) {
@@ -97,18 +108,30 @@ public class Indexer extends Threaded{
         else return;
     }
 
+    public synchronized void lick() {
+        intakeSolenoid.set(Value.kForward);
+    }
+
+    public synchronized void slime() {
+        intakeSolenoid.set(Value.kReverse);
+    }
+
+    private void testShoot() {
+        shooter.setSpeed(0.90, 0.25);
+    }
+
     private void chew() {
-        slamLeft.set(1);
-        slamRight.set(1);
+        slamLeft.set(-0.5);
+        slamRight.set(0.5);
     }
 
     private void spit() {
-        slamLeft.set(-1);
-        slamRight.set(1);
+        slamLeft.set(1);
+        slamRight.set(-1);
     }
 
     private void swallow() {
-        whooshMotor.set(-1);
+        whooshMotor.set(-0.5);
     }
 
     private void dropSoap() {
@@ -141,9 +164,9 @@ public class Indexer extends Threaded{
     public void shoot(BACKSPINRATIOS backSpin) {
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall(), backSpin);
         if (shooter.atSpeed(shot.bottomSpeed, shot.topSpeed)) {
-        dropSoap();
-        chew();
-        swallow();
+            dropSoap();
+            chew();
+            swallow();
         }
         else holdSoap();
     }

@@ -30,7 +30,7 @@ public class AutoRoutineGenerator {
 	}
 
 	static {
-		//TODO
+		Translation2d START_LEFT = new Translation2d();
 	}
 
 	public static AutoRoutine generate() {

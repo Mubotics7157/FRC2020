@@ -114,6 +114,9 @@ public final class Constants {
     public static final double WIDTH_METERS = 8.21;
     public static final double INTERPORT_METERS = 1; //placeholder
     public static final double HORZ_DIST_TO_PORT = 8; //placeholder
+    public static final double ODOMETRY_OFFSET_X = 0;
+    public static final double ODOMETRY_OFFSET_Y = 0;
+
   }
 
   public static final class LidarConstants {
@@ -122,6 +125,7 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
+    public static final int DEVICE_ID_TOP_BELT = 40;
     public static final int DEVICE_ID_INDEXER_CONVEYOR = 41;
     public static final int DEVICE_ID_INDEXER_SLAVE = 42;
     public static final int DEVICE_ID_CHUTE = 61;
@@ -130,8 +134,8 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static int DEVICE_ID_SHOOTER_TOP = 0;
-    public static int DEVICE_ID_SHOOTER_BOTTOM = 0;
+    public static int DEVICE_ID_SHOOTER_TOP = 19;
+    public static int DEVICE_ID_SHOOTER_BOTTOM = 18;
     public static int MAX_ALLOWABLE_ERROR_RPM = 1;
     public static double kP = 0.00;
     public static double kI = 0.00;

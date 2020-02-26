@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
   Drive drive = Drive.getInstance();
   //VisionManager vision = VisionManager.getInstance();
   Turret turret = Turret.getInstance();
+  Indexer indexer = Indexer.getInstance();
 
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
@@ -81,8 +82,9 @@ public class Robot extends TimedRobot {
       auto.interrupt();
     System.out.println("teleop init!");
     scheduler.resume();
-    drive.setAutoPath(traj2);
+    //drive.setAutoPath(traj2);
     //Drive.getInstance().setTeleOp();
+    indexer.setHungry(true);
   }
 
   @Override
@@ -93,6 +95,7 @@ public class Robot extends TimedRobot {
       //System.out.println("Setting TurretState to FieldLock");
       //turret.setFieldLock();
     //}
+
   }
 
   @Override

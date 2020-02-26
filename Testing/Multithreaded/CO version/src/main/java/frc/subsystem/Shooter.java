@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
@@ -43,5 +44,10 @@ public class Shooter {
         return 
             (Math.abs(topWheel.getEncoder().getVelocity() - top) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) && 
             (Math.abs(botWheel.getEncoder().getVelocity() - bottom) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM);
+    }
+
+    public void setSpeed(double bottom, double top) {
+        botWheel.set(bottom);
+        topWheel.set(top);
     }
 }

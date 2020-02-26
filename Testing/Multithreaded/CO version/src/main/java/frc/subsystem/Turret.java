@@ -44,7 +44,7 @@ public class Turret extends Threaded {
     TARGET_LOCK, //vision
   }
 
-  TurretState turretState = TurretState.FIELD_LOCK;
+  TurretState turretState = TurretState.OFF;
 
 	public static Turret getInstance() {
 		return Turret.trackingInstance;
@@ -97,8 +97,8 @@ public class Turret extends Threaded {
 
     turretMotor.configForwardSoftLimitEnable(true);
     turretMotor.configReverseSoftLimitEnable(true);
-    turretMotor.configForwardSoftLimitThreshold(TurretConstants.FORWARD_LIMIT_DEGREES / 360 * 4096);
-    turretMotor.configReverseSoftLimitThreshold(TurretConstants.REVERSE_LIMIT_DEGREES / 360 * 4096);
+    turretMotor.configForwardSoftLimitThreshold(2048);
+    turretMotor.configReverseSoftLimitThreshold(-2048);
     
     vision = VisionManager.getInstance();
   }
@@ -143,7 +143,7 @@ public class Turret extends Threaded {
   }
 
 	synchronized public Pose2d getOdometryFromLidar() {
-    //assuming bot facing driverstation is angle 0, and bot is facing target
+    //assuming bot facing driverstation is angle 0, and bot is facing target (only use during target lock)
     Rotation2d rot = RobotTracker.getInstance().getOdometry().getRotation();
 		double angle = rot.getDegrees();
 		return new Pose2d(lidar.getDistance() * Math.sin(angle - 180), lidar.getDistance() * Math.cos(angle - 180), rot);
@@ -155,7 +155,8 @@ public class Turret extends Threaded {
   }
 
   private void updateTargetLock(){
-    realSetpoint = vision.getTarget().getYaw() + driveTrainHeading;
+    
+    realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
   }
 
   public double getFieldRelativeHeading() {
@@ -184,5 +185,17 @@ public class Turret extends Threaded {
     double curTheta = VisionManager.getInstance().yaw.getDouble(0);
     return Math.atan(distToPort * Math.sin(curTheta) / (distToPort * Math.cos(curTheta)
        + FieldConstants.INTERPORT_METERS));
+  }
+
+  public double getAngleToInnerPortOdometry() {
+    double x = RobotTracker.getInstance().getOdometry().getTranslation().getX();
+    double y = RobotTracker.getInstance().getOdometry().getTranslation().getY();
+    double actualX = 0;
+    if(x < 5.85){
+      actualX = 5.85 - x;
+    }else{
+      actualX = x - 5.85;
+    }
+    return Math.atan(actualX / y);
   }
 }

@@ -19,6 +19,7 @@ public class LidarLitePWM{
 
     private Counter counter;
     double printedWarningCount = 5;
+    private double angleOffset = 0;
 
     /**
      * Create an object for a LIDAR-Lite attached to some digital input on the roboRIO
@@ -31,6 +32,7 @@ public class LidarLitePWM{
         // Configure for measuring rising to falling pulses
         counter.setSemiPeriodMode(true);
         counter.reset();
+        angleOffset = Math.toRadians(LidarConstants.ANGLE_OFFSET);
     }
 
 
@@ -39,7 +41,7 @@ public class LidarLitePWM{
      * 
      * @return Distance in cm
      */
-    public synchronized double getDistance() {
+    public double getDistance() {
         double cm;
         /* If we haven't seen the first rising to falling pulse, then we have no measurement.
         * This happens when there is no LIDAR-Lite plugged in, btw.
@@ -54,6 +56,6 @@ public class LidarLitePWM{
         * The LIDAR-Lite unit sends a high signal for 10 microseconds per cm of distance.
         */
         cm = (counter.getPeriod() * 1000000.0 / 10.0) + LidarConstants.CALIBRATION_OFFSET;
-        return cm;
+        return cm*Math.cos(angleOffset);
     }
 }

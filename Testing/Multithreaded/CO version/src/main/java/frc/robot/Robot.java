@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
 import frc.subsystem.*;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -22,6 +24,7 @@ public class Robot extends TimedRobot {
   public Controller xbox = new Controller(0);
   public Controller leftStick = new Controller(1);
   public Controller rightStick = new Controller(2);
+  private Compressor c = new Compressor();
 
   //Subsystems 
   RobotTracker robotTracker = RobotTracker.getInstance();
@@ -43,15 +46,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    c.stop();
     drive.calibrateGyro();
     drive.setPeriod(Duration.ofMillis(5));
     robotTracker.setPeriod(Duration.ofMillis(5));
     turret.setPeriod(Duration.ofMillis(20));
+    SmartDashboard.putNumber("bottom", 0);
+    SmartDashboard.putNumber("top", 0);
 
     //Schedule subsystems
     scheduler.schedule(drive, executor);
     scheduler.schedule(robotTracker, executor);
     scheduler.schedule(turret, executor);
+    scheduler.schedule(indexer, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("idk", 0);
   }
@@ -81,13 +88,15 @@ public class Robot extends TimedRobot {
 
   @Override 
   public void teleopInit() {
+    c.stop();
     if(auto != null)
       auto.interrupt();
     System.out.println("teleop init!");
     scheduler.resume();
+    turret.setLight(true);
+    //turret.setTargetLock();
     //drive.setAutoPath(traj2);
     //Drive.getInstance().setTeleOp();
-    indexer.setHungry(true);
   }
 
   @Override
@@ -98,7 +107,8 @@ public class Robot extends TimedRobot {
       //System.out.println("Setting TurretState to FieldLock");
       //turret.setFieldLock();
     //}
-
+    if (SmartDashboard.getNumber("bottom", 0) != 0)
+    indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
   }
 
   @Override
@@ -114,6 +124,7 @@ public class Robot extends TimedRobot {
     if(auto != null){
       auto.interrupt();
     }
+    turret.setLight(false);
   }
   
   @Override

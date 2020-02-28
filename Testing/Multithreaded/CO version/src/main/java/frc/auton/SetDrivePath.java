@@ -9,7 +9,7 @@ public class SetDrivePath extends AutoCommand {
 
 	private Trajectory robotPath;
 	private boolean isReversed;
-	private ArrayList<PathTrigger> triggers;
+	private ArrayList<PathTrigger> triggers = new ArrayList<>();
 
 	public SetDrivePath(Trajectory robotPath) {
 		this(robotPath, true);

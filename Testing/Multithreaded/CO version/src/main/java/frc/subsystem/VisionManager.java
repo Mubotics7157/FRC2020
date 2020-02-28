@@ -28,9 +28,9 @@ public class VisionManager extends Threaded {
 	}
 	
 	public VisionTarget getTarget(){
-		yaw = chameleon.getSubTable(VisionConstants.CAMERA_NAME).getEntry("yaw");
+		yaw = chameleon.getSubTable(VisionConstants.CAMERA_NAME).getEntry("targetYaw");
 		synchronized (this) {
-			if(chameleon.getSubTable(VisionConstants.CAMERA_NAME).getEntry("is_valid").getBoolean(false)){
+			if(chameleon.getSubTable(VisionConstants.CAMERA_NAME).getEntry("isValid").getBoolean(false)){
 				VisionTarget target = new VisionTarget((float)yaw.getDouble(0));
 				lastTarget = target;
 				return target;

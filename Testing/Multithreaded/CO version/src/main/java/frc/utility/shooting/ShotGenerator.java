@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class ShotGenerator {
     public enum BACKSPINRATIOS{
         NORMAL(2),
-        FLOATY(4),
+        FLOATY(3.75),
         SINKY(0.5);
 
         private final double value;
@@ -45,8 +45,8 @@ public class ShotGenerator {
     };
     
     public Double[][] floaty = {
-        {0d,1d,3d}, // X (distance)
-        {0d,1d,2d} // Y (RPM)
+        {1d,3d,1100d}, // X (distance)
+        {1d,2d,3000d} // Y (RPM)
     };
     
     public Double[][] sinky = {

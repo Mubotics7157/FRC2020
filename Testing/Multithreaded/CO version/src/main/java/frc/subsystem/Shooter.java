@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ShooterConstants;
 
 /**
@@ -41,6 +41,7 @@ public class Shooter {
     public boolean atSpeed(double bottom, double top) {
         topWheel.getPIDController().setReference(top, ControlType.kVelocity);
         botWheel.getPIDController().setReference(bottom, ControlType.kVelocity);
+        SmartDashboard.putNumber("bottom Encoder", botWheel.getEncoder().getVelocity());
         return 
             (Math.abs(topWheel.getEncoder().getVelocity() - top) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) && 
             (Math.abs(botWheel.getEncoder().getVelocity() - bottom) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM);

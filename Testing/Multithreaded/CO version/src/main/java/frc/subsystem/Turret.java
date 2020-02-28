@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +34,8 @@ public class Turret extends Threaded {
   private double driveTrainHeading;
   private double lastFieldRelativeSetpoint = 0;
   private VisionManager vision;
-	private LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
+  private LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
+  private Solenoid light = new Solenoid(4);
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
@@ -118,7 +120,6 @@ public class Turret extends Threaded {
         updateTargetLock();
         break;
     }
-
     lastRealSetpoint = realSetpoint;
     lastFieldRelativeSetpoint = fieldRelativeSetpoint;
 
@@ -126,6 +127,7 @@ public class Turret extends Threaded {
     SmartDashboard.putNumber("fieldRelativeSetpoint", fieldRelativeSetpoint);
     SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition() / 4096.0f * 360);
     SmartDashboard.putNumber("sensorVelocity", turretMotor.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("lidar distance", lidar.getDistance());
 
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
     if(turretState != TurretState.OFF){
@@ -134,7 +136,6 @@ public class Turret extends Threaded {
       //turretMotor.set(ControlMode.PercentOutput, 1);
       SmartDashboard.putNumber("targetPos", targetPos);
       SmartDashboard.putNumber("error", turretMotor.getSelectedSensorPosition() / 4096.0f * 360 - realSetpoint);
-
     }
   }
 
@@ -155,8 +156,8 @@ public class Turret extends Threaded {
   }
 
   private void updateTargetLock(){
-    
-    realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
+    //realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
+    realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading();
   }
 
   public double getFieldRelativeHeading() {
@@ -177,7 +178,7 @@ public class Turret extends Threaded {
 
   public double getTurretHeading() {
     //between 0 and 4095
-    return (turretMotor.getSensorCollection().getPulseWidthRiseToFallUs() - 1024) / 8f;
+    return turretMotor.getSelectedSensorPosition() / 4096f * 360f;
   }
 
   public double getAngleToInnerPort() {
@@ -197,5 +198,9 @@ public class Turret extends Threaded {
       actualX = x - 5.85;
     }
     return Math.atan(actualX / y);
+  }
+
+  public void setLight(boolean on) {
+    light.set(on);
   }
 }

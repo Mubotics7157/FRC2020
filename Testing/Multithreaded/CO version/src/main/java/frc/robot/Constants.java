@@ -94,9 +94,9 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final int DEVICE_ID_TURRET = 4;
-    public static final double kP = 60;
+    public static final double kP = 30;
     public static final double kI = 0.00;
-    public static final double kD = 240;
+    public static final double kD = 90;
     public static final double kF = 0.00;
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;
@@ -106,7 +106,7 @@ public final class Constants {
   }
 
   public static final class VisionConstants {
-    public static final String CAMERA_NAME = "USB Camera-B4.09.24.1";
+    public static final String CAMERA_NAME = "PS3";
   }
 
   public static final class FieldConstants {
@@ -122,6 +122,7 @@ public final class Constants {
   public static final class LidarConstants {
     public static final double CALIBRATION_OFFSET = -18;
     public static final int DIO_PORT = 0;
+    public static final double ANGLE_OFFSET = 2;
   }
 
   public static final class IndexerConstants {
@@ -136,10 +137,10 @@ public final class Constants {
   public static final class ShooterConstants {
     public static int DEVICE_ID_SHOOTER_TOP = 19;
     public static int DEVICE_ID_SHOOTER_BOTTOM = 18;
-    public static int MAX_ALLOWABLE_ERROR_RPM = 1;
-    public static double kP = 0.00;
+    public static int MAX_ALLOWABLE_ERROR_RPM = 100;
+    public static double kP = 0.0011;
     public static double kI = 0.00;
     public static double kD = 0.00;
-    public static double kFF = 0.00;
+    public static double kFF = 0.00023;
   }
 }

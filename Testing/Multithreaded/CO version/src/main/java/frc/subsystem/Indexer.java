@@ -7,10 +7,12 @@
 
 package frc.subsystem;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IndexerConstants;
 import frc.utility.Threaded;
 import frc.utility.shooting.ShotGenerator;
@@ -54,6 +56,13 @@ public class Indexer extends Threaded{
         soapBar = new CANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooter = new Shooter();
         shotGen = new ShotGenerator();
+        SmartDashboard.putString("Intake State", "NOPE");
+        slamLeft.setIdleMode(IdleMode.kCoast);
+        slamRight.setIdleMode(IdleMode.kCoast);
+        soapBar.setIdleMode(IdleMode.kCoast);
+        whooshMotor.setOpenLoopRampRate(0.25);
+        slamLeft.setOpenLoopRampRate(0.25);
+        slamRight.setOpenLoopRampRate(0.25);
     }
     
     @Override
@@ -65,13 +74,17 @@ public class Indexer extends Threaded{
         switch (snapIndexerState) {
             case INTAKING:
                 feast();
+                SmartDashboard.putString("Intake State", "Intaking");
                 break;
             case NOPE:
+                SmartDashboard.putString("Intake State", "NOPE");
                 break;
             case FULL:
+                SmartDashboard.putString("Intake State", "Full");
                 break;
             case SHOOTING:
                 shoot(backSpin);
+                SmartDashboard.putString("Intake State", "Shooting");
                 break;
         }
     }
@@ -81,14 +94,9 @@ public class Indexer extends Threaded{
     }
 
     public synchronized void setHungry(boolean hungry) {
+        System.out.println("the kkk");
         intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
-
         if(hungry){
-            intakeMotor.set(-1);
-            chew();
-            swallow();
-            dropSoap();
-            testShoot();
             indexerState = IndexerState.INTAKING;
         }else{
             indexerState = IndexerState.NOPE;
@@ -108,16 +116,8 @@ public class Indexer extends Threaded{
         else return;
     }
 
-    public synchronized void lick() {
-        intakeSolenoid.set(Value.kForward);
-    }
-
-    public synchronized void slime() {
-        intakeSolenoid.set(Value.kReverse);
-    }
-
-    private void testShoot() {
-        shooter.setSpeed(0.90, 0.25);
+    public void testShoot() {
+        shooter.setSpeed(0.9, 0.3);
     }
 
     private void chew() {
@@ -126,12 +126,13 @@ public class Indexer extends Threaded{
     }
 
     private void spit() {
-        slamLeft.set(1);
-        slamRight.set(-1);
+        slamLeft.set(0);
+        slamRight.set(0);
+        whooshMotor.set(0);
     }
 
     private void swallow() {
-        whooshMotor.set(-0.5);
+        whooshMotor.set(-1);
     }
 
     private void dropSoap() {
@@ -139,15 +140,15 @@ public class Indexer extends Threaded{
     }
 
     private void holdSoap() {
-        soapBar.set(1);
+        soapBar.set(0.3);
     }
 
     private void feast() {
-        if (lemons > 5) {
-            indexerState = IndexerState.FULL;
-            return;
-        }
         chew(); // run conveyor
+        intakeMotor.set(-1);
+    }
+
+    private void digest() {
         swallow(); // run chute
         holdSoap();
     }
@@ -168,7 +169,19 @@ public class Indexer extends Threaded{
             chew();
             swallow();
         }
-        else holdSoap();
+    }
+
+    
+    public void shootArbitrary(double bottomSpeed, double topSpeed) {
+        if (shooter.atSpeed(bottomSpeed, topSpeed) && bottomSpeed != 0) {
+            dropSoap();
+            chew();
+            swallow();
+        }
+        else {
+            soapBar.set(0);
+            //spit();
+        }
     }
 
     public synchronized int getLemonCount() {

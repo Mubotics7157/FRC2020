@@ -18,13 +18,13 @@ public class SetIntaking extends AutoCommand{
     private boolean down;
     public SetIntaking(boolean hungry, boolean down) {
         this.hungry = hungry;
+        this.setBlocking(false);
         this.down = down;
     }
     @Override
     public void start() {
         Indexer.getInstance().setHungry(hungry);
-        Indexer.getInstance().setSalivation(down);
-        this.setBlocking(false);
+        //Indexer.getInstance().setSalivation(down);
     }
 
     @Override

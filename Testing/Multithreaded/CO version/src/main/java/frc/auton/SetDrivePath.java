@@ -42,7 +42,6 @@ public class SetDrivePath extends AutoCommand {
 	@Override
 	public void start() {
 		Drive.getInstance().setAutoPath(robotPath, triggers);
-
 	}
 
 }

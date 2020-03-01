@@ -20,6 +20,7 @@ public class LidarLitePWM{
     private Counter counter;
     double printedWarningCount = 5;
     private double angleOffset = 0;
+    private double lastReading = 0;
 
     /**
      * Create an object for a LIDAR-Lite attached to some digital input on the roboRIO
@@ -56,6 +57,11 @@ public class LidarLitePWM{
         * The LIDAR-Lite unit sends a high signal for 10 microseconds per cm of distance.
         */
         cm = (counter.getPeriod() * 1000000.0 / 10.0) + LidarConstants.CALIBRATION_OFFSET;
-        return cm*Math.cos(angleOffset);
+        cm *= Math.cos(angleOffset);
+        if (cm > 0) {
+        lastReading = cm;
+        return cm;
+        }
+        return lastReading;
     }
 }

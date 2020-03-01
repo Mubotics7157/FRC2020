@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class ShotGenerator {
     public enum BACKSPINRATIOS{
-        NORMAL(2),
+        NORMAL(2.0597),
         FLOATY(3.75),
         SINKY(0.5);
 
@@ -40,8 +40,8 @@ public class ShotGenerator {
 
     //log data as {top wheel RPM, distance it made it in}
     public Double[][] normal = {
-        {0d,1d,3d}, // X (distance)
-        {0d,1d,2d} // Y (RPM)
+        {494d,495d,496d}, // X (distance)
+        {3450d,9999d,10000d} // Y (RPM)
     };
     
     public Double[][] floaty = {
@@ -75,6 +75,6 @@ public class ShotGenerator {
         }
 
         double rpm = interpolator.interpolate(distance);
-        return new ShooterSpeed(rpm, rpm*backSpin.getValue());
+        return new ShooterSpeed(rpm, rpm/backSpin.getValue());
     }
 }

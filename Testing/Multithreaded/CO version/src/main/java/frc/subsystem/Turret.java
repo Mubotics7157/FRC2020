@@ -44,9 +44,11 @@ public class Turret extends Threaded {
     OFF, //kys
     FIELD_LOCK, //field relative
     TARGET_LOCK, //vision
+    ARB_LOCK,
+    DEBUG_MODE
   }
 
-  TurretState turretState = TurretState.OFF;
+  TurretState turretState = TurretState.DEBUG_MODE;
 
 	public static Turret getInstance() {
 		return Turret.trackingInstance;
@@ -101,6 +103,9 @@ public class Turret extends Threaded {
     turretMotor.configReverseSoftLimitEnable(true);
     turretMotor.configForwardSoftLimitThreshold(2048);
     turretMotor.configReverseSoftLimitThreshold(-2048);
+
+    SmartDashboard.putNumber("Angle Offset", 0);
+    SmartDashboard.putNumber("Debug Setpoint", 0);
     
     vision = VisionManager.getInstance();
   }
@@ -118,6 +123,11 @@ public class Turret extends Threaded {
         break;
       case TARGET_LOCK:
         updateTargetLock();
+        break;
+      case ARB_LOCK:
+        break;
+      case DEBUG_MODE:
+        updateDebug();
         break;
     }
     lastRealSetpoint = realSetpoint;
@@ -143,6 +153,18 @@ public class Turret extends Threaded {
     return lidar.getDistance();
   }
 
+  public void setArbitraryLock(){
+    turretState = TurretState.ARB_LOCK;
+  }
+
+  public void setRealSetpoint(double setpoint){
+    realSetpoint = setpoint;
+  }
+
+  public void updateDebug(){
+    realSetpoint = SmartDashboard.getNumber("Debug Setpoint", 0);
+  }
+
 	synchronized public Pose2d getOdometryFromLidar() {
     //assuming bot facing driverstation is angle 0, and bot is facing target (only use during target lock)
     Rotation2d rot = RobotTracker.getInstance().getOdometry().getRotation();
@@ -151,13 +173,24 @@ public class Turret extends Threaded {
 	}
 
   private void updateFieldLock(){
-    fieldRelativeSetpoint = 0;
     realSetpoint = fieldRelativeSetpoint - driveTrainHeading;
+  }
+
+  public void setDebug(){
+    turretState = TurretState.DEBUG_MODE;
+  }
+
+  public void setFieldRelativeSetpoint(double setpoint){
+    fieldRelativeSetpoint = setpoint;
+  }
+
+  public boolean getIfTurretAligned(){
+    return driveTrainHeading - fieldRelativeSetpoint < 1;
   }
 
   private void updateTargetLock(){
     //realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
-    realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading();
+    realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading() - 2.3;
   }
 
   public double getFieldRelativeHeading() {

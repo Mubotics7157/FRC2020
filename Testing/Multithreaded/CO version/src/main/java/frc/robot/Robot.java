@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     c.stop();
     drive.calibrateGyro();
-    drive.setPeriod(Duration.ofMillis(5));
+    drive.setPeriod(Duration.ofMillis(20));
     robotTracker.setPeriod(Duration.ofMillis(5));
     turret.setPeriod(Duration.ofMillis(20));
     SmartDashboard.putNumber("bottom", 0);
@@ -74,6 +74,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     scheduler.resume();
     // m_autoSelected = m_chooser.getSelected();
+    turret.setLight(true);
     AutoRoutine option = AutoRoutineGenerator.generate();
     auto = new Thread(option);
     auto.start();
@@ -107,8 +108,23 @@ public class Robot extends TimedRobot {
       //System.out.println("Setting TurretState to FieldLock");
       //turret.setFieldLock();
     //}
-    if (SmartDashboard.getNumber("bottom", 0) != 0)
     indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
+    turret.setDebug();
+    //indexer.testShoot();
+    
+
+    if(xbox.getRawButton(1)) {
+      //indexer.tuneMode(3000, 2000);
+      
+    }
+    if(xbox.getRawButtonPressed(2)) {
+      indexer.debugStop();
+    }
+    
+    //indexer.shootArbitrary(3000, 3000);
+    indexer.runAll();
+
+
   }
 
   @Override
@@ -125,6 +141,8 @@ public class Robot extends TimedRobot {
       auto.interrupt();
     }
     turret.setLight(false);
+    turret.setOff();
+    indexer.setHungry(false);
   }
   
   @Override

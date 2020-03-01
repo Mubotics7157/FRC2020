@@ -160,6 +160,8 @@ public class Drive extends Threaded{
   }
 
   private double getPathPercentage() {
+    SmartDashboard.putNumber("ramsete timer", ramseteTimer.get());
+    SmartDashboard.putNumber("traj tim", currentTrajectory.getTotalTimeSeconds());
     return ramseteTimer.get() / currentTrajectory.getTotalTimeSeconds();
   }
 
@@ -218,7 +220,7 @@ public class Drive extends Threaded{
 				break;
 			}
 		}
-    SmartDashboard.putNumber("path tim", curTime);
+    SmartDashboard.putNumber("path tim", getPathPercentage());
     double dt = (curTime - ramsetePrevTime) * 10;
     Trajectory.State goal = currentTrajectory.sample(curTime);
     ChassisSpeeds adjustedSpeeds = ramseteController.calculate(RobotTracker.getInstance().getOdometry(), goal);

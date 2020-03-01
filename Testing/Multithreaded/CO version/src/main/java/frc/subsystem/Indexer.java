@@ -32,6 +32,10 @@ public class Indexer extends Threaded{
     Shooter shooter;
     ShotGenerator shotGen;
     BACKSPINRATIOS backSpin = BACKSPINRATIOS.NORMAL;
+    private boolean lastAtSpeed = false;
+
+    private double botArbitrary = -1;
+    private double topArbitrary = -1;
 
     private int lemons = 0;
     public static Indexer getInstance() {
@@ -42,7 +46,8 @@ public class Indexer extends Threaded{
         INTAKING, // want me some balls
         FULL, // keep balls in me
         SHOOTING, // POOPOO
-        NOPE // virgin bot
+        NOPE, // virgin bot
+        ARB_SHOOT
     }
 
     private IndexerState indexerState = IndexerState.NOPE;
@@ -83,8 +88,14 @@ public class Indexer extends Threaded{
                 SmartDashboard.putString("Intake State", "Full");
                 break;
             case SHOOTING:
-                shoot(backSpin);
+                if (botArbitrary <= 0)
+                    shoot(backSpin);
+                else {
+                    shootArbitrary(botArbitrary, topArbitrary);
+                }
                 SmartDashboard.putString("Intake State", "Shooting");
+                break;
+            case ARB_SHOOT:
                 break;
         }
     }
@@ -99,6 +110,7 @@ public class Indexer extends Threaded{
         if(hungry){
             indexerState = IndexerState.INTAKING;
         }else{
+            spit();
             indexerState = IndexerState.NOPE;
         }
         
@@ -106,7 +118,7 @@ public class Indexer extends Threaded{
 
     public synchronized void setSalivation(boolean ww3) {
         intakeSolenoid.set(ww3 ? Value.kReverse : Value.kForward);
-        indexerState = IndexerState.NOPE;
+        if (!ww3) indexerState = IndexerState.NOPE;
     }
 
     public synchronized void toggleHungry() {
@@ -117,7 +129,14 @@ public class Indexer extends Threaded{
     }
 
     public void testShoot() {
-        shooter.setSpeed(0.9, 0.3);
+        shooter.setSpeed(0.7, 0.3);
+    }
+
+    public void debugStop() {
+        slamLeft.set(0);
+        slamRight.set(0);
+        whooshMotor.set(0);
+        shooter.setSpeed(0, 0);
     }
 
     private void chew() {
@@ -129,6 +148,7 @@ public class Indexer extends Threaded{
         slamLeft.set(0);
         slamRight.set(0);
         whooshMotor.set(0);
+        intakeMotor.set(0);
     }
 
     private void swallow() {
@@ -154,11 +174,19 @@ public class Indexer extends Threaded{
     }
 
     public synchronized void setShooting(BACKSPINRATIOS backSpin) {
+        botArbitrary = 0;
+        topArbitrary = 0;
         indexerState = IndexerState.SHOOTING;
         this.backSpin = backSpin;
     }
     
     public void setShooting() {
+        setShooting(BACKSPINRATIOS.NORMAL);
+    }
+
+    public void setShooting(double bot, double top) {
+        botArbitrary = bot;
+        topArbitrary = top;
         indexerState = IndexerState.SHOOTING;
     }
 
@@ -171,17 +199,43 @@ public class Indexer extends Threaded{
         }
     }
 
+    public void runAll() {
+        dropSoap();
+        chew();
+        swallow();
+    }
+
+    public void setLemons(int lemons){
+        this.lemons = lemons;
+    }
+
     
     public void shootArbitrary(double bottomSpeed, double topSpeed) {
-        if (shooter.atSpeed(bottomSpeed, topSpeed) && bottomSpeed != 0) {
+        boolean atSpeed = shooter.atSpeed(bottomSpeed, topSpeed);
+        boolean lemonShot = shooter.lemonShot();
+        if(bottomSpeed == 0){
+            shooter.setSpeed(0, 0);
+        }else if (atSpeed) {
             dropSoap();
             chew();
             swallow();
         }
         else {
             soapBar.set(0);
-            //spit();
+            spit();
         }
+        SmartDashboard.putNumber("lemons", lemons);
+        if(lastAtSpeed && !lemonShot){
+            lemons--;
+        }
+        lastAtSpeed = lemonShot;
+    }
+
+    public void tuneMode(double bottomSpeed, double topSpeed) {
+        //dropSoap();
+        //chew();
+        //shootArbitrary(bottomSpeed, topSpeed);
+        swallow();
     }
 
     public synchronized int getLemonCount() {

@@ -13,7 +13,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.IndexerConstants;
 import frc.utility.LazyCANSparkMax;
 import frc.utility.Threaded;
@@ -116,7 +115,7 @@ public class Indexer extends Threaded{
      * @param hungry true = run intake
      */
     public synchronized void setHungry(boolean hungry) {
-        intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
+        setSalivation(true);
         if(hungry){
             indexerState = IndexerState.INTAKING;
         }else{

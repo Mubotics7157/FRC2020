@@ -9,6 +9,7 @@ import frc.auton.AutoRoutineGenerator;
 import frc.subsystem.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -17,13 +18,14 @@ import java.util.concurrent.*;
 
 
 import frc.utility.ThreadScheduler;
+import frc.utility.shooting.ShotGenerator.BACKSPINRATIOS;
 import frc.utility.Controller;
 
 public class Robot extends TimedRobot {
   //Controllers
-  public Controller xbox = new Controller(0);
-  public Controller leftStick = new Controller(1);
-  public Controller rightStick = new Controller(2);
+  public Joystick xbox = new Joystick(0);
+  public static Joystick leftStick = new Joystick(1);
+  public static Joystick rightStick = new Joystick(2);
   private Compressor c = new Compressor();
 
   //Subsystems 
@@ -97,32 +99,42 @@ public class Robot extends TimedRobot {
     turret.setLight(true);
     //turret.setTargetLock();
     //drive.setAutoPath(traj2);
-    //Drive.getInstance().setTeleOp();
+    Drive.getInstance().setTeleOp();
+    indexer.setLemons(1000);
   }
 
   @Override
   public void teleopPeriodic() {
-    //drive.driveTeleOp(leftStick.getY(), rightStick.getY());
+    //drive.driveTeleOp(leftStick.getRawAx, rightStick.getY());
+    if(xbox.getRawAxis(2) > 0.9) {
+      indexer.setHungry(true);
+    }
+    else if (xbox.getRawAxis(3) > 0.9) {
+      indexer.setShooting(BACKSPINRATIOS.FLOATY);
+    }
+    else {
+      indexer.setHungry(false);
+    }
+
+    if (xbox.getRawButtonPressed(1)) {
+      turret.setFieldLock();
+    }
+    else if (xbox.getRawButtonPressed(2)) {
+      turret.setTargetLock();
+    }
+    else if (xbox.getRawButtonPressed(3)) {
+      turret.setOff();
+    }
     //drive.tankDriveVelocity(0.2, 0.2);
     //if(xbox.getRawButtonPressed(1)){
       //System.out.println("Setting TurretState to FieldLock");
       //turret.setFieldLock();
     //}
-    indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
-    turret.setDebug();
     //indexer.testShoot();
-    
-
-    if(xbox.getRawButton(1)) {
-      //indexer.tuneMode(3000, 2000);
-      
-    }
-    if(xbox.getRawButtonPressed(2)) {
-      indexer.debugStop();
-    }
+  
     
     //indexer.shootArbitrary(3000, 3000);
-    indexer.runAll();
+    //indexer.runAll();
 
 
   }

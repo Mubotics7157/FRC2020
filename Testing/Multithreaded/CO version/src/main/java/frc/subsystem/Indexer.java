@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IndexerConstants;
+import frc.utility.LazyCANSparkMax;
 import frc.utility.Threaded;
 import frc.utility.shooting.ShotGenerator;
 import frc.utility.shooting.ShotGenerator.BACKSPINRATIOS;
@@ -25,9 +26,9 @@ import frc.utility.shooting.ShotGenerator.ShooterSpeed;
 public class Indexer extends Threaded{
     private static final Indexer instance = new Indexer();
     CANSparkMax intakeMotor;
-    CANSparkMax slamLeft, slamRight; // as facing intake
-    CANSparkMax whooshMotor; // chute
-    CANSparkMax soapBar; // shooter conveyor
+    LazyCANSparkMax slamLeft, slamRight; // as facing intake
+    LazyCANSparkMax whooshMotor; // chute
+    LazyCANSparkMax soapBar; // shooter conveyor
     DoubleSolenoid intakeSolenoid;
     Shooter shooter;
     ShotGenerator shotGen;
@@ -54,11 +55,11 @@ public class Indexer extends Threaded{
 
     public Indexer() {
         intakeMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_INTAKE, MotorType.kBrushless);
-        slamLeft = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
-        slamRight = new CANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
-        whooshMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
+        slamLeft = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
+        slamRight = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
+        whooshMotor = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
-        soapBar = new CANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
+        soapBar = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooter = new Shooter();
         shotGen = new ShotGenerator();
         SmartDashboard.putString("Intake State", "NOPE");
@@ -83,6 +84,7 @@ public class Indexer extends Threaded{
                 break;
             case NOPE:
                 SmartDashboard.putString("Intake State", "NOPE");
+                spit();
                 break;
             case FULL:
                 SmartDashboard.putString("Intake State", "Full");
@@ -105,13 +107,13 @@ public class Indexer extends Threaded{
     }
 
     public synchronized void setHungry(boolean hungry) {
-        System.out.println("the kkk");
         intakeSolenoid.set(hungry ? Value.kForward : Value.kReverse);
         if(hungry){
             indexerState = IndexerState.INTAKING;
         }else{
             spit();
             indexerState = IndexerState.NOPE;
+            shootArbitrary(0, 0);
         }
         
     }
@@ -137,11 +139,12 @@ public class Indexer extends Threaded{
         slamRight.set(0);
         whooshMotor.set(0);
         shooter.setSpeed(0, 0);
+        soapBar.set(0);
     }
 
     private void chew() {
-        slamLeft.set(-0.5);
-        slamRight.set(0.5);
+        slamLeft.set(-0.3);
+        slamRight.set(0.3);
     }
 
     private void spit() {
@@ -149,14 +152,16 @@ public class Indexer extends Threaded{
         slamRight.set(0);
         whooshMotor.set(0);
         intakeMotor.set(0);
+        soapBar.set(0);
+        //shootArbitrary(0, 0);
     }
 
     private void swallow() {
-        whooshMotor.set(-1);
+        whooshMotor.set(-.5);
     }
 
     private void dropSoap() {
-        soapBar.set(-1);
+        soapBar.set(-.5);
     }
 
     private void holdSoap() {
@@ -174,8 +179,8 @@ public class Indexer extends Threaded{
     }
 
     public synchronized void setShooting(BACKSPINRATIOS backSpin) {
-        botArbitrary = 0;
-        topArbitrary = 0;
+        botArbitrary = -1;
+        topArbitrary = -1;
         indexerState = IndexerState.SHOOTING;
         this.backSpin = backSpin;
     }
@@ -192,11 +197,27 @@ public class Indexer extends Threaded{
 
     public void shoot(BACKSPINRATIOS backSpin) {
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall(), backSpin);
-        if (shooter.atSpeed(shot.bottomSpeed, shot.topSpeed)) {
+        boolean atSpeed = shooter.atSpeed(shot.bottomSpeed, shot.topSpeed);
+        boolean lemonShot = shooter.lemonShot();
+        if(shot.bottomSpeed == 0){
+            shooter.setSpeed(0, 0);
+        }else if (atSpeed) {
             dropSoap();
             chew();
             swallow();
         }
+        else {
+            soapBar.set(0);
+            spit();
+        }
+        SmartDashboard.putNumber("lemons", lemons);
+        if(lastAtSpeed && !lemonShot){
+            lemons--;
+        }
+        if (lemons <= 0) {
+            indexerState = IndexerState.NOPE;
+        }
+        lastAtSpeed = lemonShot;
     }
 
     public void runAll() {
@@ -227,6 +248,9 @@ public class Indexer extends Threaded{
         SmartDashboard.putNumber("lemons", lemons);
         if(lastAtSpeed && !lemonShot){
             lemons--;
+        }
+        if (lemons <= 0) {
+            indexerState = IndexerState.NOPE;
         }
         lastAtSpeed = lemonShot;
     }

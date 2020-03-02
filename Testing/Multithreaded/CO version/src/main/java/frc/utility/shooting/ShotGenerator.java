@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class ShotGenerator {
     public enum BACKSPINRATIOS{
         NORMAL(2.0597),
-        FLOATY(3.75),
+        FLOATY(2.57),
         SINKY(0.5);
 
         private final double value;
@@ -45,8 +45,8 @@ public class ShotGenerator {
     };
     
     public Double[][] floaty = {
-        {1d,3d,1100d}, // X (distance)
-        {1d,2d,3000d} // Y (RPM)
+        {968d,1090d,1215d}, // X (distance)
+        {3500d,3550d,3600d} // Y (RPM)
     };
     
     public Double[][] sinky = {
@@ -55,7 +55,7 @@ public class ShotGenerator {
     };
 
     SplineInterpolator normalInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(normal[1]), Arrays.asList(normal[0]));
-    SplineInterpolator floatyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[1]), Arrays.asList(sinky[0]));
+    SplineInterpolator floatyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[0]), Arrays.asList(floaty[1]));
     SplineInterpolator sinkyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(sinky[1]), Arrays.asList(sinky[0]));
 
     public ShooterSpeed getShot(double distance, BACKSPINRATIOS backSpin) {
@@ -75,6 +75,6 @@ public class ShotGenerator {
         }
 
         double rpm = interpolator.interpolate(distance);
-        return new ShooterSpeed(rpm, rpm/backSpin.getValue());
+        return new ShooterSpeed(rpm/backSpin.getValue(), rpm);
     }
 }

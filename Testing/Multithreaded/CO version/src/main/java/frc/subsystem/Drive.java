@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.auton.PathTrigger;
+import frc.robot.Robot;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.utility.OrangeUtility;
@@ -118,7 +119,8 @@ public class Drive extends Threaded{
       switch (snapDriveState) {
         case TELEOP:
           updateTeleOp();
-          break;
+          SmartDashboard.putString("Drive State", "Teleop");
+        break;
         case PUREPURSUIT:          
         SmartDashboard.putString("Drive State", "Pure Pursuit");
         updatePathController();
@@ -177,13 +179,16 @@ public class Drive extends Threaded{
   }
 
   private void updateTeleOp() {
+    driveTeleOp(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
 
   }
 
   public void driveTeleOp(double l, double r) {
-    if (driveState == DriveState.TELEOP) {
-      tankDrive(l, r);
-    }
+      if(Math.abs(l) <= DriveTrainConstants.DEADBAND && Math.abs(r) <= DriveTrainConstants.DEADBAND){
+        tankDriveVolts(0, 0);
+      }else{
+        tankDrive(l, r, false);
+      }
   }
 
   public void setTeleOp() {
@@ -215,7 +220,7 @@ public class Drive extends Threaded{
     //play commands we pass
     while (!triggers.isEmpty()) {
 			if (triggers.get(0).getPercentage() <= getPathPercentage()) {
-				triggers.remove(0).playTrigger();
+        triggers.remove(0).playTrigger();
 			} else {
 				break;
 			}
@@ -297,9 +302,10 @@ public class Drive extends Threaded{
   public void tankDrive(double leftSpeed, double rightSpeed, boolean useSquares) {
     var xLeftSpeed = leftSpeed * MAX_SPEED_TELE;
     var xRightSpeed = rightSpeed * MAX_SPEED_TELE;
+    SmartDashboard.putNumber("left setpoint", leftSpeed);
     if (useSquares) {
-      xLeftSpeed *= Math.abs(xLeftSpeed);
-      xRightSpeed *= Math.abs(xRightSpeed);
+      xLeftSpeed = Math.copySign(Math.pow(Math.abs(xLeftSpeed), 4), xLeftSpeed);
+      xRightSpeed = Math.copySign(Math.pow(Math.abs(xRightSpeed), 4), xRightSpeed);
     }
     tankDriveVelocity(xLeftSpeed, xRightSpeed);
   }
@@ -391,7 +397,15 @@ public class Drive extends Threaded{
 
     var leftAccel = (leftVelocity - actualLeftVel) / .20;
     var rightAccel = (rightVelocity - actualRightVel) / .20;
+/*
+    if (Math.abs(leftAccel) > TrajectoryConstants.MAX_ACCELERATION_AUTO) {
+      leftAccel = Math.copySign(TrajectoryConstants.MAX_ACCELERATION_AUTO, leftAccel);
+    }
     
+    if (Math.abs(rightAccel) > TrajectoryConstants.MAX_ACCELERATION_AUTO) {
+      rightAccel = Math.copySign(TrajectoryConstants.MAX_ACCELERATION_AUTO, rightAccel);
+    }
+    */
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);
 

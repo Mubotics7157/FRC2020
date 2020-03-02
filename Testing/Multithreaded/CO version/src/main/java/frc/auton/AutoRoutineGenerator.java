@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsCo
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.RobotTracker;
+import frc.subsystem.Turret;
 
 public class AutoRoutineGenerator {
 	private static Translation2d robotStartPosition = new Translation2d(20, 115);
@@ -34,18 +35,18 @@ public class AutoRoutineGenerator {
 	}
 
 	public static AutoRoutine generate() {
-		TrajectoryConfig config = createConfig(0.8,1, false);
+		TrajectoryConfig config = createConfig(2,2, false);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
 			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
-			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-66))
+			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-60))
 		  ),
 		  config);
 		
 		Trajectory shootToIntake3 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
-			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-66)),
+			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-60)),
 			  new Pose2d(new Translation2d(3.23,1), Rotation2d.fromDegrees(0))
 		  ),
 		  config);
@@ -53,13 +54,13 @@ public class AutoRoutineGenerator {
 		initialDrive = new AutoRoutine();
 		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
 		RobotTracker.getInstance().setOdometry(startPos);
-		initialDrive.addCommands(new SetDrivePath(startToIntake2, true,
-								//PathTrigger.create(new SetShooting(), 0.6),
-								PathTrigger.create(new SetTurretAngle(0), 0.5),
+		initialDrive.addCommands(
+								new SetDrivePath(startToIntake2, true,
+								PathTrigger.create(new SetTurretFieldLock(), 0),
 								PathTrigger.create(new SetIntaking(true, true), 0.7))
 								);
 		initialDrive.addCommands(new Delay(2), new SetIntaking(false, false),
-								new SetShooting(3350, 1650));
+								new SetShooting(3350, 1650, 5, true));
 		initialDrive.addCommands(
 								new SetDrivePath(shootToIntake3, true,
 												PathTrigger.create(new SetIntaking(true, true), 0.3)));

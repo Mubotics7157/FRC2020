@@ -7,29 +7,18 @@
 
 package frc.auton;
 
-import frc.subsystem.Indexer;
+import frc.subsystem.Turret;
 
 /**
  * Add your docs here.
  */
-public class SetShooting extends AutoCommand{
-    private double bot;
-    private double top;
-    private int times;
-    public SetShooting(double b, double t, int times, boolean blocking) {
-        bot = b;
-        this.setBlocking(blocking);
-        top = t;
-        this.times = times;
-    }
-    @Override
+public class SetTurretFieldLock extends AutoCommand{
+    
     public void start() {
-        Indexer.getInstance().setLemons(times);
-        Indexer.getInstance().setShooting(bot, top);
+        Turret.getInstance().setFieldLock();
     }
 
-    @Override
     public boolean isFinished() {
-        return Indexer.getInstance().getLemonCount() == 0;
+        return true;
     }
 }

@@ -13,20 +13,23 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ShooterConstants;
+import frc.utility.LazyCANSparkMax;
 
 /**
  * Add your docs here.
  */
 public class Shooter {
-    private CANSparkMax botWheel;
-    private CANSparkMax topWheel;
+    private LazyCANSparkMax botWheel;
+    private LazyCANSparkMax topWheel;
 
     private double lastTop = 0;
     private double lastBot = 0;
+    private double lastVelTop = 0;
+    private double lastVelBot = 0;
 
     public Shooter() {
-        botWheel = new CANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless);
-        topWheel = new CANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_TOP, MotorType.kBrushless);
+        botWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless);
+        topWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_TOP, MotorType.kBrushless);
         CANPIDController botController = botWheel.getPIDController();
         CANPIDController topController = topWheel.getPIDController();
 
@@ -42,14 +45,23 @@ public class Shooter {
     }
 
     public boolean atSpeed(double bottom, double top) {
+        if (bottom == 0 || top == 0) {
+            topWheel.getPIDController().setReference(0, ControlType.kVoltage);
+            botWheel.getPIDController().setReference(0, ControlType.kVoltage);
+            return false;
+        }
         lastTop = top;
         lastBot = bottom;
         topWheel.getPIDController().setReference(top, ControlType.kVelocity);
         botWheel.getPIDController().setReference(bottom, ControlType.kVelocity);
         SmartDashboard.putNumber("bottom Encoder", botWheel.getEncoder().getVelocity());
         SmartDashboard.putNumber("top Encoder", topWheel.getEncoder().getVelocity());
+        SmartDashboard.putNumber("top accel", (topWheel.getEncoder().getVelocity() - lastVelTop) / .2f);
+        SmartDashboard.putNumber("bot accel", (botWheel.getEncoder().getVelocity() - lastVelBot) / .2f);
         SmartDashboard.putNumber("top Setpoint", top);
         SmartDashboard.putNumber("bottom Setpoint", bottom);
+        lastVelBot = botWheel.getEncoder().getVelocity();
+        lastVelTop = topWheel.getEncoder().getVelocity();
         
 
         return 
@@ -58,6 +70,7 @@ public class Shooter {
     }
 
     public boolean lemonShot() { //ONLY USE WHEN ALSO USING ATSPEED
+        SmartDashboard.putNumber("currBot", botWheel.getOutputCurrent());
         return 
             (Math.abs(topWheel.getEncoder().getVelocity() - lastTop) < ShooterConstants.LEMON_ERROR_COUNTER) &&
             (Math.abs(botWheel.getEncoder().getVelocity() - lastBot) < ShooterConstants.LEMON_ERROR_COUNTER);

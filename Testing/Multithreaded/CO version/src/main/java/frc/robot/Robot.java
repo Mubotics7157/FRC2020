@@ -8,7 +8,6 @@ import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
 import frc.subsystem.*;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -18,9 +17,6 @@ import java.util.concurrent.*;
 
 
 import frc.utility.ThreadScheduler;
-import frc.utility.shooting.ShotGenerator.BACKSPINRATIOS;
-import frc.utility.Controller;
-
 public class Robot extends TimedRobot {
   //Controllers
   public Joystick xbox = new Joystick(0);
@@ -110,7 +106,7 @@ public class Robot extends TimedRobot {
       indexer.setHungry(true);
     }
     else if (xbox.getRawAxis(3) > 0.9) {
-      indexer.setShooting(BACKSPINRATIOS.FLOATY);
+      indexer.setShooting();
     }
     else {
       indexer.setHungry(false);

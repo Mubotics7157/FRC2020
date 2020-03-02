@@ -9,11 +9,13 @@ package frc.utility.shooting;
 
 import java.util.Arrays;
 
+import frc.robot.Constants.ShooterConstants;
+
 /**
  * Add your docs here.
  */
 public class ShotGenerator {
-    public enum BACKSPINRATIOS{
+    private enum BACKSPINRATIOS{
         NORMAL(2.0597),
         FLOATY(2.57),
         SINKY(0.5);
@@ -39,17 +41,17 @@ public class ShotGenerator {
 
 
     //log data as {top wheel RPM, distance it made it in}
-    public Double[][] normal = {
+    private Double[][] normal = {
         {494d,495d,496d}, // X (distance)
         {3450d,9999d,10000d} // Y (RPM)
     };
     
-    public Double[][] floaty = {
+    private Double[][] floaty = {
         {968d,1090d,1215d}, // X (distance)
         {3500d,3550d,3600d} // Y (RPM)
     };
     
-    public Double[][] sinky = {
+    private Double[][] sinky = {
         {0d,1d,3d}, // X (distance)
         {0d,1d,2d} // Y (RPM)
     };
@@ -58,8 +60,14 @@ public class ShotGenerator {
     SplineInterpolator floatyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(floaty[0]), Arrays.asList(floaty[1]));
     SplineInterpolator sinkyInterpolator = SplineInterpolator.createMonotoneCubicSpline(Arrays.asList(sinky[1]), Arrays.asList(sinky[0]));
 
-    public ShooterSpeed getShot(double distance, BACKSPINRATIOS backSpin) {
+    public ShooterSpeed getShot(double distance) {
         SplineInterpolator interpolator;
+        BACKSPINRATIOS backSpin;
+        if (distance > ShooterConstants.BACKSPIN_BREAKPOINT_CM) {
+            backSpin = BACKSPINRATIOS.FLOATY;
+        }
+        else backSpin = BACKSPINRATIOS.NORMAL;
+
         switch (backSpin) {
             case NORMAL:
                 interpolator = normalInterpolator;

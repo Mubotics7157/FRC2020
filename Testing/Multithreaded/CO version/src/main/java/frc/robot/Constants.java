@@ -4,6 +4,7 @@ package frc.robot;
 import static frc.robot.Constants.DriveTrainConstants.DRIVE_KINEMATICS;
 import static frc.robot.Constants.DriveTrainConstants.FEED_FORWARD;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
@@ -132,6 +133,8 @@ public final class Constants {
     public static final int DEVICE_ID_CHUTE = 61;
     public static final int DEVICE_ID_INTAKE = 51;
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
+    public static final Value INTAKE_DEPLOYED = Value.kForward;
+    public static final Value INTAKE_RETRACTED = Value.kReverse;
   }
 
   public static final class ShooterConstants {
@@ -147,6 +150,10 @@ public final class Constants {
     public static double kI_BOTTOM = 0.00;
     public static double kD_BOTTOM = 0.512;
     public static double kFF_BOTTOM = 0.00019;
+    public static final int[] SOLENOID_IDS_SHOOTER = {2,3};
+    public static final Value SHOOTER_RETRACTED = Value.kForward;
+    public static final Value SHOOTER_ANGLED = Value.kReverse;
+    public static final int BACKSPIN_BREAKPOINT_CM = 1200;
   }
 }
 

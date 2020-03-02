@@ -62,8 +62,6 @@ public class Shooter {
         SmartDashboard.putNumber("bottom Setpoint", bottom);
         lastVelBot = botWheel.getEncoder().getVelocity();
         lastVelTop = topWheel.getEncoder().getVelocity();
-        
-
         return 
             (Math.abs(topWheel.getEncoder().getVelocity() - top) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) && 
             (Math.abs(botWheel.getEncoder().getVelocity() - bottom) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM);

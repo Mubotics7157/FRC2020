@@ -67,6 +67,28 @@ public class AutoRoutineGenerator {
 		return initialDrive;
 	}
 
+	
+	public static AutoRoutine generateSimpleLine() {
+		TrajectoryConfig config = createConfig(2,2, false);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+		Trajectory startMove = TrajectoryGenerator.generateTrajectory(
+		  List.of(
+			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
+			  new Pose2d(2,0, Rotation2d.fromDegrees(0))
+		  ),
+		  config);
+
+		initialDrive = new AutoRoutine();
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands(
+								new SetDrivePath(startMove, true,
+								PathTrigger.create(new SetTurretFieldLock(), 0),
+								PathTrigger.create(new SetShooting(3000, 2000, 3, false), 0.8))
+								);
+		return initialDrive;
+	}
+
 	private static TrajectoryConfig createConfig(double v, double a, boolean reversed) {
 		TrajectoryConfig config = new TrajectoryConfig(v, a);
 		config.addConstraint(TrajectoryConstants.VOLTAGE_CONSTRAINT);

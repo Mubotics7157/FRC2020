@@ -153,7 +153,7 @@ public final class Constants {
     public static final int[] SOLENOID_IDS_SHOOTER = {2,3};
     public static final Value SHOOTER_RETRACTED = Value.kForward;
     public static final Value SHOOTER_ANGLED = Value.kReverse;
-    public static final int BACKSPIN_BREAKPOINT_CM = 1200;
+    public static final int BACKSPIN_BREAKPOINT_CM = 0;
   }
 }
 

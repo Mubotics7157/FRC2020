@@ -129,7 +129,7 @@ public class Robot extends TimedRobot {
     //indexer.testShoot();
   
     
-    //indexer.shootArbitrary(3000, 3000);
+    //indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
     //indexer.runAll();
 
 

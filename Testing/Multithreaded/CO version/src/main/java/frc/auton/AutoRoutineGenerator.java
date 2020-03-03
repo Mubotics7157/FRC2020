@@ -35,7 +35,7 @@ public class AutoRoutineGenerator {
 	}
 
 	public static AutoRoutine generate() {
-		TrajectoryConfig config = createConfig(2,2, false);
+		TrajectoryConfig config = createConfig(3,1, false);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
@@ -59,11 +59,11 @@ public class AutoRoutineGenerator {
 								PathTrigger.create(new SetTurretFieldLock(), 0),
 								PathTrigger.create(new SetIntaking(true, true), 0.7))
 								);
-		initialDrive.addCommands(new Delay(2), new SetIntaking(false, false),
-								new SetShooting(3350, 1650, 5, true));
-		initialDrive.addCommands(
-								new SetDrivePath(shootToIntake3, true,
-												PathTrigger.create(new SetIntaking(true, true), 0.3)));
+		initialDrive.addCommands(new Delay(2.3), new SetIntaking(false, false), new SetTurretOff(),
+								new SetShooting(3325, 1637, 5, true));
+		//initialDrive.addCommands(
+		//						new SetDrivePath(shootToIntake3, true,
+		//										PathTrigger.create(new SetIntaking(true, true), 0.3)));
 		return initialDrive;
 	}
 

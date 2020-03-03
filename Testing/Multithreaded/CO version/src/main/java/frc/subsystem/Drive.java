@@ -179,16 +179,19 @@ public class Drive extends Threaded{
   }
 
   private void updateTeleOp() {
-    driveTeleOp(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
 
+    driveTeleOp(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
+    SmartDashboard.putNumber("leftStick", Robot.rightStick.getRawAxis(1));
   }
 
-  public void driveTeleOp(double l, double r) {
-      if(Math.abs(l) <= DriveTrainConstants.DEADBAND && Math.abs(r) <= DriveTrainConstants.DEADBAND){
-        tankDriveVolts(0, 0);
-      }else{
-        tankDrive(l, r, false);
-      }
+  private void driveTeleOp(double l, double r) {
+    double leftIn = 0;
+    double rightIn = 0;
+    if(Math.abs(l) >= DriveTrainConstants.DEADBAND)
+      leftIn = l;
+    if(Math.abs(r) >= DriveTrainConstants.DEADBAND)
+      rightIn = r;
+    tankDrive(leftIn, rightIn, false);
   }
 
   public void setTeleOp() {
@@ -409,16 +412,27 @@ public class Drive extends Threaded{
     var leftFeedForwardVolts = FEED_FORWARD.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = FEED_FORWARD.calculate(rightVelocity, rightAccel);
 
-    leftMaster.set(
+    if(leftVelocity == 0){
+      leftMaster.set(TalonFXControlMode.PercentOutput, 0);
+    }else{
+      leftMaster.set(
         TalonFXControlMode.Velocity, 
         metersPerSecToStepsPerDecisec(leftVelocity), 
         DemandType.ArbitraryFeedForward,
         leftFeedForwardVolts / 12);
-    rightMaster.set(
+    }
+    if(rightVelocity == 0){
+      rightMaster.set(TalonFXControlMode.PercentOutput, 0);
+    }else{
+      rightMaster.set(
         TalonFXControlMode.Velocity,
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
         rightFeedForwardVolts / 12);
+    }
+
+    
+    
   }
 
   public void tankDriveVelocity(double leftVelocity, double rightVelocity, double dt) {

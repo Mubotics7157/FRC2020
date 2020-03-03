@@ -12,14 +12,12 @@ import frc.subsystem.Turret;
 /**
  * Add your docs here.
  */
-public class SetTurretFieldLock extends AutoCommand{
-    
-    public SetTurretFieldLock(){
+public class SetTurretOff extends AutoCommand{
+    public SetTurretOff(){
         this.setBlocking(false);
     }
-
     public void start() {
-        Turret.getInstance().setTargetLock();
+        Turret.getInstance().setOff();
     }
 
     public boolean isFinished() {

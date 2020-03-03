@@ -107,7 +107,6 @@ public class Indexer extends Threaded{
     public synchronized void setOff() {
         indexerState = IndexerState.NOPE;
         spit();
-        shootArbitrary(0, 0);
     }
 
     /**
@@ -155,6 +154,7 @@ public class Indexer extends Threaded{
      * Stops all motors except shooter
      */
     private void spit() {
+        shooter.atSpeed(0, 0);
         slamLeft.set(0);
         slamRight.set(0);
         whooshMotor.set(0);
@@ -213,6 +213,7 @@ public class Indexer extends Threaded{
      * @param top top wheel speed
      */
     public void setShooting(double bot, double top) {
+        automated = false;
         botArbitrary = bot;
         topArbitrary = top;
         indexerState = IndexerState.SHOOTING;
@@ -230,6 +231,7 @@ public class Indexer extends Threaded{
             swallow();
         }
         else {
+            //shooter.atSpeed(0, 0);
             spit();
         }
         SmartDashboard.putNumber("lemons", lemons);

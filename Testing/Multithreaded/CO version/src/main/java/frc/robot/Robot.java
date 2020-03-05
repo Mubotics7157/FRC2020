@@ -17,7 +17,7 @@ import java.util.concurrent.*;
 
 
 import frc.utility.ThreadScheduler;
-import frc.utility.vanity.AddressableLEDs;
+//import frc.utility.vanity.AddressableLEDs;
 public class Robot extends TimedRobot {
   //Controllers
   public Joystick xbox = new Joystick(0);
@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   //VisionManager vision = VisionManager.getInstance();
   Turret turret = Turret.getInstance();
   Indexer indexer = Indexer.getInstance();
-  private AddressableLEDs harshalsWillie = new AddressableLEDs();
+  //private AddressableLEDs harshalsWillie = new AddressableLEDs();
 
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
     scheduler.schedule(indexer, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("idk", 0);
-    harshalsWillie.setLED();
+    //harshalsWillie.setLED();
   }
 
   @Override
@@ -106,13 +106,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //drive.driveTeleOp(leftStick.getRawAx, rightStick.getY());
     if(xbox.getRawAxis(2) > 0.9) {
-      indexer.setHungry(true);
+      //indexer.setHungry(true);
     }
     else if (xbox.getRawAxis(3) > 0.9) {
-      indexer.setShooting();
+      //indexer.setShooting();
     }
     else {
-      indexer.setHungry(false);
+      //indexer.setHungry(false);
     }
 
     if (xbox.getRawButtonPressed(1)) {
@@ -132,7 +132,7 @@ public class Robot extends TimedRobot {
     //indexer.testShoot();
   
     
-    //indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
+    indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
     //indexer.runAll();
 
 

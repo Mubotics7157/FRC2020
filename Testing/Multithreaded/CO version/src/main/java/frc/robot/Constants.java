@@ -142,14 +142,24 @@ public final class Constants {
     public static int DEVICE_ID_SHOOTER_BOTTOM = 18;
     public static int MAX_ALLOWABLE_ERROR_RPM = 50;
     public static int LEMON_ERROR_COUNTER = 100;
-    public static double kP_TOP = 0.0006;
-    public static double kI_TOP = 0.00;
+    //public static double kP_TOP = 0.0006;
+    //public static double kI_TOP = 0.00;
+    //public static double kD_TOP = 0.512;
+    //public static double kFF_TOP = 0.000184;
+
+    public static double kP_TOP = 0.0009;
+    public static double kI_TOP = 0.000;
     public static double kD_TOP = 0.512;
-    public static double kFF_TOP = 0.000184;
-    public static double kP_BOTTOM = 0.0007;
+    public static double kFF_TOP = 0.0002103;
+    //public static double kP_BOTTOM = 0.0007;
+    //public static double kI_BOTTOM = 0.00;
+    //public static double kD_BOTTOM = 0.512;
+    //public static double kFF_BOTTOM = 0.00019;
+
+    public static double kP_BOTTOM = 0.0009;
     public static double kI_BOTTOM = 0.00;
     public static double kD_BOTTOM = 0.512;
-    public static double kFF_BOTTOM = 0.00019;
+    public static double kFF_BOTTOM = 0.0002074;
     public static final int[] SOLENOID_IDS_SHOOTER = {2,3};
     public static final Value SHOOTER_RETRACTED = Value.kForward;
     public static final Value SHOOTER_ANGLED = Value.kReverse;

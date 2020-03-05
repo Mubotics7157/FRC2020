@@ -47,8 +47,8 @@ public class ShotGenerator {
     };
     
     private Double[][] floaty = {
-        {786d, 968d, 982d, 1052d, 1090d,1215d}, // X (distance)
-        {3220d, 3500d, 3520d, 3530d, 3550d,3600d} // Y (RPM)
+        {786d, 968d, 982d, 1052d, 1090d, 1215d}, // X (distance)
+        {3220d, 3500d, 3520d, 3530d, 3550d, 3600d} // Y (RPM)
     };
     
     private Double[][] sinky = {

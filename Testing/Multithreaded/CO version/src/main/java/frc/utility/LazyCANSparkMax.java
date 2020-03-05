@@ -10,8 +10,12 @@ import com.revrobotics.*;
 public class LazyCANSparkMax extends CANSparkMax {
 	
 	private double prevValue = 0;
-	
 
+	public LazyCANSparkMax(int deviceNumber, MotorType type, double nominalVoltage) {
+		super(deviceNumber, type);
+		enableVoltageCompensation(nominalVoltage);
+	}
+	
 	public LazyCANSparkMax(int deviceNumber, MotorType type) {
 		super(deviceNumber, type);
 		enableVoltageCompensation(12);

@@ -119,10 +119,13 @@ public class Indexer extends Threaded{
 
     public synchronized void changeBotRPM(double rpm) {
         botRPMAdjust += rpm;
+        SmartDashboard.putNumber("botRPMAdjust", botRPMAdjust);
     }
 
     public synchronized void changeTopRPM(double rpm) {
         topRPMAdjust += rpm;
+        SmartDashboard.putNumber("topRPMAdjust", topRPMAdjust);
+
     }
 
     /**

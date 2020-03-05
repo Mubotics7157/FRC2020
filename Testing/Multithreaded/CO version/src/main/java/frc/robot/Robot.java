@@ -106,13 +106,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //drive.driveTeleOp(leftStick.getRawAx, rightStick.getY());
     if(xbox.getRawAxis(2) > 0.9) {
-      //indexer.setHungry(true);
+      indexer.setHungry(true);
     }
     else if (xbox.getRawAxis(3) > 0.9) {
-      //indexer.setShooting();
+      indexer.setShooting();
     }
     else {
-      //indexer.setHungry(false);
+      indexer.setHungry(false);
     }
 
     if (xbox.getRawButtonPressed(1)) {
@@ -132,7 +132,7 @@ public class Robot extends TimedRobot {
     //indexer.testShoot();
   
     
-    indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
+    //indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
     //indexer.runAll();
 
 

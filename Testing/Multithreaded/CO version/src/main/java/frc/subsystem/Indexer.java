@@ -39,6 +39,9 @@ public class Indexer extends Threaded{
     private double botArbitrary = 0;
     private double topArbitrary = 0;
 
+    private double topRPMAdjust = 0;
+    private double botRPMAdjust = 0;
+
     private int lemons = 0;
     public static Indexer getInstance() {
         return instance;
@@ -107,6 +110,19 @@ public class Indexer extends Threaded{
     public synchronized void setOff() {
         indexerState = IndexerState.NOPE;
         spit();
+    }
+
+    public synchronized void setRPMAdjustment(double bot, double top) {
+        botRPMAdjust = bot;
+        topRPMAdjust = top;
+    }
+
+    public synchronized void changeBotRPM(double rpm) {
+        botRPMAdjust += rpm;
+    }
+
+    public synchronized void changeTopRPM(double rpm) {
+        topRPMAdjust += rpm;
     }
 
     /**
@@ -221,7 +237,7 @@ public class Indexer extends Threaded{
 
     public void shoot() {
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
-        boolean atSpeed = shooter.atSpeed(shot.bottomSpeed, shot.topSpeed);
+        boolean atSpeed = shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
         boolean lemonShot = shooter.lemonShot();
         if(shot.bottomSpeed == 0){
             shooter.setSpeed(0, 0);
@@ -256,7 +272,7 @@ public class Indexer extends Threaded{
 
     
     public void shootArbitrary(double bottomSpeed, double topSpeed) {
-        boolean atSpeed = shooter.atSpeed(bottomSpeed, topSpeed);
+        boolean atSpeed = shooter.atSpeed(bottomSpeed + botRPMAdjust, topSpeed + topRPMAdjust);
         boolean lemonShot = shooter.lemonShot();
         if(bottomSpeed == 0){
             shooter.setSpeed(0, 0);

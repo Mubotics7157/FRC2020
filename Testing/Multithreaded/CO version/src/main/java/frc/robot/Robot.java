@@ -124,6 +124,14 @@ public class Robot extends TimedRobot {
     else if (xbox.getRawButtonPressed(3)) {
       turret.setOff();
     }
+
+    if(Math.abs(xbox.getRawAxis(2)) > 0.2){
+      indexer.changeBotRPM(xbox.getRawAxis(2));
+    }
+
+    if(Math.abs(xbox.getRawAxis(3)) > 0.2){
+      indexer.changeTopRPM(xbox.getRawAxis(3));
+    }
     //drive.tankDriveVelocity(0.2, 0.2);
     //if(xbox.getRawButtonPressed(1)){
       //System.out.println("Setting TurretState to FieldLock");

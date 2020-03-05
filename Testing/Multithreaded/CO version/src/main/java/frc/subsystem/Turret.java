@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -35,7 +36,7 @@ public class Turret extends Threaded {
   private double lastFieldRelativeSetpoint = 0;
   private VisionManager vision;
   private LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
-  private Solenoid light = new Solenoid(4);
+  private Relay light = new Relay(0);
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
@@ -234,6 +235,6 @@ public class Turret extends Threaded {
   }
 
   public void setLight(boolean on) {
-    light.set(on);
+    light.set(on ? Relay.Value.kOn : Relay.Value.kOff);
   }
 }

@@ -28,8 +28,8 @@ public class Shooter {
     private double lastVelBot = 0;
 
     public Shooter() {
-        botWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless);
-        topWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_TOP, MotorType.kBrushless);
+        botWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless, 11);
+        topWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_TOP, MotorType.kBrushless, 11);
         CANPIDController botController = botWheel.getPIDController();
         CANPIDController topController = topWheel.getPIDController();
 

@@ -104,6 +104,7 @@ public final class Constants {
     public static final int kPIDLoopIdx = 0;
     public static final int FORWARD_LIMIT_DEGREES = 190;
     public static final int REVERSE_LIMIT_DEGREES = -190;
+    public static final int[] ANGLE_ID_SOLENOID = {2, 3};
   }
 
   public static final class VisionConstants {
@@ -164,6 +165,11 @@ public final class Constants {
     public static final Value SHOOTER_RETRACTED = Value.kForward;
     public static final Value SHOOTER_ANGLED = Value.kReverse;
     public static final int BACKSPIN_BREAKPOINT_CM = 0;
+
+    public static final double RATIO_FLOATY = 2.57;
+    public static final double RATIO_NORMAL = 2.0597;
+    public static final double RATIO_SINKY = 0.5;
+
   }
 }
 

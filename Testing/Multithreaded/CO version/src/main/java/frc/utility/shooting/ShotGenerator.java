@@ -16,9 +16,9 @@ import frc.robot.Constants.ShooterConstants;
  */
 public class ShotGenerator {
     private enum BACKSPINRATIOS{
-        NORMAL(2.0597),
-        FLOATY(2.57),
-        SINKY(0.5);
+        NORMAL(ShooterConstants.RATIO_NORMAL),
+        FLOATY(ShooterConstants.RATIO_FLOATY),
+        SINKY(ShooterConstants.RATIO_SINKY);
 
         private final double value;
 
@@ -48,7 +48,7 @@ public class ShotGenerator {
     
     private Double[][] floaty = {
         {786d, 968d, 982d, 1052d, 1090d, 1215d}, // X (distance)
-        {3220d, 3500d, 3520d, 3530d, 3550d, 3600d} // Y (RPM)
+        {3245d, 3525d, 3545d, 3555d, 3575d, 3625d} // Y (RPM)
     };
     
     private Double[][] sinky = {

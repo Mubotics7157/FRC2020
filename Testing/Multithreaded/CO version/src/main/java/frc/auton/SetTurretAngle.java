@@ -22,8 +22,9 @@ public class SetTurretAngle extends AutoCommand{
     }
 
     public void start() {
-        Turret.getInstance().setTargetLock();;
-        //Turret.getInstance().setFieldRelativeSetpoint(_setpoint);
+        //Turret.getInstance().setTargetLock();
+        Turret.getInstance().setArbitraryLock();
+        Turret.getInstance().setRealSetpoint(_setpoint);
     }
 
     @Override

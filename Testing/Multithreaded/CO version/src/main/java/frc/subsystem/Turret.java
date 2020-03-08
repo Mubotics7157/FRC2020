@@ -13,8 +13,10 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +39,7 @@ public class Turret extends Threaded {
   private VisionManager vision;
   private LidarLitePWM lidar = new LidarLitePWM(new DigitalInput(Constants.LidarConstants.DIO_PORT));
   private Relay light = new Relay(0);
+  private double debugSetpoint = 0;
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
@@ -106,9 +109,10 @@ public class Turret extends Threaded {
     turretMotor.configReverseSoftLimitThreshold(-2048);
 
     SmartDashboard.putNumber("Angle Offset", 0);
-    SmartDashboard.putNumber("Debug Setpoint", 0);
     
     vision = VisionManager.getInstance();
+
+    
   }
 
   @Override
@@ -118,17 +122,22 @@ public class Turret extends Threaded {
     
     switch(turretState){
       case OFF:
+        SmartDashboard.putString("TurretState", "OFF");
         break;
       case FIELD_LOCK:
         updateFieldLock();
+        SmartDashboard.putString("TurretState", "FIELD_LOCK");
         break;
       case TARGET_LOCK:
         updateTargetLock();
+        SmartDashboard.putString("TurretState", "TARGET_LOCK");
         break;
       case ARB_LOCK:
+        SmartDashboard.putString("TurretState", "ARB_LOCK");
         break;
       case DEBUG_MODE:
         updateDebug();
+        SmartDashboard.putString("TurretState", "DEBUG_MODE");
         break;
     }
     lastRealSetpoint = realSetpoint;
@@ -163,7 +172,12 @@ public class Turret extends Threaded {
   }
 
   public void updateDebug(){
-    realSetpoint = SmartDashboard.getNumber("Debug Setpoint", 0);
+    SmartDashboard.putNumber("Debug Setpoint", debugSetpoint);
+    realSetpoint = debugSetpoint;
+  }
+
+  public synchronized void adjustDebugHeading(double change) {
+    debugSetpoint += change;
   }
 
 	synchronized public Pose2d getOdometryFromLidar() {

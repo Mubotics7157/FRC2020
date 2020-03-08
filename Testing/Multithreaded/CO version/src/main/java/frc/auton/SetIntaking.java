@@ -24,7 +24,7 @@ public class SetIntaking extends AutoCommand{
     @Override
     public void start() {
         Indexer.getInstance().setHungry(hungry);
-        //Indexer.getInstance().setSalivation(down);
+        Indexer.getInstance().setSalivation(down);
     }
 
     @Override

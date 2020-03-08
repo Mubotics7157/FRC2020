@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
+import frc.robot.Constants.ShooterConstants;
 import frc.subsystem.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
@@ -60,8 +61,11 @@ public class Robot extends TimedRobot {
     scheduler.schedule(turret, executor);
     scheduler.schedule(indexer, executor);
     //scheduler.schedule(vision, executor);
-    m_chooser.addOption("idk", 0);
+    m_chooser.addOption("arbitrary", 0);
     //harshalsWillie.setLED();
+    m_chooser.addOption("human player station", 2);
+    m_chooser.setDefaultOption("target", 1);
+    SmartDashboard.putData(m_chooser);
   }
 
   @Override
@@ -73,10 +77,11 @@ public class Robot extends TimedRobot {
   boolean autoDone;
   @Override
   public void autonomousInit() {
+    c.start();
     scheduler.resume();
     // m_autoSelected = m_chooser.getSelected();
     turret.setLight(true);
-    AutoRoutine option = AutoRoutineGenerator.generate();
+    AutoRoutine option = AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
   }
@@ -90,7 +95,7 @@ public class Robot extends TimedRobot {
 
   @Override 
   public void teleopInit() {
-    c.stop();
+    c.start();
     if(auto != null)
       auto.interrupt();
     System.out.println("teleop init!");
@@ -100,38 +105,63 @@ public class Robot extends TimedRobot {
     //drive.setAutoPath(traj2);
     Drive.getInstance().setTeleOp();
     indexer.setLemons(1000);
+    robotTracker.resetOdometry();
+    turret.setDebug();
   }
 
   @Override
   public void teleopPeriodic() {
     //drive.driveTeleOp(leftStick.getRawAx, rightStick.getY());
-    if(xbox.getRawAxis(2) > 0.9) {
+    if(Math.abs(xbox.getRawAxis(4)) > 0.3) {
       indexer.setHungry(true);
+      indexer.setIntakeSpeed(-xbox.getRawAxis(4));
     }
-    else if (xbox.getRawAxis(3) > 0.9) {
+    else if (xbox.getRawButton(1)) {
       indexer.setShooting();
     }
-    else {
+    else if (xbox.getRawButton(10)) {
+      indexer.setPuke();
+    }
+    else{
       indexer.setHungry(false);
     }
 
-    if (xbox.getRawButtonPressed(1)) {
-      turret.setFieldLock();
+    if (xbox.getRawButtonPressed(7)) {
+      turret.setDebug();
     }
-    else if (xbox.getRawButtonPressed(2)) {
+    else if (xbox.getRawButtonPressed(6)) {
       turret.setTargetLock();
     }
-    else if (xbox.getRawButtonPressed(3)) {
+    else if (xbox.getRawButtonPressed(5)) {
       turret.setOff();
     }
 
-    if(Math.abs(xbox.getRawAxis(2)) > 0.2){
-      indexer.changeBotRPM(xbox.getRawAxis(2));
+    indexer.setRPMAdjustment(xbox.getRawAxis(2) * -200, xbox.getRawAxis(2) * -200 / indexer.getRPMRatio());
+
+    if(xbox.getRawButtonPressed(9)){
+      indexer.setRPMRatio(ShooterConstants.RATIO_FLOATY);
+    }else if(xbox.getRawButtonPressed(8)){
+      //indexer.setRPMRatio(ShooterConstants.RATIO_NORMAL);
     }
 
-    if(Math.abs(xbox.getRawAxis(3)) > 0.2){
-      indexer.changeTopRPM(xbox.getRawAxis(3));
+    if(xbox.getRawButtonPressed(2)) {
+      indexer.setSalivation(false);
     }
+
+    if(xbox.getRawButtonPressed(3)) {
+      indexer.toggleShooterAngle();
+    }
+
+    if(Math.abs(xbox.getRawAxis(3)) > 0.05) {
+      turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
+    }
+
+    if(xbox.getRawButton(8)) {
+      indexer.setSwallowing(true);
+    }else{
+      indexer.setSwallowing(false);
+    }
+
     //drive.tankDriveVelocity(0.2, 0.2);
     //if(xbox.getRawButtonPressed(1)){
       //System.out.println("Setting TurretState to FieldLock");

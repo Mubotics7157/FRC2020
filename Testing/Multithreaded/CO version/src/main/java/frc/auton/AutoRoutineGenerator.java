@@ -34,19 +34,30 @@ public class AutoRoutineGenerator {
 		Translation2d START_LEFT = new Translation2d();
 	}
 
-	public static AutoRoutine generate() {
-		TrajectoryConfig config = createConfig(3,1, false);
+	public static AutoRoutine getRoutine(int path) {
+		AutoRoutine routine;
+		switch(path) {
+			case 0: routine = generateSimpleLine();
+			case 1: routine = targetStart(); //unfilled
+			case 2: routine = humanPlayerStart();
+			default: routine = humanPlayerStart();
+		}
+		return routine;
+	}
+
+	public static AutoRoutine humanPlayerStart() {
+		TrajectoryConfig config = createConfig(2,1, false);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
 			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
-			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-60))
+			  new Pose2d(2.58, 0.342, Rotation2d.fromDegrees(16))
 		  ),
 		  config);
 		
 		Trajectory shootToIntake3 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
-			  new Pose2d(3.219328,-0.332063, Rotation2d.fromDegrees(-60)),
+			  new Pose2d(3.1732,-0.05, Rotation2d.fromDegrees(-63)),
 			  new Pose2d(new Translation2d(3.23,1), Rotation2d.fromDegrees(0))
 		  ),
 		  config);
@@ -56,11 +67,45 @@ public class AutoRoutineGenerator {
 		RobotTracker.getInstance().setOdometry(startPos);
 		initialDrive.addCommands(
 								new SetDrivePath(startToIntake2, true,
-								PathTrigger.create(new SetTurretFieldLock(), 0),
-								PathTrigger.create(new SetIntaking(true, true), 0.7))
+								PathTrigger.create(new SetTurretAngle(-35.414), 0.2),
+								PathTrigger.create(new SetIntaking(true, true), 0.5))
+								);
+		initialDrive.addCommands(new Delay(2.3), new SetIntaking(false, true), new SetTurretOff(),
+								new SetShooting(3390, 1319, 3, true), new SetIntaking(true, true), 
+								new Delay(1), new SetIntaking(false, true), new SetShooting(3390, 1319, 3, true));
+		//initialDrive.addCommands(
+		//						new SetDrivePath(shootToIntake3, true,
+		//										PathTrigger.create(new SetIntaking(true, true), 0.3)));
+		return initialDrive;
+	}
+
+	public static AutoRoutine targetStart() {
+		TrajectoryConfig config = createConfig(2,1, false);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
+		  List.of(
+			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
+			  new Pose2d(2.58, 0.342, Rotation2d.fromDegrees(14.6))
+		  ),
+		  config);
+		
+		Trajectory shootToIntake3 = TrajectoryGenerator.generateTrajectory(
+		  List.of(
+			  new Pose2d(3.1732,-0.05, Rotation2d.fromDegrees(-63)),
+			  new Pose2d(new Translation2d(3.23,1), Rotation2d.fromDegrees(0))
+		  ),
+		  config);
+
+		initialDrive = new AutoRoutine();
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands(
+								new SetDrivePath(startToIntake2, true,
+								PathTrigger.create(new SetTurretAngle(-34.014), 0.2),
+								PathTrigger.create(new SetIntaking(true, true), 0.5))
 								);
 		initialDrive.addCommands(new Delay(2.3), new SetIntaking(false, false), new SetTurretOff(),
-								new SetShooting(3325, 1637, 5, true));
+								new SetShooting(3375, 1294, 5, true));
 		//initialDrive.addCommands(
 		//						new SetDrivePath(shootToIntake3, true,
 		//										PathTrigger.create(new SetIntaking(true, true), 0.3)));

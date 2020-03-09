@@ -142,6 +142,7 @@ public final class Constants {
     public static int DEVICE_ID_SHOOTER_TOP = 19;
     public static int DEVICE_ID_SHOOTER_BOTTOM = 18;
     public static int MAX_ALLOWABLE_ERROR_RPM = 50;
+    public static int MAX_ALLOWABLE_ERROR_RPM_FART = 300;
     public static int LEMON_ERROR_COUNTER = 100;
     //public static double kP_TOP = 0.0006;
     //public static double kI_TOP = 0.00;

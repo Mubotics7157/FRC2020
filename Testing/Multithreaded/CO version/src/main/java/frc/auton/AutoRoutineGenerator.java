@@ -51,7 +51,7 @@ public class AutoRoutineGenerator {
 		Trajectory startToIntake2 = TrajectoryGenerator.generateTrajectory(
 		  List.of(
 			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
-			  new Pose2d(2.58, 0.342, Rotation2d.fromDegrees(16))
+			  new Pose2d(2.58, 0.342, Rotation2d.fromDegrees(18))
 		  ),
 		  config);
 		
@@ -67,7 +67,7 @@ public class AutoRoutineGenerator {
 		RobotTracker.getInstance().setOdometry(startPos);
 		initialDrive.addCommands(
 								new SetDrivePath(startToIntake2, true,
-								PathTrigger.create(new SetTurretAngle(-35.414), 0.2),
+								PathTrigger.create(new SetTurretAngle(-37.414), 0.2),
 								PathTrigger.create(new SetIntaking(true, true), 0.5))
 								);
 		initialDrive.addCommands(new Delay(2.3), new SetIntaking(false, true), new SetTurretOff(),

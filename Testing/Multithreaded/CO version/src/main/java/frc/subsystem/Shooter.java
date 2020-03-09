@@ -27,6 +27,8 @@ public class Shooter {
     private double lastVelTop = 0;
     private double lastVelBot = 0;
 
+    private double allowableRPMError = ShooterConstants.MAX_ALLOWABLE_ERROR_RPM;
+
     public Shooter() {
         botWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_BOTTOM, MotorType.kBrushless, 11);
         topWheel = new LazyCANSparkMax(ShooterConstants.DEVICE_ID_SHOOTER_TOP, MotorType.kBrushless, 11);
@@ -42,6 +44,17 @@ public class Shooter {
         topController.setI(ShooterConstants.kI_TOP);
         topController.setD(ShooterConstants.kD_TOP);
         topController.setFF(ShooterConstants.kFF_TOP);
+    }
+
+    public synchronized void toggleRPMTolerance() {
+        if(allowableRPMError == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) allowableRPMError = ShooterConstants.MAX_ALLOWABLE_ERROR_RPM_FART;
+        else allowableRPMError = ShooterConstants.MAX_ALLOWABLE_ERROR_RPM;
+
+        SmartDashboard.putNumber("allowable rpm error", allowableRPMError);
+    }
+
+    public synchronized double getRPMTolerance() {
+        return allowableRPMError;
     }
 
     public boolean atSpeed(double bottom, double top) {
@@ -63,8 +76,8 @@ public class Shooter {
         lastVelBot = botWheel.getEncoder().getVelocity();
         lastVelTop = topWheel.getEncoder().getVelocity();
         return 
-            (Math.abs(topWheel.getEncoder().getVelocity() - top) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) && 
-            (Math.abs(botWheel.getEncoder().getVelocity() - bottom) < ShooterConstants.MAX_ALLOWABLE_ERROR_RPM);
+            (Math.abs(topWheel.getEncoder().getVelocity() - top) < allowableRPMError) && 
+            (Math.abs(botWheel.getEncoder().getVelocity() - bottom) < allowableRPMError);
     }
 
     public boolean lemonShot() { //ONLY USE WHEN ALSO USING ATSPEED

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.utility.LazyCANSparkMax;
 import frc.utility.Threaded;
@@ -58,6 +59,7 @@ public class Indexer extends Threaded{
         PUKE, // keep balls in me
         SHOOTING, // POOPOO
         NOPE, // virgin bot
+        REVVING
     }
 
     private IndexerState indexerState = IndexerState.NOPE;
@@ -103,6 +105,10 @@ public class Indexer extends Threaded{
                 SmartDashboard.putString("Intake State", "Full");
                 puke();
                 break;
+            case REVVING:
+                SmartDashboard.putString("Intake State", "REVVING");
+                rev();
+                break;
             case SHOOTING:
                 if (automated)
                     shoot();
@@ -122,9 +128,22 @@ public class Indexer extends Threaded{
         spit();
     }
 
+    public synchronized void toggleRPMTolerance() {
+        shooter.toggleRPMTolerance();
+    }
+
+    public synchronized void setRevving() {
+        indexerState = IndexerState.REVVING;
+    }
+
+    public synchronized void rev() {
+        ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
+        shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
+    }
+
     public synchronized void setPuke() {
         indexerState = IndexerState.PUKE;
-        spit();
+        vomit();
     }
 
     public synchronized void setRPMAdjustment(double bot, double top) {
@@ -179,10 +198,10 @@ public class Indexer extends Threaded{
     public synchronized void toggleShooterAngle() {
         if(turretUp) {
           turretUp = false;
-          shooterSolenoid.set(Value.kReverse);
+          shooterSolenoid.set(Value.kForward);
         }else{
           turretUp = true;
-          shooterSolenoid.set(Value.kForward);
+          shooterSolenoid.set(Value.kReverse);
         }
       }
 
@@ -227,6 +246,15 @@ public class Indexer extends Threaded{
         slamLeft.set(0);
         slamRight.set(0);
         whooshMotor.set(0);
+        intakeMotor.set(0);
+        soapBar.set(0);
+    }
+
+    private void vomit() {
+        shooter.atSpeed(0, 0);
+        //slamLeft.set(0);
+        //slamRight.set(0);
+        //whooshMotor.set(0);
         intakeMotor.set(0);
         soapBar.set(0);
     }
@@ -305,7 +333,8 @@ public class Indexer extends Threaded{
         }else if (atSpeed) {
             dropSoap();
             chew();
-            swallow(-.5);
+            if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) swallow(-.5);
+            else swallow(-1);
         }
         else {
             //shooter.atSpeed(0, 0);

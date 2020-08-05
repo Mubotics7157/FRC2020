@@ -172,6 +172,9 @@ public final class Constants {
     public static final double RATIO_SINKY = 0.5;
 
   }
+    public static final class MiscConstants{
+    public static int LED = 69; //update later
+  }
 }
 
 //3600, 1400

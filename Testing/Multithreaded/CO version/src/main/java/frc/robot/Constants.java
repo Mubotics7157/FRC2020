@@ -172,7 +172,12 @@ public final class Constants {
     public static final double RATIO_SINKY = 0.5;
 
   }
-    public static final class MiscConstants{
+  public static final class ClimbConstants{
+    public static int DEVICE_ID_LEFT_CLIMB = 0; //update later
+    public static int DEVICE_ID_RIGHT_CLIMB = 0; //update later
+  }
+  
+   public static final class MiscConstants{
     public static int LED = 69; //update later
   }
 }

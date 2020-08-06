@@ -39,9 +39,6 @@ public TalonFX leftClimb;
     WINCHING
 }
 
-  public double ticksToCM(double val){
-    return val / 4096.0 /9.6666666; 
-  }
   public synchronized void setclimbState(ClimbState climbstate){
       this.climbState = climbstate;
       

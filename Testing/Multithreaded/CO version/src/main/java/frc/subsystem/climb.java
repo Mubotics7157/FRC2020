@@ -19,10 +19,10 @@ import frc.utility.Threaded;
 public class climb extends Threaded {
 public TalonFX leftClimb;
   public TalonFX rightClimb; 
-  public ClimbState cState;
+  public ClimbState climbState;
   
   public climb(){
-      cState = ClimbState.STATIC;
+      climbState = ClimbState.STATIC;
       leftClimb = new TalonFX(ClimbConstants.DEVICE_ID_LEFT_CLIMB);//add to constants
       rightClimb = new TalonFX(ClimbConstants.DEVICE_ID_RIGHT_CLIMB);//add to constatns
       //leftClimb.enableVoltageCompensation(true);
@@ -30,37 +30,33 @@ public TalonFX leftClimb;
       leftClimb.setNeutralMode(NeutralMode.Brake);
       rightClimb.setNeutralMode(NeutralMode.Brake);
       rightClimb.follow(leftClimb);
-
       
   }
   
+  public enum ClimbState{
+    STATIC,
+    EXTENDING,
+    WINCHING
+}
+
   public double ticksToCM(double val){
     return val / 4096.0 /9.6666666; 
   }
   public synchronized void setclimbState(ClimbState climbstate){
-      cState = climbstate;
+      this.climbState = climbstate;
       
   }
       
-  public enum ClimbState{
-      STATIC,
-      EXTENDING,
-      WINCHING
+
+  public void Extend(double speed){   
+      speed = speed> ClimbConstants.MAX_CLIMB_SPEED ? ClimbConstants.MAX_CLIMB_SPEED : speed;
+          leftClimb.set(ControlMode.PercentOutput,speed);
   }
 
-
-
-  public void Extend(){   
-          leftClimb.set(ControlMode.PercentOutput,.7);
+  public void Winch(double speed){
+    speed = speed> ClimbConstants.MAX_CLIMB_SPEED ? ClimbConstants.MAX_CLIMB_SPEED * -1 : speed;
+      leftClimb.set(ControlMode.PercentOutput, speed);
   }
-
-  public void Winch(){
-      leftClimb.set(ControlMode.PercentOutput, -.7);
-  }
-
-
-
-  
 
 
 
@@ -68,16 +64,16 @@ public TalonFX leftClimb;
   public void update() {
     switch(cState){
         case STATIC:
-            SmartDashboard.putString("climb", "STATIC");
+            SmartDashboard.putString("climb state", "STATIC");
             break; 
         case EXTENDING:
-            SmartDashboard.putString("climb", "EXTENDING");
+            SmartDashboard.putString("climb state", "EXTENDING");
             Extend();
             break;
 
         case WINCHING:
             Winch();
-            SmartDashboard.putString("climb", "WINCHING ");
+            SmartDashboard.putString("climb state", "WINCHING ");
 
     }
   

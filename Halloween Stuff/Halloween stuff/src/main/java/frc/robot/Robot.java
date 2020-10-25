@@ -19,9 +19,9 @@ public class Robot extends TimedRobot {
   
  Joystick controller = new Joystick(0);
  Music music = new Music();
- BetterLED ledLight = new BetterLED();
+ //BetterLED ledLight = new BetterLED();
  //AdressableLED led = new AdressableLED();
-
+Lights light = new Lights();
   
   @Override
   public void robotInit() {
@@ -67,7 +67,8 @@ public class Robot extends TimedRobot {
     if(controller.getRawButtonPressed(3)){
       music.togglePause();
     }
-      ledLight.generateRandLED();
+      //ledLight.generateRandLED();
+      light.mixItUp();
   }
 
   @Override

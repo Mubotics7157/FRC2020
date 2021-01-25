@@ -4,11 +4,14 @@ package frc.robot;
 import static frc.robot.Constants.DriveTrainConstants.DRIVE_KINEMATICS;
 import static frc.robot.Constants.DriveTrainConstants.FEED_FORWARD;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import frc.utility.Coordinate;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -95,10 +98,10 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final int DEVICE_ID_TURRET = 4;
-    public static final double kP = 30;
-    public static final double kI = 0.00;
-    public static final double kD = 90;
-    public static final double kF = 0.00;
+    public static final double kP = 30; //60
+    public static final double kI = 0.00; //0
+    public static final double kD = 90; //300
+    public static final double kF = 0.00; //0
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
@@ -160,7 +163,7 @@ public final class Constants {
 
     public static double kP_BOTTOM = 0.0009;
     public static double kI_BOTTOM = 0.00;
-    public static double kD_BOTTOM = 0.512;
+    public static double kD_BOTTOM = 0.512; 
     public static double kFF_BOTTOM = 0.0002074;
     public static final int[] SOLENOID_IDS_SHOOTER = {2,3};
     public static final Value SHOOTER_RETRACTED = Value.kForward;
@@ -172,14 +175,93 @@ public final class Constants {
     public static final double RATIO_SINKY = 0.5;
 
   }
+
   public static final class ClimbConstants{
-    public static int DEVICE_ID_LEFT_CLIMB = 0; //update later
-    public static int DEVICE_ID_RIGHT_CLIMB = 0; //update later
+    public static final int DEVICE_ID_LEFT_CLIMB = 0; //update later
+    public static final int DEVICE_ID_RIGHT_CLIMB = 0; //update later
+    public static final double MAX_CLIMB_SPEED = .8; //update later
+    public static final double GEAR_DIVISOR = 0; //update later
+    public static final double VOLTAGE_SETPOINT = 0; //update later
+    public static final double VOLTAGE_TOLERANCE = 0; //update later
+    public static final double kP = 0;
+    public static final double kD = 0;
+    public static final double kFF = 0;
   }
   
-   public static final class MiscConstants{
-    public static int LED = 69; //update later
+  public static final class MiscConstants{
+    public static int LED = 1; //update later
+    public static double ROBOT_Y_OFFSET_METERS = 2.286;
+    public static Coordinate [][] plane = {
+        { //a
+          new Coordinate(2.5,12.5),
+          new Coordinate(5.0,12.5),
+          new Coordinate(7.5, 12.5),
+          new Coordinate(10.0,12.5),
+          new Coordinate(12.5,12.5),
+          new Coordinate(15.0,12.5),
+          new Coordinate(17.5,12.5),
+          new Coordinate(20.0,12.5),
+          new Coordinate(22.5,12.5),
+          new Coordinate(25.0,12.5),
+          new Coordinate(27.5,12.5),
+          new Coordinate(30.0,12.5)
+        },
+        { //b
+          new Coordinate(2.5,10.0),
+          new Coordinate(5.0,10.0),
+          new Coordinate(7.5, 10.0),
+          new Coordinate(10.0,10.0),
+          new Coordinate(10.0,10.0),
+          new Coordinate(15.0,10.0),
+          new Coordinate(17.5,10.0),
+          new Coordinate(20.0,10.0),
+          new Coordinate(22.5,10.0),
+          new Coordinate(25.0,10.0),
+          new Coordinate(27.5,10.0),
+          new Coordinate(30.0,10.0)
+        },
+        { //c
+          new Coordinate(2.5,7.5),
+          new Coordinate(5.0,7.5),
+          new Coordinate(7.5, 7.5),
+          new Coordinate(10.0,7.5),
+          new Coordinate(7.5,7.5),
+          new Coordinate(15.0,7.5),
+          new Coordinate(17.5,7.5),
+          new Coordinate(20.0,7.5),
+          new Coordinate(22.5,7.5),
+          new Coordinate(25.0,7.5),
+          new Coordinate(27.5,7.5),
+          new Coordinate(30.0,7.5)
+        },
+        { //d
+          new Coordinate(2.5,5.0),
+          new Coordinate(5.0,5.0),
+          new Coordinate(7.5, 5.0),
+          new Coordinate(10.0,5.0),
+          new Coordinate(5.0,5.0),
+          new Coordinate(15.0,5.0),
+          new Coordinate(17.5,5.0),
+          new Coordinate(20.0,5.0),
+          new Coordinate(22.5,5.0),
+          new Coordinate(25.0,5.0),
+          new Coordinate(27.5,5.0),
+          new Coordinate(30.0,5.0)
+        },
+        { //e
+          new Coordinate(2.5,2.5),
+          new Coordinate(5.0,2.5),
+          new Coordinate(7.5, 2.5),
+          new Coordinate(10.0,2.5),
+          new Coordinate(2.5,2.5),
+          new Coordinate(15.0,2.5),
+          new Coordinate(17.5,2.5),
+          new Coordinate(20.0,2.5),
+          new Coordinate(22.5,2.5),
+          new Coordinate(25.0,2.5),
+          new Coordinate(27.5,2.5),
+          new Coordinate(30.0,2.5)
+        }
+    };
   }
 }
-
-//3600, 1400

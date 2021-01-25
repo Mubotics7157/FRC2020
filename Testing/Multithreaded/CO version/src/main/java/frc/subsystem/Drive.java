@@ -184,7 +184,7 @@ public class Drive extends Threaded{
     SmartDashboard.putNumber("leftStick", Robot.rightStick.getRawAxis(1));
   }
 
-  private void driveTeleOp(double l, double r) {
+  public void driveTeleOp(double l, double r) {
     double leftIn = 0;
     double rightIn = 0;
     if(Math.abs(l) >= DriveTrainConstants.DEADBAND)

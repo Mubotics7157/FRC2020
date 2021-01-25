@@ -17,7 +17,9 @@ import java.time.Duration;
 import java.util.concurrent.*;
 
 
+
 import frc.utility.ThreadScheduler;
+
 //import frc.utility.vanity.AddressableLEDs;
 public class Robot extends TimedRobot {
   //Controllers
@@ -81,7 +83,7 @@ public class Robot extends TimedRobot {
     scheduler.resume();
     // m_autoSelected = m_chooser.getSelected();
     turret.setLight(true);
-    AutoRoutine option = AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
+    AutoRoutine option = AutoRoutineGenerator.redOne();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
   }
@@ -95,7 +97,7 @@ public class Robot extends TimedRobot {
 
   @Override 
   public void teleopInit() {
-    c.start();
+    //c.start();
     if(auto != null)
       auto.interrupt();
     System.out.println("teleop init!");
@@ -111,17 +113,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    //drive.driveTeleOp(leftStick.getRawAx, rightStick.getY());
+    drive.driveTeleOp(leftStick.getY(), rightStick.getY());
     if(Math.abs(xbox.getRawAxis(4)) > 0.3) {
-      indexer.setHungry(true);
-      indexer.setIntakeSpeed(-xbox.getRawAxis(4));
+      
+        indexer.toggleHungry();
+      //indexer.setHungry(true);
+      //indexer.setIntakeSpeed(-xbox.getRawAxis(4));
+      //indexer.setIntakeSpeed(1.0);
     }
     else if (xbox.getRawButton(1)) {
       indexer.setShooting();
     }
     else if (xbox.getRawButton(10)) {
       indexer.setPuke();
-    }else if(xbox.getRawButton(2)){
+    }//else if(xbox.getRawButton(2)){
+      else if(rightStick.getRawButton(1)){
       indexer.setRevving();
     }
     else{
@@ -131,9 +137,9 @@ public class Robot extends TimedRobot {
     if (xbox.getRawButtonPressed(7)) {
       turret.setDebug();
     }
-    else if (xbox.getRawButtonPressed(6)) {
+    /*else if (xbox.getRawButtonPressed(6)) {
       turret.setTargetLock();
-    }
+    }*/
 
     indexer.setRPMAdjustment(xbox.getRawAxis(2) * -200, xbox.getRawAxis(2) * -200 / indexer.getRPMRatio());
 
@@ -152,15 +158,17 @@ public class Robot extends TimedRobot {
       indexer.toggleShooterAngle();
     }
 
-    if(Math.abs(xbox.getRawAxis(3)) > 0.05) {
-      turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
+    if(Math.abs(xbox.getRawAxis(1)) > 0.05) {
+      turret.adjustDebugHeading(xbox.getRawAxis(0) * -0.2);
     }
-
-    if(xbox.getRawButton(8)) {
+ 
+    //if(xbox.getRawButton(8)) {
+      if(leftStick.getRawButton(1)){
       indexer.setSwallowing(true);
-    }else{
-      indexer.setSwallowing(false);
-    }
+      indexer.runAll();
+    }//else{
+      //indexer.setSwallowing(false);
+    //}
 
     //drive.tankDriveVelocity(0.2, 0.2);
     //if(xbox.getRawButtonPressed(1)){

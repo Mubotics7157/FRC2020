@@ -16,6 +16,7 @@ import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.RobotTracker;
 import frc.subsystem.Turret;
 import frc.utility.Coordinate;
+import frc.utility.FieldCooridnates;
 
 public class AutoRoutineGenerator {
 	private static Translation2d robotStartPosition = new Translation2d(20, 115);
@@ -23,7 +24,8 @@ public class AutoRoutineGenerator {
 	private static Translation2d midFieldLeftPosition = new Translation2d(240, 108);
 
 	private static AutoRoutine initialDrive;
-	static Coordinate [][] coords = Constants.MiscConstants.plane;
+	static FieldCooridnates fieldCooridnates = new FieldCooridnates();
+
 
 	public enum PathOption {
 		SCALE, SWITCH, BOTH, FORWARD, NONE
@@ -159,9 +161,8 @@ public class AutoRoutineGenerator {
 		Trajectory move = TrajectoryGenerator.generateTrajectory(
 			List.of(
 				new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
-				new Pose2d(new Translation2d(-(coords[2][2].getX()),coords[2][2].getY()),Rotation2d.fromDegrees(0))
-				//new Pose2d(new Translation2d(2.5/*coords[3][4].getRelX(coords[2][2].getX())*/,2.5),new Rotation2d(0)),
-				//new Pose2d(new Translation2d(coords[0][5].getRelX(coords[3][4].getX()),coords[0][5].getRelY(coords[3][4].getY())),new Rotation2d(coords[0][5].getAngle(coords[3][4].getX(), coords[3][4].getY())))
+				new Pose2d(FieldCooridnates.a1,new Rotation2d(123)),
+				new Pose2d(fieldCooridnates.getXDist(fieldCooridnates.a1, fieldCooridnates.c3),fieldCooridnates.getYDist(fieldCooridnates.a1, fieldCooridnates.c3),new Rotation2d(123))
 		),config);
 		initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));

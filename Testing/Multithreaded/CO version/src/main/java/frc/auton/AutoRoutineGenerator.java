@@ -161,8 +161,9 @@ public class AutoRoutineGenerator {
 		Trajectory move = TrajectoryGenerator.generateTrajectory(
 			List.of(
 				new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
-				new Pose2d(FieldCooridnates.a1,new Rotation2d(123)),
-				new Pose2d(fieldCooridnates.getXDist(fieldCooridnates.a1, fieldCooridnates.c3),fieldCooridnates.getYDist(fieldCooridnates.a1, fieldCooridnates.c3),new Rotation2d(123))
+				new Pose2d(FieldCooridnates.c3,new Rotation2d(123)),
+				new Pose2d(fieldCooridnates.getXDist(fieldCooridnates.c3, fieldCooridnates.d5),fieldCooridnates.getYDist(fieldCooridnates.c3, fieldCooridnates.d5),new Rotation2d(123)),
+				new Pose2d(fieldCooridnates.getXDist(fieldCooridnates.d5, fieldCooridnates.a6), fieldCooridnates.getYDist(fieldCooridnates.d5, fieldCooridnates.a6), new Rotation2d())
 		),config);
 		initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
@@ -170,6 +171,19 @@ public class AutoRoutineGenerator {
 		initialDrive.addCommands(new SetDrivePath(move,true));
 		return initialDrive;
 	}
+
+	/*public static AutoRoutine redTwo(){
+		TrajectoryConfig config = createConfig(2, .5, false);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0,0, new Rotation2d(0)));
+		Trajectory move = TrajectoryGenerator.generateTrajectory(
+			List.of(
+				new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
+				new Pose2d(FieldCooridnates.c3, new Rotation2d(123)),
+				new Pose2d(fieldCooridnates.getXDist(fieldCooridnates.c3, fieldCooridnates.d5),fieldCooridnates.getYDist(fieldCoordinates.c3,fieldCooridnates.d5), new Rotation2d(123)),
+			)
+		)	
+
+	}*/
 
 	private static TrajectoryConfig createConfig(double v, double a, boolean reversed) {
 		TrajectoryConfig config = new TrajectoryConfig(v, a);
@@ -183,5 +197,6 @@ public class AutoRoutineGenerator {
 		config.addConstraint(kkk);
 		config.setReversed(reversed);
 		return config;
+	
 	}
 }

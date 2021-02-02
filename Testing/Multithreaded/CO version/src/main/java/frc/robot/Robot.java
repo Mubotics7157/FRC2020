@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
       indexer.setPuke();
     }//else if(xbox.getRawButton(2)){
       else if(rightStick.getRawButton(1)){
-      indexer.setRevving();
+        indexer.setShooting();
     }
     else{
       indexer.setHungry(false);
@@ -140,8 +140,13 @@ public class Robot extends TimedRobot {
     /*else if (xbox.getRawButtonPressed(6)) {
       turret.setTargetLock();
     }*/
+    if(leftStick.getRawButtonPressed(2))
+      turret.setTargetLock();
 
-    indexer.setRPMAdjustment(xbox.getRawAxis(2) * -200, xbox.getRawAxis(2) * -200 / indexer.getRPMRatio());
+    if(rightStick.getRawButtonPressed(2))
+      turret.setFieldLock();
+
+    indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
 
     if(xbox.getRawButtonPressed(9)){
       indexer.setRPMRatio(ShooterConstants.RATIO_FLOATY);
@@ -164,9 +169,12 @@ public class Robot extends TimedRobot {
  
     //if(xbox.getRawButton(8)) {
       if(leftStick.getRawButton(1)){
-      indexer.setSwallowing(true);
-      indexer.runAll();
-    }//else{
+        indexer.setRevving();
+
+    }
+    
+      if(leftStick.getRawButtonPressed(3))
+        turret.setOff();  //else{
       //indexer.setSwallowing(false);
     //}
 

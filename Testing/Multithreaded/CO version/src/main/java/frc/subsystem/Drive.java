@@ -44,9 +44,9 @@ import frc.utility.control.SynchronousPid;
  */
 public class Drive extends Threaded{
 
-  public final TalonFX leftMaster = new TalonFX(DEVICE_ID_LEFT_MASTER);
+  private final TalonFX leftMaster = new TalonFX(DEVICE_ID_LEFT_MASTER);
   private final TalonFX leftSlave = new TalonFX(DEVICE_ID_LEFT_SLAVE);
-  public final TalonFX rightMaster = new TalonFX(DEVICE_ID_RIGHT_MASTER);
+  private final TalonFX rightMaster = new TalonFX(DEVICE_ID_RIGHT_MASTER);
   private final TalonFX rightSlave = new TalonFX(DEVICE_ID_RIGHT_SLAVE);
   private final Servo leftShifter = new Servo(DEVICE_ID_LEFT_SHIFTER);
   private final Servo rightShifter = new Servo(DEVICE_ID_RIGHT_SHIFTER);
@@ -64,7 +64,7 @@ public class Drive extends Threaded{
   }
   
 	public enum DriveState {
-		TELEOP, PUREPURSUIT, TURN, HOLD, DONE,TUNING
+		TELEOP, PUREPURSUIT, TURN, HOLD, DONE
   }
   
   DriveState driveState = DriveState.TELEOP;
@@ -134,16 +134,7 @@ public class Drive extends Threaded{
         case DONE:
         SmartDashboard.putString("Drive State", "Done");
           break;
-
-        case TUNING:
-        SmartDashboard.putString("Drive State", "Tuning");
-        updateTuning();
       }
-  }
-
-  public synchronized void setBreakMode(){
-    leftMaster.setNeutralMode(NeutralMode.Brake);
-    rightMaster.setNeutralMode(NeutralMode.Brake);
   }
 
   public synchronized void setAutoPath(Trajectory path, ArrayList<PathTrigger> triggers) {
@@ -185,17 +176,6 @@ public class Drive extends Threaded{
     synchronized (this) {
       driveState = DriveState.HOLD;
     }
-  }
-
-  public void setTuning(){
-    synchronized(this){
-      driveState = DriveState.TUNING;
-    }
-  }
-
-  private void updateTuning() {
-tankDriveVelocity(1, 1);
-
   }
 
   private void updateTeleOp() {

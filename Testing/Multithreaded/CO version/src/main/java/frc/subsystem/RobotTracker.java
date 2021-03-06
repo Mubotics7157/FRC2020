@@ -69,9 +69,6 @@ public class RobotTracker extends Threaded {
 			SmartDashboard.putNumber("PoseX", differentialDriveOdometry.getPoseMeters().getTranslation().getX());
 			SmartDashboard.putNumber("PoseY", differentialDriveOdometry.getPoseMeters().getTranslation().getY());
 			SmartDashboard.putNumber("PoseR", differentialDriveOdometry.getPoseMeters().getRotation().getDegrees());
-			SmartDashboard.putNumber("tan", differentialDriveOdometry.getPoseMeters().getRotation().getTan());
-			SmartDashboard.putNumber("sin", differentialDriveOdometry.getPoseMeters().getRotation().getSin());
-			SmartDashboard.putNumber("cos", differentialDriveOdometry.getPoseMeters().getRotation().getSin());
 			vehicleHistory.add(new InterpolablePair<>(System.nanoTime(), currentPose));
 		}
 	}

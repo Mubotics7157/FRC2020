@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 
 import frc.utility.ThreadScheduler;
 
@@ -79,16 +79,13 @@ public class Robot extends TimedRobot {
   boolean autoDone;
   @Override
   public void autonomousInit() {
-    //c.start();
+    c.start();
     scheduler.resume();
     // m_autoSelected = m_chooser.getSelected();
     turret.setLight(true);
-    //drive.setTuning();
-    robotTracker.resetOdometry();
     AutoRoutine option = AutoRoutineGenerator.redOne();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
-   
   }
 
   /**
@@ -96,12 +93,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-
   }
 
   @Override 
   public void teleopInit() {
-    c.start();
+    //c.start();
     if(auto != null)
       auto.interrupt();
     System.out.println("teleop init!");
@@ -112,13 +108,13 @@ public class Robot extends TimedRobot {
     Drive.getInstance().setTeleOp();
     indexer.setLemons(1000);
     robotTracker.resetOdometry();
-    turret.setOff();
-
+    turret.setDebug();
   }
 
   @Override
   public void teleopPeriodic() {
-    /*if(Math.abs(xbox.getRawAxis(4)) > 0.3) {
+    drive.driveTeleOp(leftStick.getY(), rightStick.getY());
+    if(Math.abs(xbox.getRawAxis(4)) > 0.3) {
       
         indexer.toggleHungry();
       //indexer.setHungry(true);
@@ -136,93 +132,51 @@ public class Robot extends TimedRobot {
     }
     else{
       indexer.setHungry(false);
+    }
+
+    if (xbox.getRawButtonPressed(7)) {
+      turret.setDebug();
+    }
+    /*else if (xbox.getRawButtonPressed(6)) {
+      turret.setTargetLock();
     }*/
+    if(leftStick.getRawButtonPressed(2))
+      turret.setTargetLock();
 
-//shooting
-    if(xbox.getRawButtonPressed(1))
-    indexer.setRevving();
-    if(Math.abs(xbox.getRawAxis(1)) > 0.05) {
-     // turret.adjustDebugHeading(xbox.getRawAxis(0) * -0.2);
-    }  
-
-// -- - - - - - -  - - - - -  everything to do with running intake
-
-// running the belt - -- - -  - - 
-    if(xbox.getRawButtonPressed(3)){
-      indexer.sideChew();  
-    }
-    if(xbox.getRawButtonReleased(3)){
-    }
-// - - - - - - retract the intake (should auto deploy when set hungry) - - - - - -
-
-    if(xbox.getRawButtonPressed(4)) {
-      indexer.setSalivation(false);
-    }
-
-//  - - - - - - - - - - - -  runs the chute - - - - - - - - -  - - - 
-      if(xbox.getRawButtonPressed(2))
-        indexer.setIndexing(true);
-
-      if(xbox.getRawButtonReleased(2))
-        indexer.setIndexing(false);
-// - - - - - - - - - - - - 
-
-
-
-// - - - - - - setting different modes for the turret - - - - - - -
-    if(xbox.getRawButton(5))
+    if(rightStick.getRawButtonPressed(2))
       turret.setFieldLock();
 
-    if(xbox.getRawButtonPressed(6))
-      turret.setTargetLock();
-      
-     if (xbox.getRawButtonPressed(7)) 
-      turret.setDebug();
-     
-    if(xbox.getRawButtonPressed(8))
-      turret.setOff();  
-
-// - - - - - - - 
     indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
-    
-      if(leftStick.getRawButtonPressed(1)){
-        indexer.setHungry(true);
 
-    }
-
-    if(leftStick.getRawButtonReleased(1)){
-      indexer.setHungry(false);
-    }
-
-       if(xbox.getRawAxis(2)<.05 && xbox.getRawAxis(2)>-.05){
-         indexer.setOff();
-       }
-
-       else if(xbox.getRawAxis(2)>.05){
-         indexer.setHungry(true);
-       }
-
-       else if(xbox.getRawAxis(2) < -.05){
-         indexer.setPuke();
-       }
-          
-      
-      
-        //else{
-      //indexer.setSwallowing(false);
-    //}
-
-
-    /*if(xbox.getRawButtonPressed(3)) {
-      indexer.toggleRPMTolerance();
-      indexer.toggleShooterAngle();
-    }*/
-
-    /*if(xbox.getRawButtonPressed(9)){
+    if(xbox.getRawButtonPressed(9)){
       indexer.setRPMRatio(ShooterConstants.RATIO_FLOATY);
     }else if(xbox.getRawButtonPressed(8)){
       //indexer.setRPMRatio(ShooterConstants.RATIO_NORMAL);
-    }*/
+    }
+
+    if(xbox.getRawButtonPressed(5)) {
+      indexer.setSalivation(false);
+    }
+
+    if(xbox.getRawButtonPressed(3)) {
+      indexer.toggleRPMTolerance();
+      indexer.toggleShooterAngle();
+    }
+
+    if(Math.abs(xbox.getRawAxis(1)) > 0.05) {
+      turret.adjustDebugHeading(xbox.getRawAxis(0) * -0.2);
+    }
+ 
+    //if(xbox.getRawButton(8)) {
+      if(leftStick.getRawButton(1)){
+        indexer.setRevving();
+
+    }
+    
+      if(leftStick.getRawButtonPressed(3))
+        turret.setOff();  //else{
+      //indexer.setSwallowing(false);
+    //}
 
     //drive.tankDriveVelocity(0.2, 0.2);
     //if(xbox.getRawButtonPressed(1)){
@@ -254,7 +208,6 @@ public class Robot extends TimedRobot {
     turret.setLight(false);
     turret.setOff();
     indexer.setHungry(false);
-    drive.setBreakMode();
   }
   
   @Override

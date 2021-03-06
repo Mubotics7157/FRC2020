@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +28,8 @@ import frc.utility.shooting.ShotGenerator.ShooterSpeed;
 public class Indexer extends Threaded{
     private static final Indexer instance = new Indexer();
     CANSparkMax intakeMotor;
-    LazyCANSparkMax slamLeft, slamRight; // as facing intake
+    LazyCANSparkMax slamMotor; // as facing intake
+    LazyCANSparkMax slamSlave;
     LazyCANSparkMax whooshMotor; // chute
     LazyCANSparkMax soapBar; // shooter conveyor
     DoubleSolenoid intakeSolenoid;
@@ -49,13 +51,18 @@ public class Indexer extends Threaded{
     private boolean turretUp = false;
     private double intakeSpeed = -1;
 
+    private boolean passed;
+
     private int lemons = 0;
+
+    //private DigitalInput breakBeam;
     public static Indexer getInstance() {
         return instance;
     }
 
     public enum IndexerState {
         INTAKING, // want me some balls
+        IDEXING,
         PUKE, // keep balls in me
         SHOOTING, // POOPOO
         NOPE, // virgin bot
@@ -66,23 +73,24 @@ public class Indexer extends Threaded{
 
     public Indexer() {
         intakeMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_INTAKE, MotorType.kBrushless);
-        slamLeft = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
-        slamRight = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
+        slamMotor = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
+        slamSlave = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
         whooshMotor = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
         soapBar = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooterSolenoid = new DoubleSolenoid(TurretConstants.ANGLE_ID_SOLENOID[0], TurretConstants.ANGLE_ID_SOLENOID[1]);
 
+        //breakBeam = new DigitalInput(0);
+
         shooter = new Shooter();
         shotGen = new ShotGenerator();
         
         SmartDashboard.putString("Intake State", "NOPE");
-        slamLeft.setIdleMode(IdleMode.kCoast);
-        slamRight.setIdleMode(IdleMode.kCoast);
+        slamMotor.setIdleMode(IdleMode.kCoast);
         soapBar.setIdleMode(IdleMode.kCoast);
         whooshMotor.setOpenLoopRampRate(0.25);
-        slamLeft.setOpenLoopRampRate(0.25);
-        slamRight.setOpenLoopRampRate(0.25);
+        slamMotor.setOpenLoopRampRate(0.25);
+        intakeMotor.setInverted(true);
 
         shooterSolenoid.set(Value.kForward);
     }
@@ -98,6 +106,8 @@ public class Indexer extends Threaded{
                 feast();
                 SmartDashboard.putString("Intake State", "Intaking");
                 break;
+            case IDEXING:
+                SmartDashboard.putString("Intake State", "Indexing");
             case NOPE:
                 SmartDashboard.putString("Intake State", "NOPE");
                 break;
@@ -123,6 +133,16 @@ public class Indexer extends Threaded{
     /**
      * Turns all indexer motors off
      */
+
+     /*private void updateBreakBeamData(){
+        passed = breakBeam.get();
+        if(passed)
+            SmartDashboard.putString("passed Limit", "yes");
+        
+        else 
+            SmartDashboard.putString("passed Limit", "no");
+     }*/
+
     public synchronized void setOff() {
         indexerState = IndexerState.NOPE;
         spit();
@@ -138,7 +158,8 @@ public class Indexer extends Threaded{
 
     public synchronized void rev() {
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
-        shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
+ //       shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
+ shooter.atSpeed(4000, 4000);
     }
 
     public synchronized void setPuke() {
@@ -191,7 +212,12 @@ public class Indexer extends Threaded{
      * Sets if the chute runs while intaking
      */
     public synchronized void setSwallowing(boolean swallowing) {
-        swallow = swallowing;
+        if(passed){
+            swallow = false;
+        }
+        else
+           swallow = swallowing;
+
         SmartDashboard.putBoolean("swallowing", swallowing);
     }
 
@@ -212,6 +238,7 @@ public class Indexer extends Threaded{
     public synchronized void setSalivation(boolean ww3) {
         if (!ww3) setOff();
         intakeSolenoid.set(ww3 ? IndexerConstants.INTAKE_DEPLOYED : IndexerConstants.INTAKE_RETRACTED);
+
     }
 
     public synchronized void toggleHungry() {
@@ -223,18 +250,16 @@ public class Indexer extends Threaded{
      * Sets the conveyor motors (V-shaped) to funnel balls towards the center
      */
     private void chew() {
-        slamLeft.set(-0.2);
-        slamRight.set(0.7);
+        slamMotor.set(-0.2);
     }
 
-    private void sideChew() {
-        slamLeft.set(-0.2);
-        slamRight.set(0.7);
+    public synchronized void sideChew() {
+           slamMotor.set(-.7);
+           slamSlave.set(.2);
     }
 
     private void puke() {
-        slamLeft.set(0.7);
-        slamRight.set(-0.7);
+        slamMotor.set(0.7); //check this to make sure it is the correct value
         whooshMotor.set(0.5);
     }
 
@@ -243,8 +268,7 @@ public class Indexer extends Threaded{
      */
     private void spit() {
         shooter.atSpeed(0, 0);
-        slamLeft.set(0);
-        slamRight.set(0);
+        slamMotor.set(0);
         whooshMotor.set(0);
         intakeMotor.set(0);
         soapBar.set(0);
@@ -257,6 +281,11 @@ public class Indexer extends Threaded{
         //whooshMotor.set(0);
         intakeMotor.set(0);
         soapBar.set(0);
+    }
+
+    public synchronized void setIndexing(boolean swallow){
+            if(swallow)
+                whooshMotor.set(-.5);
     }
 
     /**
@@ -287,9 +316,11 @@ public class Indexer extends Threaded{
      * Runs when intaking
      */
     private void feast() {
+        //updateBreakBeamData();
         if (swallow) swallow(-.2);
         sideChew();
         intakeMotor.set(intakeSpeed);
+        SmartDashboard.putNumber("speed", intakeSpeed);
     }
 
     /**

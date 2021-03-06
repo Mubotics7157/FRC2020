@@ -56,7 +56,7 @@ public final class Constants {
 
     public static final double DEADBAND = 0.05;
 
-    public static final double kP = 0.0003;
+    public static final double kP = 0.03;
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;
@@ -98,9 +98,9 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final int DEVICE_ID_TURRET = 4;
-    public static final double kP = 30; //60
+    public static final double kP = 20; //60
     public static final double kI = 0.00; //0
-    public static final double kD = 90; //300
+    public static final double kD = 40; //300
     public static final double kF = 0.00; //0
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;
@@ -118,8 +118,7 @@ public final class Constants {
     public static final double LENGTH_METERS = 15.98;
     public static final double WIDTH_METERS = 8.21;
     public static final double INTERPORT_METERS = 1; //placeholder
-    public static final double HORZ_DIST_TO_PORT = 8; //placeholder
-    public static final double ODOMETRY_OFFSET_X = 0;
+    public static final double HORZ_DIST_TO_PORT = 8; //placeholder public static final double ODOMETRY_OFFSET_X = 0;
     public static final double ODOMETRY_OFFSET_Y = 0;
 
   }
@@ -137,8 +136,9 @@ public final class Constants {
     public static final int DEVICE_ID_CHUTE = 61;
     public static final int DEVICE_ID_INTAKE = 51;
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
-    public static final Value INTAKE_DEPLOYED = Value.kForward;
-    public static final Value INTAKE_RETRACTED = Value.kReverse;
+    public static final Value INTAKE_DEPLOYED = Value.kReverse;
+    public static final Value INTAKE_RETRACTED = Value.kForward;
+	public static final int DEVICE_ID_INDEXER_BELT = 0;
   }
 
   public static final class ShooterConstants {
@@ -191,77 +191,5 @@ public final class Constants {
   public static final class MiscConstants{
     public static int LED = 1; //update later
     public static double ROBOT_Y_OFFSET_METERS = 2.286;
-    public static Coordinate [][] plane = {
-        { //a
-          new Coordinate(2.5,12.5),
-          new Coordinate(5.0,12.5),
-          new Coordinate(7.5, 12.5),
-          new Coordinate(10.0,12.5),
-          new Coordinate(12.5,12.5),
-          new Coordinate(15.0,12.5),
-          new Coordinate(17.5,12.5),
-          new Coordinate(20.0,12.5),
-          new Coordinate(22.5,12.5),
-          new Coordinate(25.0,12.5),
-          new Coordinate(27.5,12.5),
-          new Coordinate(30.0,12.5)
-        },
-        { //b
-          new Coordinate(2.5,10.0),
-          new Coordinate(5.0,10.0),
-          new Coordinate(7.5, 10.0),
-          new Coordinate(10.0,10.0),
-          new Coordinate(10.0,10.0),
-          new Coordinate(15.0,10.0),
-          new Coordinate(17.5,10.0),
-          new Coordinate(20.0,10.0),
-          new Coordinate(22.5,10.0),
-          new Coordinate(25.0,10.0),
-          new Coordinate(27.5,10.0),
-          new Coordinate(30.0,10.0)
-        },
-        { //c
-          new Coordinate(2.5,7.5),
-          new Coordinate(5.0,7.5),
-          new Coordinate(7.5, 7.5),
-          new Coordinate(10.0,7.5),
-          new Coordinate(7.5,7.5),
-          new Coordinate(15.0,7.5),
-          new Coordinate(17.5,7.5),
-          new Coordinate(20.0,7.5),
-          new Coordinate(22.5,7.5),
-          new Coordinate(25.0,7.5),
-          new Coordinate(27.5,7.5),
-          new Coordinate(30.0,7.5)
-        },
-        { //d
-          new Coordinate(2.5,5.0),
-          new Coordinate(5.0,5.0),
-          new Coordinate(7.5, 5.0),
-          new Coordinate(10.0,5.0),
-          new Coordinate(5.0,5.0),
-          new Coordinate(15.0,5.0),
-          new Coordinate(17.5,5.0),
-          new Coordinate(20.0,5.0),
-          new Coordinate(22.5,5.0),
-          new Coordinate(25.0,5.0),
-          new Coordinate(27.5,5.0),
-          new Coordinate(30.0,5.0)
-        },
-        { //e
-          new Coordinate(2.5,2.5),
-          new Coordinate(5.0,2.5),
-          new Coordinate(7.5, 2.5),
-          new Coordinate(10.0,2.5),
-          new Coordinate(2.5,2.5),
-          new Coordinate(15.0,2.5),
-          new Coordinate(17.5,2.5),
-          new Coordinate(20.0,2.5),
-          new Coordinate(22.5,2.5),
-          new Coordinate(25.0,2.5),
-          new Coordinate(27.5,2.5),
-          new Coordinate(30.0,2.5)
-        }
-    };
   }
 }

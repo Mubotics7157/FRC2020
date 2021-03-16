@@ -366,6 +366,39 @@ public class AutoRoutineGenerator {
 		//initialDrive.addCommands(new SetDrivePath(leg1,true));
 		return initialDrive;
 	}
+
+	public static AutoRoutine secondRed(){
+		TrajectoryConfig config = createConfig(2,2,false);
+		config.setEndVelocity(0);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0,0,new Rotation2d(0)));
+		Trajectory leg1 = TrajectoryGenerator.generateTrajectory(
+			List.of(
+				new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
+				new Pose2d(0.915501, 0.078550, Rotation2d.fromDegrees(6.06)),
+				new Pose2d(2.611811,-1.1203931 , Rotation2d.fromDegrees(-34.49)),
+				new Pose2d(4.368612,-0.003472 , Rotation2d.fromDegrees(35)),
+				new Pose2d(8.137649,0.580949 , Rotation2d.fromDegrees(13.534))
+				
+				
+		),config);
+
+		initialDrive = new AutoRoutine();
+		Pose2d start = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		RobotTracker.getInstance().setOdometry(start);
+		initialDrive.addCommands(new SetDrivePath(leg1,true,
+			PathTrigger.create(new SetIntaking(true,true), .1), 
+			PathTrigger.create(new RunChute(true, true), .05),
+			PathTrigger.create(new SetIntaking(false,true), .7)
+			//PathTrigger.create(new RunChute(false,false), .9) 
+			//PathTrigger.create(new SetIntaking(false,true), .5),
+			//PathTrigger.create(new SetIntaking(false,true), .5),
+			//PathTrigger.create(new SetIntaking(true, false), .27),
+			//PathTrigger.create(new SetIndexing(true), .35),
+			//PathTrigger.create(new SetIndexing(true), .45))
+		//initialDrive.addCommands(new SetDrivePath(leg1,true));
+		));
+		return initialDrive;
+	}
 	public static AutoRoutine slalomRoutine(){
 		TrajectoryConfig config = createConfig(2, 2,true );
 		TrajectoryConfig turnConfig = createConfig(1.5, 1.5, true);

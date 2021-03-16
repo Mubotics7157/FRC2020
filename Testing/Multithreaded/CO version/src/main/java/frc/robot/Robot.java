@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
     turret.setLight(true);
     //drive.setTuning();
     robotTracker.resetOdometry();
-    AutoRoutine option = AutoRoutineGenerator.redOne();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
+    AutoRoutine option = AutoRoutineGenerator.barrelRoutine();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
    

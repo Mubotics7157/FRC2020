@@ -1,6 +1,7 @@
 // Copyright 2019 FRC Team 3476 Code Orange
 
 package frc.robot;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -9,9 +10,12 @@ import frc.auton.AutoRoutineGenerator;
 import frc.robot.Constants.ShooterConstants;
 import frc.subsystem.*;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -27,6 +31,7 @@ public class Robot extends TimedRobot {
   public static Joystick leftStick = new Joystick(1);
   public static Joystick rightStick = new Joystick(2);
   private Compressor c = new Compressor();
+  DigitalInput breakBeam = new DigitalInput(1);
 
   //Subsystems 
   RobotTracker robotTracker = RobotTracker.getInstance();
@@ -112,12 +117,20 @@ public class Robot extends TimedRobot {
     Drive.getInstance().setTeleOp();
     indexer.setLemons(1000);
     robotTracker.resetOdometry();
-    turret.setOff();
+    turret.setDebug();
 
   }
 
   @Override
   public void teleopPeriodic() {
+    SmartDashboard.putBoolean("did it pass", breakBeam.get());
+    /*try {
+				writeToFile(differentialDriveOdometry.getPoseMeters().getTranslation().getX(),
+						differentialDriveOdometry.getPoseMeters().getTranslation().getY(),
+						differentialDriveOdometry.getPoseMeters().getRotation().getDegrees());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}*/
     /*if(Math.abs(xbox.getRawAxis(4)) > 0.3) {
       
         indexer.toggleHungry();
@@ -142,7 +155,7 @@ public class Robot extends TimedRobot {
     if(xbox.getRawButtonPressed(1))
     indexer.setRevving();
     if(Math.abs(xbox.getRawAxis(1)) > 0.05) {
-     // turret.adjustDebugHeading(xbox.getRawAxis(0) * -0.2);
+     turret.adjustDebugHeading(xbox.getRawAxis(0) * -0.2);
     }  
 
 // -- - - - - - -  - - - - -  everything to do with running intake

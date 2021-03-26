@@ -40,6 +40,7 @@ public final class Constants {
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
     public static final double TRACK_WIDTH_METERS = .70979231;
+    public static final double TRACK_WIDTH_FEET = 2.32871493;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
         TRACK_WIDTH_METERS);
 
@@ -138,7 +139,9 @@ public final class Constants {
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
     public static final Value INTAKE_DEPLOYED = Value.kReverse;
     public static final Value INTAKE_RETRACTED = Value.kForward;
-	public static final int DEVICE_ID_INDEXER_BELT = 0;
+  public static final int DEVICE_ID_INDEXER_BELT = 0;
+    public static final boolean BROKEN = false;
+    public static final boolean NOT_BROKEN = true;
   }
 
   public static final class ShooterConstants {

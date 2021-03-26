@@ -55,7 +55,8 @@ public class Indexer extends Threaded{
 
     private int lemons = 0;
 
-    //private DigitalInput breakBeam;
+    //private DigitalInput breakBeam = new DigitalInput(1);
+
     public static Indexer getInstance() {
         return instance;
     }
@@ -80,7 +81,6 @@ public class Indexer extends Threaded{
         soapBar = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooterSolenoid = new DoubleSolenoid(TurretConstants.ANGLE_ID_SOLENOID[0], TurretConstants.ANGLE_ID_SOLENOID[1]);
 
-        //breakBeam = new DigitalInput(0);
 
         shooter = new Shooter();
         shotGen = new ShotGenerator();
@@ -134,14 +134,15 @@ public class Indexer extends Threaded{
      * Turns all indexer motors off
      */
 
-     /*private void updateBreakBeamData(){
-        passed = breakBeam.get();
-        if(passed)
+     public synchronized void updateBreakBeamData(){
+        /*if(passed)
             SmartDashboard.putString("passed Limit", "yes");
         
         else 
             SmartDashboard.putString("passed Limit", "no");
-     }*/
+            */
+           // SmartDashboard.putBoolean("break beam", breakBeam.get());
+     }
 
     public synchronized void setOff() {
         indexerState = IndexerState.NOPE;
@@ -320,6 +321,7 @@ public class Indexer extends Threaded{
         if (swallow) swallow(-.2);
         sideChew();
         intakeMotor.set(intakeSpeed);
+        updateBreakBeamData();
         SmartDashboard.putNumber("speed", intakeSpeed);
     }
 

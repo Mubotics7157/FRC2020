@@ -1,6 +1,10 @@
 // Copyright 2019 FRC Team 3476 Code Orange
 
 package frc.subsystem;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -8,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.InterpolablePoseCircularQueue;
 import frc.utility.Threaded;
 import frc.utility.math.InterpolablePair;
-public class RobotTracker extends Threaded {
+public class RobotTracker extends Threaded{
 
 	private static final RobotTracker trackingInstance = new RobotTracker();
 
@@ -18,10 +22,12 @@ public class RobotTracker extends Threaded {
 
 	private Drive drive;
 	private Pose2d currentPose;
-	private final DifferentialDriveOdometry differentialDriveOdometry;
+	public final DifferentialDriveOdometry differentialDriveOdometry;
+	private boolean writeToggle;
 
 	private Pose2d lastPose;
 	private InterpolablePoseCircularQueue vehicleHistory;
+	private boolean blocking;
 
 	private RobotTracker() {
 		vehicleHistory = new InterpolablePoseCircularQueue(100);
@@ -33,8 +39,28 @@ public class RobotTracker extends Threaded {
 		return vehicleHistory.getInterpolatedPose(time).getRotation();
 	}
 
+	public synchronized void toggleBlocking(boolean blocking){
+		this.blocking = blocking;
+	}
+
+	public synchronized void writeToFile (double x, double y, double r) throws FileNotFoundException{
+		FileOutputStream fileOutput = new FileOutputStream("coords.txt", true);
+		PrintWriter printW = new PrintWriter(fileOutput);
+		/*if(blocking){
+			printW.println("start blocking");
+			
+		}*/
+		printW.println("new Pose2d(" + x+ "," + y +",Rotation2d.fromDegrees(" + r +")),");
+		printW.close();
+
+	}
+
 	synchronized public Pose2d getOdometry() {
 		return currentPose;
+	}
+
+	public synchronized void toggleWritingSwitch(boolean on){
+		writeToggle = on;
 	}
 
 	synchronized public void resetOdometry() {
@@ -61,10 +87,7 @@ public class RobotTracker extends Threaded {
 		double rightDist = drive.getRightEncoderDistance();
 
 		synchronized (this) {
-			differentialDriveOdometry.update(
-				Rotation2d.fromDegrees(heading),
-				leftDist,
-				rightDist);
+			differentialDriveOdometry.update(Rotation2d.fromDegrees(heading), leftDist, rightDist);
 			currentPose = differentialDriveOdometry.getPoseMeters();
 			SmartDashboard.putNumber("PoseX", differentialDriveOdometry.getPoseMeters().getTranslation().getX());
 			SmartDashboard.putNumber("PoseY", differentialDriveOdometry.getPoseMeters().getTranslation().getY());
@@ -73,6 +96,10 @@ public class RobotTracker extends Threaded {
 			SmartDashboard.putNumber("sin", differentialDriveOdometry.getPoseMeters().getRotation().getSin());
 			SmartDashboard.putNumber("cos", differentialDriveOdometry.getPoseMeters().getRotation().getSin());
 			vehicleHistory.add(new InterpolablePair<>(System.nanoTime(), currentPose));
+
+			//if (writeToggle) {
+			
 		}
 	}
-}
+	}
+//}

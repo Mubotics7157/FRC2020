@@ -58,6 +58,7 @@ public class Shooter {
         return allowableRPMError;
     }
 
+
     public boolean atSpeed(double bottom, double top) {
         if (bottom == 0 || top == 0) {
             topWheel.getPIDController().setReference(0, ControlType.kVoltage);

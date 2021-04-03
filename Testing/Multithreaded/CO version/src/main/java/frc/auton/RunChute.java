@@ -16,7 +16,7 @@ public class RunChute extends AutoCommand{
     }
     @Override
     public void start() {
-        Indexer.getInstance().setIndexing(runChute);
+        //Indexer.getInstance().setIndexing(runChute);
         Indexer.getInstance().sideChew();
     }
 

@@ -40,6 +40,7 @@ public class Indexer extends Threaded{
 
     private boolean automated = true;
     private boolean swallow = false;
+    private boolean intake = true;
 
     private double botArbitrary = 0;
     private double topArbitrary = 0;
@@ -55,7 +56,7 @@ public class Indexer extends Threaded{
 
     private int lemons = 0;
 
-    //private DigitalInput breakBeam = new DigitalInput(1);
+    private DigitalInput breakBeam;
 
     public static Indexer getInstance() {
         return instance;
@@ -67,7 +68,8 @@ public class Indexer extends Threaded{
         PUKE, // keep balls in me
         SHOOTING, // POOPOO
         NOPE, // virgin bot
-        REVVING
+        REVVING,
+        INDEXING
     }
 
     private IndexerState indexerState = IndexerState.NOPE;
@@ -75,11 +77,13 @@ public class Indexer extends Threaded{
     public Indexer() {
         intakeMotor = new CANSparkMax(IndexerConstants.DEVICE_ID_INTAKE, MotorType.kBrushless);
         slamMotor = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_CONVEYOR, MotorType.kBrushless);
-        slamSlave = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
+        //slamSlave = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_INDEXER_SLAVE, MotorType.kBrushless);
         whooshMotor = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_CHUTE, MotorType.kBrushless);
         intakeSolenoid = new DoubleSolenoid(IndexerConstants.SOLENOID_IDS_INTAKE[0], IndexerConstants.SOLENOID_IDS_INTAKE[1]);
         soapBar = new LazyCANSparkMax(IndexerConstants.DEVICE_ID_TOP_BELT, MotorType.kBrushless);
         shooterSolenoid = new DoubleSolenoid(TurretConstants.ANGLE_ID_SOLENOID[0], TurretConstants.ANGLE_ID_SOLENOID[1]);
+
+        breakBeam = new DigitalInput(1);
 
 
         shooter = new Shooter();
@@ -127,6 +131,11 @@ public class Indexer extends Threaded{
                 }
                 SmartDashboard.putString("Intake State", "Shooting");
                 break;
+            
+            case INDEXING:
+                runIndexer();
+                SmartDashboard.putString("Intake State", "Indexing");
+                break;
         }
     }
 
@@ -134,14 +143,13 @@ public class Indexer extends Threaded{
      * Turns all indexer motors off
      */
 
-     public synchronized void updateBreakBeamData(){
-        /*if(passed)
-            SmartDashboard.putString("passed Limit", "yes");
+    private boolean heightLimitPassed(){
+        if(breakBeam.get() == IndexerConstants.NOT_BROKEN)
+            return false;
+
+        else
+            return true;
         
-        else 
-            SmartDashboard.putString("passed Limit", "no");
-            */
-           // SmartDashboard.putBoolean("break beam", breakBeam.get());
      }
 
     public synchronized void setOff() {
@@ -149,6 +157,14 @@ public class Indexer extends Threaded{
         spit();
     }
 
+    private void runIndexer(){
+        sideChew();
+          if (!heightLimitPassed()) 
+            swallow(-.5);
+         else if(heightLimitPassed()){
+            swallow(0);
+         }
+    }
     public synchronized void toggleRPMTolerance() {
         shooter.toggleRPMTolerance();
     }
@@ -157,10 +173,14 @@ public class Indexer extends Threaded{
         indexerState = IndexerState.REVVING;
     }
 
+    public synchronized void setIndexing(){
+        indexerState = IndexerState.INDEXING;
+    }
+
     public synchronized void rev() {
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
- //       shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
- shooter.atSpeed(4000, 4000);
+        shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
+ //shooter.atSpeed(4000, 4000);
     }
 
     public synchronized void setPuke() {
@@ -182,6 +202,11 @@ public class Indexer extends Threaded{
 
     public synchronized double getRPMRatio() {
         return rpmRatio;
+    }
+
+    //merely for testing purposes
+    public synchronized void toggleManualBeamBreak(){
+        passed = !passed;
     }
 
     public synchronized void setBotRPM(double rpm) {
@@ -213,13 +238,7 @@ public class Indexer extends Threaded{
      * Sets if the chute runs while intaking
      */
     public synchronized void setSwallowing(boolean swallowing) {
-        if(passed){
-            swallow = false;
-        }
-        else
            swallow = swallowing;
-
-        SmartDashboard.putBoolean("swallowing", swallowing);
     }
 
     public synchronized void toggleShooterAngle() {
@@ -247,6 +266,13 @@ public class Indexer extends Threaded{
         setHungry(!hungry);
     }
 
+    public synchronized void toggleIntaking(){
+        if(intake)
+            intake = false;
+        else if(!intake)
+            intake = true;
+    }
+
     /**
      * Sets the conveyor motors (V-shaped) to funnel balls towards the center
      */
@@ -256,7 +282,7 @@ public class Indexer extends Threaded{
 
     public synchronized void sideChew() {
            slamMotor.set(-.7);
-           slamSlave.set(.2);
+           //slamSlave.set(.2);
     }
 
     private void puke() {
@@ -284,9 +310,9 @@ public class Indexer extends Threaded{
         soapBar.set(0);
     }
 
-    public synchronized void setIndexing(boolean swallow){
+    private synchronized void setIndexing(boolean swallow){
             if(swallow)
-                whooshMotor.set(-.5);
+                swallow(-.5);
     }
 
     /**
@@ -294,6 +320,7 @@ public class Indexer extends Threaded{
      */
     private void swallow(double speed) {
         whooshMotor.set(speed);
+        SmartDashboard.putNumber("chute speed", whooshMotor.get());
     }
 
     public synchronized void ulcer() {
@@ -318,11 +345,26 @@ public class Indexer extends Threaded{
      */
     private void feast() {
         //updateBreakBeamData();
-        if (swallow) swallow(-.2);
-        sideChew();
-        intakeMotor.set(intakeSpeed);
-        updateBreakBeamData();
-        SmartDashboard.putNumber("speed", intakeSpeed);
+        //heightLimitPassed();
+             if (swallow && !heightLimitPassed()) 
+                 swallow(-.2);
+            else if(swallow &&heightLimitPassed()){
+                swallow(0);
+             intakeMotor.set(intakeSpeed);
+
+
+            }
+             sideChew();
+             intakeMotor.set(intakeSpeed);
+             SmartDashboard.putBoolean("swallowing", swallow);
+             SmartDashboard.putBoolean("passed?", heightLimitPassed());
+
+        
+        //setSwallowing(true);
+    }
+        /*
+        if(heightLimitPassed())
+            vomit();
     }
 
     /**
@@ -340,7 +382,7 @@ public class Indexer extends Threaded{
     /**
      * Shoots using auto generated wheel speeds
      */
-    public void setShooting() {
+    public synchronized void setShooting() {
         automated = true;
         indexerState = IndexerState.SHOOTING;
     }
@@ -361,11 +403,12 @@ public class Indexer extends Threaded{
         ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
         boolean atSpeed = shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
         boolean lemonShot = shooter.lemonShot();
+        SmartDashboard.putBoolean("at speed", atSpeed);
         if(shot.bottomSpeed == 0){
             shooter.setSpeed(0, 0);
         }else if (atSpeed) {
             dropSoap();
-            chew();
+            //chew();
             if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) swallow(-.5);
             else swallow(-1);
         }
@@ -428,4 +471,5 @@ public class Indexer extends Threaded{
     public synchronized int getLemonCount() {
         return lemons;
     }
+
 }

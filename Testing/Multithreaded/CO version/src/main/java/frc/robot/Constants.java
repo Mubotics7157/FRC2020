@@ -55,7 +55,7 @@ public final class Constants {
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
-    public static final double DEADBAND = 0.05;
+    public static final double DEADBAND = 0.07;
 
     public static final double kP = 0.03;
     public static final double kD = 0;
@@ -133,7 +133,7 @@ public final class Constants {
   public static final class IndexerConstants {
     public static final int DEVICE_ID_TOP_BELT = 40;
     public static final int DEVICE_ID_INDEXER_CONVEYOR = 41;
-    public static final int DEVICE_ID_INDEXER_SLAVE = 42;
+  //  public static final int DEVICE_ID_INDEXER_SLAVE = 42;
     public static final int DEVICE_ID_CHUTE = 61;
     public static final int DEVICE_ID_INTAKE = 51;
     public static final int[] SOLENOID_IDS_INTAKE = {0,1};
@@ -145,8 +145,8 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static int DEVICE_ID_SHOOTER_TOP = 19;
-    public static int DEVICE_ID_SHOOTER_BOTTOM = 18;
+    public static int DEVICE_ID_SHOOTER_TOP = 42;
+    public static int DEVICE_ID_SHOOTER_BOTTOM = 20; //18
     public static int MAX_ALLOWABLE_ERROR_RPM = 50;
     public static int MAX_ALLOWABLE_ERROR_RPM_FART = 300;
     public static int LEMON_ERROR_COUNTER = 100;

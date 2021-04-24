@@ -344,27 +344,19 @@ public class Indexer extends Threaded{
      * Runs when intaking
      */
     private void feast() {
-        //updateBreakBeamData();
-        //heightLimitPassed();
-             if (swallow && !heightLimitPassed()) 
-                 swallow(-.2);
-            else if(swallow &&heightLimitPassed()){
-                swallow(0);
-             intakeMotor.set(intakeSpeed);
-
-
+        if (swallow && !heightLimitPassed()) 
+            swallow(-.2);
+        else if(swallow &&heightLimitPassed()){
+            swallow(0);
+            intakeMotor.set(-intakeSpeed);
             }
-             sideChew();
-             intakeMotor.set(intakeSpeed);
-             SmartDashboard.putBoolean("swallowing", swallow);
-             SmartDashboard.putBoolean("passed?", heightLimitPassed());
+         sideChew();
+         intakeMotor.set(intakeSpeed);
+         SmartDashboard.putBoolean("swallowing", swallow);
+         SmartDashboard.putBoolean("passed?", heightLimitPassed());
 
         
         //setSwallowing(true);
-    }
-        /*
-        if(heightLimitPassed())
-            vomit();
     }
 
     /**

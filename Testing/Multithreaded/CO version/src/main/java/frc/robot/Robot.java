@@ -123,41 +123,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-   /* if(leftStick.getRawButton(1)){
-      indexer.setHungry(true);
-    }
-
-    else if(xbox.getRawButton(1)){
-      indexer.setShooting();
-    }
-
-    else if(xbox.getRawAxis(2)>0){
-      indexer.setPuke();
-    }
-
-    else if(xbox.getRawButton(4)){
-      indexer.setSalivation(true);
-    }
-
-    else if(xbox.getRawButton(3)){
-      indexer.setSalivation(false);
-    }
-
-    else if(rightStick.getRawButton(1)){
-      indexer.setIndexing();
-    }
-    else if(xbox.getRawButton(8)){
-      indexer.setSwallowing(true);
-    }
-
-    else if(xbox.getRawAxis(4)> 0){
-      indexer.toggleShooterAngle();
-    }
-
-    else{
-      indexer.setHungry(false);
-    }*/
-
     if(leftStick.getRawButton(1)){
       indexer.setHungry(true);
     }
@@ -178,13 +143,11 @@ public class Robot extends TimedRobot {
       indexer.setHungry(false);
     }
 
-
-
     if(xbox.getRawButton(4)){
       indexer.setSalivation(true);
     }
 
-    else if(xbox.getRawButton(3)){
+    else if(rightStick.getRawButton(4)){
       indexer.setSalivation(false);
     }
 
@@ -202,11 +165,6 @@ public class Robot extends TimedRobot {
 
 
      indexer.setRPMAdjustment(leftStick.getRawAxis(3)*-200, leftStick.getRawAxis(3)*-200/indexer.getRPMRatio()); 
-
-    
-
-    
-
 
 // - - - - - - setting different modes for the turret - - - - - - -
     if(xbox.getRawButton(5))
@@ -227,38 +185,6 @@ public class Robot extends TimedRobot {
       turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
     }
     indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
-    
-         
-      
-      
-        //else{
-      //indexer.setSwallowing(false);
-    //}
-
-
-    /*if(xbox.getRawButtonPressed(3)) {
-      indexer.toggleRPMTolerance();
-      indexer.toggleShooterAngle();
-    }*/
-
-    /*if(xbox.getRawButtonPressed(9)){
-      indexer.setRPMRatio(ShooterConstants.RATIO_FLOATY);
-    }else if(xbox.getRawButtonPressed(8)){
-      //indexer.setRPMRatio(ShooterConstants.RATIO_NORMAL);
-    }*/
-
-    //drive.tankDriveVelocity(0.2, 0.2);
-    //if(xbox.getRawButtonPressed(1)){
-      //System.out.println("Setting TurretState to FieldLock");
-      //turret.setFieldLock();
-    //}
-    //indexer.testShoot();
-  
-    
-    //indexer.shootArbitrary(SmartDashboard.getNumber("bottom", 0), SmartDashboard.getNumber("top", 0));
-    //indexer.runAll();
-
-
   }
 
   @Override

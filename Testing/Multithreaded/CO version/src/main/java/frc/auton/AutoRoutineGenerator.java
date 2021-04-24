@@ -150,316 +150,49 @@ public class AutoRoutineGenerator {
 		TrajectoryConfig endConfig = createConfig(2.5, 2, false);
 		endConfig.setEndVelocity(0);
 		config.setEndVelocity(2);
-		//RobotTracker.getInstance().setOdometry(new Pose2d(0,0,new Rotation2d(0)));
-		Trajectory move = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
-				new Pose2d(-2.470619,-0.082973,Rotation2d.fromDegrees(-10.91000)),
-				new Pose2d(-4.021514,0.250229,Rotation2d.fromDegrees(-1.479996)),
-				new Pose2d(-4.092075,0.330317,Rotation2d.fromDegrees(-30.529)),
-				new Pose2d(-4.364941,1.535670,Rotation2d.fromDegrees(-120.850)),
-				new Pose2d(-3.837267,1.551642,Rotation2d.fromDegrees(-168.430008)),
-				new Pose2d(-2.992,1.566,Rotation2d.fromDegrees(137.190)),
-				new Pose2d(-3.216,0.352,Rotation2d.fromDegrees(20.549)),
-				new Pose2d(-5.816,-.074,Rotation2d.fromDegrees(6.224)),
-				new Pose2d(-6.777,-.999,Rotation2d.fromDegrees(70.380)),
-				new Pose2d(-6.093,-1.864,Rotation2d.fromDegrees(165.800)),
-				new Pose2d(-5.035,-1.101,Rotation2d.fromDegrees(-104.670)),
-				new Pose2d(-6.088,.3945,Rotation2d.fromDegrees(-39.530)),
-				new Pose2d(-7.441,1.440,Rotation2d.fromDegrees(-1.390)),
-				new Pose2d(-7.570534,0.235500,Rotation2d.fromDegrees(122)),
-				new Pose2d(-8.972,1.233,Rotation2d.fromDegrees(122.160)),
-				new Pose2d(-8.015,.0834, Rotation2d.fromDegrees(146.000))
-
-		),endConfig);
-			Trajectory leg1 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-				new Pose2d(-4.427721, 0.736240, Rotation2d.fromDegrees(-88.44))
-
-		),endConfig);
-			Trajectory leg2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-4.427721, 0.736240, Rotation2d.fromDegrees(-88.44)),
-				new Pose2d(-2.771362, 1.093276, Rotation2d.fromDegrees(86.33))
-
-
-		),endConfig);
-
-		Trajectory leg3 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-2.771362, 1.093276, Rotation2d.fromDegrees(86.33)),
-				new Pose2d(-6.857051, -0.674395, Rotation2d.fromDegrees(91.216980)),
-				new Pose2d(-4.934478,-1.075311 , Rotation2d.fromDegrees(-95.583)),
-				new Pose2d(-7.429410, 1.627405, Rotation2d.fromDegrees(6.04))
-		),endConfig);
-
-			Trajectory leg4 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-7.429410, 1.627405, Rotation2d.fromDegrees(6.04)),
-				new Pose2d(-8.419118,0.257621 , Rotation2d.fromDegrees(151.10)),
-				new Pose2d(-1.181883,-0.032069 , Rotation2d.fromDegrees(175.156998))
-
-		),endConfig);
-
-		Trajectory moveAll = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-				new Pose2d(-2.470619,-0.082973,Rotation2d.fromDegrees(-10.91000)),
-				new Pose2d(-4.373016, 0.415173, Rotation2d.fromDegrees(-42)),
-				new Pose2d(-2.623561, 1.406949, Rotation2d.fromDegrees(138.900009)),
-				new Pose2d(-2.745443, -0.084210, Rotation2d.fromDegrees(59.343994)),
-				new Pose2d(-6.857051, -0.674395, Rotation2d.fromDegrees(91.216980)),
-				new Pose2d(-4.934478,-1.075311 , Rotation2d.fromDegrees(-95.583)),
-				new Pose2d(-7.429410, 1.627405, Rotation2d.fromDegrees(6.04)),
-				new Pose2d(-8.145571, 0.062183, Rotation2d.fromDegrees(150.43)),
-				new Pose2d(-8.419118,0.257621 , Rotation2d.fromDegrees(151.10)),
-				new Pose2d(-0.536926,0.295040, Rotation2d.fromDegrees(175.156998))
-
-		),endConfig);
-
-		Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(new Translation2d(0.878,-2.099), new Rotation2d(0, 0)),
-				new Pose2d(3.88, -2.376, new Rotation2d(0.3, -0.236)),
-				new Pose2d(4.111, -3.555 , new Rotation2d(-1.329,-0.366)),
-				new Pose2d(3.365,-2.595, new Rotation2d(0.42, 1.329)),
-				//maybe have it not swing out on pt below:
-				new Pose2d(5.061,-2.342  , new Rotation2d(0.952,-2.342)), /* new Pose2d(5.061,-2.342, new Rotation2d(.678,.289)) */
-				new Pose2d(6.91,-1.323, new Rotation2d(-0.19, 1.441)),
-				new Pose2d( 5.564, -1.5, new Rotation2d(0.163,-1.563 )),
-				// old one -new Pose2d( 6.557,-3.104 , new Rotation2d(0.653, -0.367))
-				// new one: new points 
-				new Pose2d( 6.793,-3.42 , new Rotation2d(1.131, -0.391)),
-				new Pose2d( 8.274, -3.359, new Rotation2d(0.329, 0.74)),
-				new Pose2d(7.904 ,-2.125 , new Rotation2d(-1.604, -0.062)),
-				new Pose2d( 1.137,-1.919 , new Rotation2d(-0.532,0.02 ))
-			
-			),endConfig
-		);
-
-		Trajectory wideTrajectory = TrajectoryGenerator.generateTrajectory(
-			List.of(
-
-			//INTAKE FACING FIELD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				// make the turn a bit wider
-				new Pose2d(new Translation2d(0.878,-2.099), new Rotation2d(0, 0)),
-				//new Pose2d(3.917, -2.396, new Rotation2d(0.542, -0.356)),
-				new Pose2d(4.883,-2.607, new Rotation2d(0.53, -1.21)),
-				new Pose2d(3.933,-3.906, new Rotation2d(-1.251, 0.285)),
-				new Pose2d(2.825,-2.809, new Rotation2d(0.34,.785)),
-				//new Pose2d(3.048,-3.543, new Rotation2d(-0.255,0.812)),
-				//new Pose2d(2.859,-2.75, new Rotation2d(1.373,1.319)), /* new Pose2d(5.061,-2.342, new Rotation2d(.678,.289)) */
-				new Pose2d(4.912,-2.274, new Rotation2d(1.412,0.344)),
-				new Pose2d(6.951,-1.472, new Rotation2d(0.334, 2.445)),
-				//continue from here
-				new Pose2d( 5.333, -1.241, new Rotation2d(-0.625,-2.026)),			
-				new Pose2d( 6.584,-3.512, new Rotation2d(1.003, -0.558)),
-				//new Pose2d(7.937,-3.69, new Rotation2d(1.067, 0.288)),
-				new Pose2d(8.8,-3.525, new Rotation2d(-0.136, 2.026)),
-				new Pose2d(7.201 ,-2.162 , new Rotation2d(-2.871, -0.032)),
-				new Pose2d( 1.137,-1.919 , new Rotation2d(-0.532,0.02 ))
-			), config);
-
-
 		Trajectory newWideTrajectory = TrajectoryGenerator.generateTrajectory(
 			List.of(
-				// wide 1st turn--------
 				new Pose2d(5.333,-2.329, new Rotation2d(-2.329, -0.738)),
 				new Pose2d(4.857,-4.123, new Rotation2d(-0.735, 0.027)),
-				//new Pose2d(2.519,-2.927, new Rotation2d(0.748,1.482)),
 				new Pose2d(2.995,-2.886, new Rotation2d(1.509,1.727)),
-				// ------------- 
-
-				// going to 2nd turn.....
 				new Pose2d(4.71,-2.129, new Rotation2d(1.412,0.344)),
-
-				// narrower 2nd turn----------
 				new Pose2d(6.885,-1.369, new Rotation2d(0.218, 1.796)),
 				new Pose2d(5.421,-1.337, new Rotation2d(-0.353,-2.039)),			
-				//-------------
-
-				//narrower 3rd turn--------
 				new Pose2d( 6.584,-3.512, new Rotation2d(1.003, -0.558)),
 				new Pose2d(8.511,-3.286, new Rotation2d(-0.112, 1.144)),
 				new Pose2d(7.201 ,-2.162 , new Rotation2d(-2.871, -0.032)),
-				// ------------
 				new Pose2d( 1.137,-1.919 , new Rotation2d(-0.532,0.02 ))
 			), endConfig);
-
-			Trajectory endingTrajectory = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(7.201 ,-2.162 , new Rotation2d(-2.871, -0.032)),
-				new Pose2d( 1.137,-1.919 , new Rotation2d(-0.532,0.02 ))
-
-
-				),endConfig);
-		
-
-
-		initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0.878,-2.099), new Rotation2d(0, 0));
-		//Pose2d start = new Pose2d(new Translation2d(0,0), new Rotation2d(0, 0));
 		RobotTracker.getInstance().setOdometry(start);
-		//initialDrive.addCommands(new SetDrivePath(leg1,true), new SetDrivePath(leg2,true))/*, new SetDrivePath(leg3,true)), new SetDrivePath(leg4,true)*/;
-		//initialDrive.addCommands(new SetDrivePath(moveAll,true));
 		initialDrive.addCommands(new SetDrivePath(newWideTrajectory,false));
 		return initialDrive;
 	}
 
-	
-
-	public static AutoRoutine routineThree(){
-		TrajectoryConfig moveConfig = createConfig(2, 2, true);
-		TrajectoryConfig turnConfig = createConfig(1.5, 1.5, true);
-		TrajectoryConfig endConfig = createConfig(2, 2, true);
-		moveConfig.setEndVelocity(1.5);
-		turnConfig.setEndVelocity(1.5);
-		endConfig.setEndVelocity(0);
-
-		Trajectory move = TrajectoryGenerator.generateTrajectory(
-			List.of(
-	new Pose2d(-1.374599,-0.115002, Rotation2d.fromDegrees(12.781002)),
-	new Pose2d(-2.029526,-1.391703, Rotation2d.fromDegrees(90.350998)),
-	new Pose2d(-2.729339,1.335382, Rotation2d.fromDegrees(152.701004)),
-	new Pose2d(-3.876381,1.567433, Rotation2d.fromDegrees(-146.958984)),
-	new Pose2d(-4.482058,-0.910463,Rotation2d.fromDegrees(-95.299004)),
-	new Pose2d(-5.500382,2.074891, Rotation2d.fromDegrees(-4.749000)),
-	new Pose2d(-6.951861,-0.909220, Rotation2d.fromDegrees(85.451004)),
-	new Pose2d(-8.897672,0.045091, Rotation2d.fromDegrees(-175.418991))
-			),endConfig);
-
-		Trajectory move1 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(0,0,Rotation2d.fromDegrees(0)),
-				new Pose2d(-1.368,.122,Rotation2d.fromDegrees(-3.790))
-			),moveConfig);
-
-		Trajectory turn1 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-1.368,.122,Rotation2d.fromDegrees(-3.790)),
-				new Pose2d(-1.969,-1.207,Rotation2d.fromDegrees(82.340))
-			),turnConfig);
-
-		Trajectory move2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-1.969,-1.207,Rotation2d.fromDegrees(82.340)),
-				new Pose2d(-2.305,1.189,Rotation2d.fromDegrees(130.059))
-			),moveConfig);
-
-		Trajectory turn2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-2.305,1.189,Rotation2d.fromDegrees(130.059)),
-				new Pose2d(-3.151,1.665,Rotation2d.fromDegrees(167.100)),
-				new Pose2d(-4.261,1.275,Rotation2d.fromDegrees(-85.113))
-
-			),turnConfig);
-
-		Trajectory move3 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-4.261,1.275,Rotation2d.fromDegrees(-85.113)),
-				new Pose2d(-4.332,-.991,Rotation2d.fromDegrees(-93.200)),
-				new Pose2d(-4.300,1.044,Rotation2d.fromDegrees(-80.360))
-			),moveConfig);
-
-		Trajectory turn3 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-4.300,1.044,Rotation2d.fromDegrees(-80.360)),
-				new Pose2d(-5.749,1.803,Rotation2d.fromDegrees(26.260)),
-				new Pose2d(-6.999,.968,Rotation2d.fromDegrees(90.360))
-			),turnConfig);
-
-
-		Trajectory move4 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-6.999,.968,Rotation2d.fromDegrees(90.360)),
-				new Pose2d(-7.066,-1.431,Rotation2d.fromDegrees(90.800)),
-				new Pose2d(-8.520,.251,Rotation2d.fromDegrees(-178.3200))
-
-			),endConfig);
-
-		initialDrive = new AutoRoutine();
-		Pose2d start = new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0));
-		RobotTracker.getInstance().setOdometry(start);
-		initialDrive.addCommands(new SetDrivePath(move));
-		return initialDrive;
-		
-
-	}
 	public static AutoRoutine redOne(){
 		TrajectoryConfig config = createConfig(3.5, 2.5,false);
 		config.setEndVelocity(2.25);
 		TrajectoryConfig endconfig = createConfig(3.5, 1.7,false);
-		//endconfig.setEndVelocity(0);
-		RobotTracker.getInstance().setOdometry(new Pose2d(0,0,new Rotation2d(0)));
-		Trajectory leg1 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
-				new Pose2d(3.079775, -0.104601, Rotation2d.fromDegrees(-1)),
-				new Pose2d(4.571761, 2.233312, Rotation2d.fromDegrees(22.40)),
-				new Pose2d(7.577031,0.004608, Rotation2d.fromDegrees(-30.210001)),
-				new Pose2d(7.892087, 0.583988, Rotation2d.fromDegrees(-21.950001))
-				//new Pose2d(2.943269,-0.160445 , Rotation2d.fromDegrees(-90))
-	),endconfig);
-
-		Trajectory leg2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(4.571761, 2.233312, Rotation2d.fromDegrees(22.40)),
-				new Pose2d(7.577031,0.004608, Rotation2d.fromDegrees(-30.210001))
-			),endconfig);
-
-		Trajectory leg3 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(0,0,Rotation2d.fromDegrees(0)),
-				new Pose2d(1.791379,-0.002556,Rotation2d.fromDegrees(0.494000)),
-				new Pose2d(3.451786,-0.706009,Rotation2d.fromDegrees(29)),
-				new Pose2d(4.994328,0.993345,Rotation2d.fromDegrees(30.754002)),
-				new Pose2d(8.558551,1.296587,Rotation2d.fromDegrees(-5.3))
-			),endconfig
-		);
-
-	
-			Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+		Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
 				List.of(
-					/*new Pose2d(2.375,-2.324,new Rotation2d(.266,-.184)),
-					new Pose2d(4.178,-3.131,new Rotation2d(0.353,-0.054)),
-					new Pose2d(4.803,-2.658, new Rotation2d(0.104,0.225)),
-					new Pose2d(3.661,-1.656, new Rotation2d(-0.046,0.19)),
-					new Pose2d(4.654,-0.697,new Rotation2d(2.733,-0.87)),
-					new Pose2d(8.647,-1.817,new Rotation2d(0.33,-0.063))
-					*/
-					//new Pose2d(2.375,-2.324,new Rotation2d(.266,-.184)),
 					new Pose2d(1.758,-1.432 , new Rotation2d(0.534,-0.204)),
 					new Pose2d(2.342,-2.37 , new Rotation2d(0.245,-0.585)),
 					new Pose2d(3.226,-3.525 , new Rotation2d(0.616,0.118)),
-					new Pose2d(3.851,-2.873,new Rotation2d(0.625,1.835)), //.027,.272
-					//new Pose2d(3.43,-1.595 , new Rotation2d(0.231,0.326))
+					new Pose2d(3.851,-2.873,new Rotation2d(0.625,1.835)), 
 					new Pose2d(4.749,-0.969,new Rotation2d(0.816,0.027)),
-					//new Pose2d(6.598,-0.521 , new Rotation2d(1.196,-0.435)),
-					//new Pose2d(8.647, -1.817, new Rotation2d(0.33,-0.063))
-					//new Pose2d(6.598,-0.521 , new Rotation2d(2.121,-1.427)),
 					new Pose2d(8.773, -0.969, new Rotation2d(.258,0))
 				), endconfig);
 
 		initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0.849,-1.546), new Rotation2d(0,0));
 		RobotTracker.getInstance().setOdometry(start);
-		//initialDrive.addCommands(new SetDrivePath(leg1,true,PathTrigger.create(new SetIntaking(true, true),.25),PathTrigger.create(new SetIntaking(false,true), .27),PathTrigger.create(new SetIndexing(true), .35),PathTrigger.create(new SetIndexing(false), .4), PathTrigger.create(new SetIntaking(true, true),.5), PathTrigger.create(new SetIntaking(false,true), .56), PathTrigger.create(new SetIntaking(true,true), .8), PathTrigger.create(new SetIntaking(false,true), .86)));
-		/*initialDrive.addCommands(
-			new SetDrivePath(leg1,false, 
-			PathTrigger.create(new SetIntaking(true,true), .1), 
-			//PathTrigger.create(new SetIntaking(false,true), .5),
-			PathTrigger.create(new RunChute(true, true), .1)
-			//PathTrigger.create(new SetIntaking(true,true), .6),
-//			PathTrigger.create(new SetIntaking(false,true), .75)
-
-			));*/
 			initialDrive.addCommands(new SetDrivePath(trajectory,true,
 			PathTrigger.create(new SetIntaking(true,true), .01), 
 			PathTrigger.create(new RunChute(true, true), .05)
 			));
 		return initialDrive;
 	}
+
 	public static AutoRoutine redTwo(){
 		TrajectoryConfig config = createConfig(3.5, 2,false);
 		config.setEndVelocity(0);
@@ -470,7 +203,6 @@ public class AutoRoutineGenerator {
 				new Pose2d(3.079775, -0.104601, Rotation2d.fromDegrees(-1)),
 				new Pose2d(4.379519,1.940491 , Rotation2d.fromDegrees(51.600)),
 				new Pose2d(7.968154,0.596197 , Rotation2d.fromDegrees(31.330000))
-				//new Pose2d(2.943269,-0.160445 , Rotation2d.fromDegrees(-90))
 		),config);
 
 		initialDrive = new AutoRoutine();
@@ -478,10 +210,6 @@ public class AutoRoutineGenerator {
 		RobotTracker.getInstance().setOdometry(start);
 		initialDrive.addCommands(new SetDrivePath(leg1,true,PathTrigger.create(
 			new SetIntaking(true, true),.5)));
-			//PathTrigger.create(new SetIntaking(true, false), .27),
-			//PathTrigger.create(new SetIndexing(true), .35),
-			//PathTrigger.create(new SetIndexing(true), .45))
-		//initialDrive.addCommands(new SetDrivePath(leg1,true));
 		return initialDrive;
 	}
 
@@ -507,13 +235,6 @@ public class AutoRoutineGenerator {
 			PathTrigger.create(new SetIntaking(true,true), .1), 
 			PathTrigger.create(new RunChute(true, true), .05),
 			PathTrigger.create(new SetIntaking(false,true), .7)
-			//PathTrigger.create(new RunChute(false,false), .9) 
-			//PathTrigger.create(new SetIntaking(false,true), .5),
-			//PathTrigger.create(new SetIntaking(false,true), .5),
-			//PathTrigger.create(new SetIntaking(true, false), .27),
-			//PathTrigger.create(new SetIndexing(true), .35),
-			//PathTrigger.create(new SetIndexing(true), .45))
-		//initialDrive.addCommands(new SetDrivePath(leg1,true));
 		));
 		return initialDrive;
 	}
@@ -530,101 +251,6 @@ public class AutoRoutineGenerator {
 		config.setEndVelocity(1.5);
 		turnConfig.setEndVelocity(1.5);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0,0,new Rotation2d(0)));
-		Trajectory move = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				
-				new Pose2d(-1.190,-.374,Rotation2d.fromDegrees(56.760)),
-				new Pose2d(-2.198,-1.491,Rotation2d.fromDegrees(17.540)),
-				new Pose2d(-4.912,-1.447,Rotation2d.fromDegrees(-2.435)),
-				new Pose2d(-5.717,-.747,Rotation2d.fromDegrees(-74.531))
-				/*new Pose2d(-6.546,.148,Rotation2d.fromDegrees(-4.778)),
-				new Pose2d(-7.623,-.803,Rotation2d.fromDegrees(88.887)),
-				new Pose2d(-6.225,-1.464,Rotation2d.fromDegrees(-176.01)),
-				new Pose2d(-5.316,-.164,Rotation2d.fromDegrees(-116.762)),
-				new Pose2d(-1.126,-.119,Rotation2d.fromDegrees(171.071)),
-				new Pose2d(-.300,-1.529,Rotation2d.fromDegrees(118.443))
-				*/
-
-
-
-
-				
-		),config);
-		
-		Trajectory move1 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-			new Pose2d(new Translation2d(0,0),Rotation2d.fromDegrees(0)),
-				new Pose2d(-1.190,-.374,Rotation2d.fromDegrees(56.760))
-
-			),startConfig);
-
-		Trajectory turn1 = TrajectoryGenerator.generateTrajectory(
-
-		List.of(
-				new Pose2d(-1.190,-.374,Rotation2d.fromDegrees(56.760)),
-				new Pose2d(-2.198,-1.491,Rotation2d.fromDegrees(17.540))
-
-		),turnConfig
-		);
-
-		Trajectory move2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-2.198,-1.491,Rotation2d.fromDegrees(17.540)),
-				new Pose2d(-4.912,-1.447,Rotation2d.fromDegrees(-2.435))
-			),config);
-
-		Trajectory turn2 = TrajectoryGenerator.generateTrajectory(
-			List.of(
-				new Pose2d(-4.912,-1.447,Rotation2d.fromDegrees(-2.435)),
-				new Pose2d(-6.025798,-0.833632,Rotation2d.fromDegrees(-80.351))
-
-			),turnConfig);
-
-			Trajectory move3 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(-6.025798,-0.833632,Rotation2d.fromDegrees(-80.351)),
-				new Pose2d(-6.546,.148,Rotation2d.fromDegrees(-4.778))
-
-				),config);
-
-			Trajectory turn3 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(-6.546,.148,Rotation2d.fromDegrees(-4.778)),
-				new Pose2d(-7.623,-.803,Rotation2d.fromDegrees(88.887))
-					
-				),turnConfig);
-
-			Trajectory move4 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(-7.623,-.803,Rotation2d.fromDegrees(88.887)),
-				new Pose2d(-6.225,-1.464,Rotation2d.fromDegrees(-176.01))
-				),config);
-
-			Trajectory turn4 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(-6.225,-1.464,Rotation2d.fromDegrees(-176.01)),
-				//new Pose2d(-5.316,-.164,Rotation2d.fromDegrees(-116.762))
-				new Pose2d(-6.029934,-0.647818, Rotation2d.fromDegrees(-86.586006))
-					
-			),turnConfig);
-
-			Trajectory move5 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				
-				new Pose2d(-6.029934,-0.647818, Rotation2d.fromDegrees(-86.586006)),
-				//new Pose2d(-5.316,-.164,Rotation2d.fromDegrees(-116.762)),
-				new Pose2d(-2.716390,0.410242,Rotation2d.fromDegrees(174.910004))
-					
-			),config);
-
-			Trajectory move6 = TrajectoryGenerator.generateTrajectory(
-				List.of(
-				new Pose2d(-2.716390,0.410242,Rotation2d.fromDegrees(174.910004)),
-				new Pose2d(-1.522499,-0.653756,Rotation2d.fromDegrees(90.190002)),
-				new Pose2d(-0.540623,-1.250486, Rotation2d.fromDegrees(176.631012))
-
-			),endConfig);
-
 			Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
 				List.of(
 					new Pose2d(2.154,-3.553 , new Rotation2d(0.2260,.364)),
@@ -639,9 +265,7 @@ public class AutoRoutineGenerator {
 		initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0.884,-3.812), new Rotation2d(0,0));
 		RobotTracker.getInstance().setOdometry(start);
-		//initialDrive.addCommands(new SetDrivePath(move1,true), new SetDrivePath(turn1,true), new SetDrivePath(move2,true), new SetDrivePath(turn2), new SetDrivePath(move3), new SetDrivePath(turn3), new SetDrivePath(move4), new SetDrivePath(turn4),new SetDrivePath(move5),new SetDrivePath(move6));
 		initialDrive.addCommands(new SetDrivePath(trajectory,true));
-
 		return initialDrive;
 	}
 
@@ -669,21 +293,18 @@ public static AutoRoutine BouncePath() {
 	Trajectory leg2 = TrajectoryGenerator.generateTrajectory(
 		List.of(
 			new Pose2d(-2.157335,-0.477802,Rotation2d.fromDegrees(107.919998)),
-			new Pose2d(-2.614958, 0.023152, Rotation2d.fromDegrees(138.389)),//142 /123
+			new Pose2d(-2.614958, 0.023152, Rotation2d.fromDegrees(138.389)),
 			new Pose2d(-2.665922,0.922003,Rotation2d.fromDegrees(91.039001)),
-			//new Pose2d(-2.924118,1.006595, Rotation2d.fromDegrees(91.059998)),//1.097//94
 			new Pose2d(-4.133699,0.827626, Rotation2d.fromDegrees(-91.746002)),
-			new Pose2d(-4.384727,-1.199028 , Rotation2d.fromDegrees(-97.136002))//changeto91
+			new Pose2d(-4.384727,-1.199028 , Rotation2d.fromDegrees(-97.136002))
 		)
 	,backwards);
 	
 	Trajectory leg3 = TrajectoryGenerator.generateTrajectory(
 		List.of(
-			new Pose2d(-4.436752, 1.345510, Rotation2d.fromDegrees(-88.585999)),//91
-			//new Pose2d(-6.537744,1.136592 , Rotation2d.fromDegrees(89.354004)),
+			new Pose2d(-4.436752, 1.345510, Rotation2d.fromDegrees(-88.585999)),
 			new Pose2d(-6.739544,0.994054,Rotation2d.fromDegrees(90.610001)),
 			new Pose2d(-6.753090,-1.633875 , Rotation2d.fromDegrees(92.753998))
-
 		)
 	,moveConfig);
 
@@ -691,7 +312,6 @@ public static AutoRoutine BouncePath() {
 	Trajectory leg4 = TrajectoryGenerator.generateTrajectory(
 		List.of(
 			new Pose2d(-6.524428,-1.504273,Rotation2d.fromDegrees(92.229996)),
-			//new Pose2d(-6.739544,0.994054,Rotation2d.fromDegrees(90.610001)),
 			new	Pose2d(-7.709881,-0.270928,Rotation2d.fromDegrees(179.860001))
 		)
 ,turnConfig);
@@ -702,7 +322,6 @@ public static AutoRoutine BouncePath() {
 		initialDrive.addCommands(new SetDrivePath(leg1), new SetDrivePath(leg2), new SetDrivePath(leg3), new SetDrivePath(leg4));
 		return initialDrive;
 }
-
 
 	private static TrajectoryConfig createConfig(double v, double a, boolean reversed) {
 		TrajectoryConfig config = new TrajectoryConfig(v, a);

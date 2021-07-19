@@ -180,6 +180,7 @@ public class AutoRoutineGenerator {
 				new Pose2d(7.201 ,-2.162 , new Rotation2d(-2.871, -0.032)),
 				new Pose2d( 1.137,-1.919 , new Rotation2d(-0.532,0.02 ))
 			), endConfig);
+			initialDrive = new AutoRoutine();
 		Pose2d start = new Pose2d(new Translation2d(0.878,-2.099), new Rotation2d(0, 0));
 		RobotTracker.getInstance().setOdometry(start);
 		initialDrive.addCommands(new SetDrivePath(newWideTrajectory,false));

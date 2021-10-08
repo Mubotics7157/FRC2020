@@ -4,14 +4,15 @@ package frc.robot;
 import static frc.robot.Constants.DriveTrainConstants.DRIVE_KINEMATICS;
 import static frc.robot.Constants.DriveTrainConstants.FEED_FORWARD;
 
-import java.util.List;
-
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
-import frc.utility.Coordinate;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -55,7 +56,7 @@ public final class Constants {
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
-    public static final double DEADBAND = 0.07;
+    public static final double DEADBAND = 0.17;
 
     public static final double kP = 0.03; //.03
     public static final double kD = 0;
@@ -109,17 +110,27 @@ public final class Constants {
     public static final int FORWARD_LIMIT_DEGREES = 190;
     public static final int REVERSE_LIMIT_DEGREES = -190;
     public static final int[] ANGLE_ID_SOLENOID = {2, 3};
+    public static final double FORWARD_LIMIT_NATIVE = 190 * 4096 / 360; 
+    public static final double REVERSE_LIMIT_NATIVE = -190 * 4096 / 360;
   }
 
   public static final class VisionConstants {
     public static final String CAMERA_NAME = "PS3";
+    public static final double FAR_TARGET_X = Units.feetToMeters(54);
+    public static final double FAR_TARGET_Y = Units.feetToMeters(27.0f/2.0f) - Units.inchesToMeters(43.75) - Units.inchesToMeters(48.0/2.0);
+    public static final Pose2d FAR_TARGET_POSE = new Pose2d(new Translation2d(FAR_TARGET_X, FAR_TARGET_Y), new Rotation2d(0));
+    public static final Transform2d kCameraToRobot =
+            new Transform2d(
+                    new Translation2d(-0.25, 0), // in meters
+                    new Rotation2d());
   }
 
   public static final class FieldConstants {
     public static final double LENGTH_METERS = 15.98;
     public static final double WIDTH_METERS = 8.21;
     public static final double INTERPORT_METERS = 1; //placeholder
-    public static final double HORZ_DIST_TO_PORT = 8; //placeholder public static final double ODOMETRY_OFFSET_X = 0;
+    public static final double HORZ_DIST_TO_PORT = 8; //placeholder 
+    public static final double ODOMETRY_OFFSET_X = 0;
     public static final double ODOMETRY_OFFSET_Y = 0;
 
   }
@@ -181,14 +192,13 @@ public final class Constants {
 
   public static final class ClimbConstants{
     public static final int DEVICE_ID_LEFT_CLIMB = 0; //update later
-    public static final int DEVICE_ID_RIGHT_CLIMB = 0; //update later
-    public static final double MAX_CLIMB_SPEED = .8; //update later
-    public static final double GEAR_DIVISOR = 0; //update later
-    public static final double VOLTAGE_SETPOINT = 0; //update later
-    public static final double VOLTAGE_TOLERANCE = 0; //update later
     public static final double kP = 0;
+    public static final double kI = 0.00; 
     public static final double kD = 0;
-    public static final double kFF = 0;
+    public static final double kF = 0.00; 
+    public static final int kTimeoutMs = 20; 
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopx = 0;
   }
   
   public static final class MiscConstants{

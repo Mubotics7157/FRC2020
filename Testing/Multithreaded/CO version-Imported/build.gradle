@@ -43,6 +43,10 @@ def includeDesktopSupport = false
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
+
+    implementation "com.github.Spartronics4915:SpartronicsLib:master-SNAPSHOT"
+
+
     implementation wpi.deps.wpilib()
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
@@ -62,6 +66,10 @@ dependencies {
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
     // simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+}
+
+repositories{
+     maven { url 'https://jitpack.io' }
 }
 
 // Simulation configuration (e.g. environment variables).

@@ -84,8 +84,8 @@ public Drive(){
   
   rightMaster.setSensorPhase(true);
   leftMaster.setSensorPhase(true);
-  leftSlave.setSensorPhase(true);
-  rightSlave.setSensorPhase(true);
+  //leftSlave.setSensorPhase(true);
+  //rightSlave.setSensorPhase(true);
   leftMaster.overrideLimitSwitchesEnable(false);
   rightMaster.overrideLimitSwitchesEnable(false);
 
@@ -198,6 +198,7 @@ public Drive(){
   }
 
   private void updatePathController(){
+    double currentTime = timer.get();
     SmartDashboard.putBoolean("finished", isFinished());
         while (!triggers.isEmpty()) {
 			if (triggers.get(0).getPercentage() <= getPathPercentage()) {
@@ -207,12 +208,12 @@ public Drive(){
 			}
 		}
    
-      var desiredPose = currentTrajectory.sample(timer.get());
+      Trajectory.State desiredPose = currentTrajectory.sample(currentTime);
       ChassisSpeeds speeds = ramseteController.calculate(RobotTracker.getInstance().getOdometry(), desiredPose);
       DifferentialDriveWheelSpeeds calculatedSpeeds = DRIVE_KINEMATICS.toWheelSpeeds(speeds);
       double leftSpeed = calculatedSpeeds.leftMetersPerSecond;
       double rightSpeed = calculatedSpeeds.rightMetersPerSecond;
-      double timeChange = (timer.get()-previousTime) *.1 ;
+      double timeChange = (currentTime-previousTime) *10 ;
       SmartDashboard.putNumber("desired poseX", desiredPose.poseMeters.getX());
       SmartDashboard.putNumber("desired poseY", desiredPose.poseMeters.getY());
       SmartDashboard.putNumber("desired angle", desiredPose.poseMeters.getRotation().getDegrees());
@@ -227,7 +228,7 @@ public Drive(){
    }
 
    tankDriveVelocity(leftSpeed, rightSpeed, timeChange);
-   previousTime = timer.get();
+   previousTime = currentTime;
    //outputTelemtery();
 
   }
@@ -405,6 +406,9 @@ private void outputTelemtery(){
     return gyro.getRotation2d();
   }
 
+  public synchronized DifferentialDriveWheelSpeeds getRates(){
+    return new DifferentialDriveWheelSpeeds(stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity()),stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity()));
+  }
   public double getHeading(){
     //might have to change the output
     //return gyro.getAngle();   

@@ -144,6 +144,49 @@ public class AutoRoutineGenerator {
 								);
 		return initialDrive;
 	}
+
+	public static AutoRoutine SixBallAuto(){ // 3 loaded + trench, can only start if in front of trench finish filling out
+		TrajectoryConfig config = createConfig(2,1.5, true);
+		config.setEndVelocity(0);
+		Pose2d startPos = new Pose2d(new Translation2d(1.516, -.67), new Rotation2d(3.048,0));
+		RobotTracker.getInstance().setOdometry(startPos);
+		Trajectory moveToTrench = TrajectoryGenerator.generateTrajectory(
+			List.of(
+			new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)),
+			new Pose2d(new Translation2d(8.2,-.67), new Rotation2d(1.012,0))
+			), config);
+
+		initialDrive = new AutoRoutine();
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands( 
+			new SetTurretFieldLock(),  
+			new SetShooting(3000, 1000, 3, false), //arbitrary num
+	    	new Delay(3));
+		initialDrive.addCommands(new SetDrivePath(moveToTrench,true,
+		 PathTrigger.create(new SetIntaking(true,true, true), .3), 
+		 PathTrigger.create(new SetIntaking(false, true, false), .65),
+		 PathTrigger.create(new SetShooting(3000, 1000, 3, false), .8))); //arbitrary num
+
+		 return initialDrive;
+
+	}
+
+	public static AutoRoutine simpleLine(){
+		TrajectoryConfig config = createConfig(.5, .5, false);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0,0,new Rotation2d(0)));
+		Trajectory move = TrajectoryGenerator.generateTrajectory(
+			List.of(
+			new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
+			new Pose2d(2,0,Rotation2d.fromDegrees(0))
+		),
+		config);
+
+		initialDrive = new AutoRoutine();
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands(new SetDrivePath(move,true/*, PathTrigger.create(new SetIndexing(true), .4))*/));
+		return initialDrive;
+	}
 	public static AutoRoutine generateSimpleAngle() {
 		TrajectoryConfig config = createConfig(1,1, false);
 		config.setEndVelocity(0);
@@ -188,9 +231,9 @@ public class AutoRoutineGenerator {
 	}
 
 	public static AutoRoutine redOne(){
-		TrajectoryConfig config = createConfig(3.5, 2.5,false);
-		config.setEndVelocity(2.25);
-		TrajectoryConfig endconfig = createConfig(3.5, 1.7,false);
+		TrajectoryConfig config = createConfig(1, 1,false);
+		config.setEndVelocity(1);
+		TrajectoryConfig endconfig = createConfig(1, 1,false);
 		Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
 				List.of(
 					new Pose2d(1.758,-1.432 , new Rotation2d(0.534,-0.204)),

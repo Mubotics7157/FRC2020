@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import frc.utility.ThreadScheduler;
 
 //import frc.utility.vanity.AddressableLEDs;
@@ -89,7 +87,7 @@ public class Robot extends TimedRobot {
     turret.setLight(true);
     //drive.setTuning();
     robotTracker.resetOdometry();
-    AutoRoutine option = AutoRoutineGenerator.barrelRoutine();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
+    AutoRoutine option = AutoRoutineGenerator.generateSimpleAngle();//AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
    
@@ -123,9 +121,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if(leftStick.getRawButton(1)){
-      indexer.setHungry(true);
+    if(xbox.getRawAxis(2)>0){
+      //indexer.setHungry(true);
+      indexer.setSalivation(true);
     }
+    else if(xbox.getRawAxis(2)<0)
+      indexer.setSalivation(false);
 
     else if(xbox.getRawButton(1)){
       indexer.setShooting();

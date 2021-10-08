@@ -258,7 +258,7 @@ public class Indexer extends Threaded{
     public synchronized void setSalivation(boolean ww3) {
         if (!ww3) setOff();
         intakeSolenoid.set(ww3 ? IndexerConstants.INTAKE_DEPLOYED : IndexerConstants.INTAKE_RETRACTED);
-
+        SmartDashboard.putBoolean("want intake down?", ww3);
     }
 
     public synchronized void toggleHungry() {

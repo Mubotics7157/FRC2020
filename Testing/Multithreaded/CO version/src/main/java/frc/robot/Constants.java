@@ -45,19 +45,19 @@ public final class Constants {
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = 0.293;
+    public static final double kS = .293; //.293
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 2.2;
+    public static final double kV = 2.2; //2.2
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = 0.272;
+    public static final double kA = .272; //.272
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
     public static final double DEADBAND = 0.07;
 
-    public static final double kP = 0.03;
+    public static final double kP = 0.03; //.03
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;

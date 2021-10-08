@@ -22,6 +22,11 @@ public class SetShooting extends AutoCommand{
         top = t;
         this.times = times;
     }
+
+    public SetShooting(int times, boolean blocking){
+        this.setBlocking(blocking);
+        this.times = times;
+    }
     @Override
     public void start() {
         Indexer.getInstance().setLemons(times);

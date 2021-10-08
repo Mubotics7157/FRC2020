@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
+import javax.lang.model.util.ElementScanner6;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -51,6 +53,7 @@ public class Indexer extends Threaded{
 
     private boolean turretUp = false;
     private double intakeSpeed = -1;
+    private boolean innerPort = false;
 
     private boolean passed;
 
@@ -110,8 +113,6 @@ public class Indexer extends Threaded{
                 feast();
                 SmartDashboard.putString("Intake State", "Intaking");
                 break;
-            case IDEXING:
-                SmartDashboard.putString("Intake State", "Indexing");
             case NOPE:
                 SmartDashboard.putString("Intake State", "NOPE");
                 break;
@@ -137,6 +138,9 @@ public class Indexer extends Threaded{
                 SmartDashboard.putString("Intake State", "Indexing");
                 break;
         }
+        SmartDashboard.putBoolean("running chute?", swallow);
+        SmartDashboard.putBoolean("intake up?", intakeSolenoid.get()==IndexerConstants.INTAKE_DEPLOYED);
+        SmartDashboard.putBoolean("inner Port?", innerPort);
     }
 
     /**
@@ -176,9 +180,19 @@ public class Indexer extends Threaded{
     public synchronized void setIndexing(){
         indexerState = IndexerState.INDEXING;
     }
+    
+    public synchronized void setInnerPortMode(){
+        innerPort = !innerPort;
+    }
 
     public synchronized void rev() {
-        ShooterSpeed shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
+        ShooterSpeed shot;
+        if(innerPort)
+            shot = shotGen.getShot(Turret.getInstance().getInnerPortDist());
+        
+        else
+            shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
+            
         shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
  //shooter.atSpeed(4000, 4000);
     }
@@ -288,6 +302,8 @@ public class Indexer extends Threaded{
     private void puke() {
         slamMotor.set(0.7); //check this to make sure it is the correct value
         whooshMotor.set(0.5);
+       // if(intakeSolenoid.get() == IndexerConstants.INTAKE_DEPLOYED)
+          //  intakeMotor.set(.5);
     }
 
     /**

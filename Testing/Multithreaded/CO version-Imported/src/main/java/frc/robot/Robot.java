@@ -9,6 +9,7 @@ import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
 import frc.robot.Constants.ShooterConstants;
 import frc.subsystem.*;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,13 +22,14 @@ import java.time.Duration;
 import java.util.concurrent.*;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.unmanaged.Unmanaged;
 
 import frc.utility.ThreadScheduler;
 
 //import frc.utility.vanity.AddressableLEDs;
 public class Robot extends TimedRobot {
   //Controllers
-  public Joystick xbox = new Joystick(0);
+  public static Joystick xbox = new Joystick(0);
   public static Joystick leftStick = new Joystick(1);
   public static Joystick rightStick = new Joystick(2);
   private Compressor c = new Compressor();
@@ -43,6 +45,7 @@ public class Robot extends TimedRobot {
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
   ThreadScheduler scheduler = new ThreadScheduler();
+  climb climber = climb.getInstance();
   Thread auto;
 
   
@@ -89,7 +92,7 @@ public class Robot extends TimedRobot {
     turret.setLight(true);
     //drive.setTuning();
     robotTracker.resetOdometry();
-    AutoRoutine option = AutoRoutineGenerator.barrelRoutine();
+    AutoRoutine option = AutoRoutineGenerator.simpleLine();
     //AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
@@ -104,8 +107,6 @@ public class Robot extends TimedRobot {
 
   }
 
-
-
   @Override 
   public void teleopInit() {
     c.start();
@@ -118,11 +119,14 @@ public class Robot extends TimedRobot {
     indexer.setLemons(1000);
     robotTracker.resetOdometry();
     turret.setOff();
+    turret.resetTurretPosition();
+    climber.setManual();
 
   }
-
-  @Override
+  /*
+@Override
   public void teleopPeriodic() {
+
 
     if(leftStick.getRawButton(1)){
       indexer.setHungry(true);
@@ -132,7 +136,7 @@ public class Robot extends TimedRobot {
       indexer.setShooting();
     }
 
-    else if(xbox.getRawAxis(2)>0){
+    else if(leftStick.getRawButton(3)){
       indexer.setPuke();
     }
 
@@ -148,8 +152,9 @@ public class Robot extends TimedRobot {
       indexer.setSalivation(true);
     }
 
-    else if(rightStick.getRawButton(4)){
-      indexer.setSalivation(false);
+    else if(rightStick.getRawButtonPressed(4)){
+      //indexer.setSalivation(false);
+      turret.setInnerPort();
     }
 
     else if(xbox.getRawButton(8)){
@@ -161,14 +166,15 @@ public class Robot extends TimedRobot {
     }
 
     else if(xbox.getRawButton(9)){
-      indexer.toggleManualBeamBreak();
+      //indexer.toggleManualBeamBreak();
+      indexer.setInnerPortMode();
     }
 
 
-     indexer.setRPMAdjustment(leftStick.getRawAxis(3)*-200, leftStick.getRawAxis(3)*-200/indexer.getRPMRatio()); 
+     //indexer.setRPMAdjustment(leftStick.getRawAxis(3)*-200, leftStick.getRawAxis(3)*-200/indexer.getRPMRatio()); 
 
 // - - - - - - setting different modes for the turret - - - - - - -
-   /* if(xbox.getRawButton(5))
+    if(xbox.getRawButton(5))
       turret.setFieldLock();
 
     else if(xbox.getRawButtonPressed(6))
@@ -179,13 +185,70 @@ public class Robot extends TimedRobot {
      
     else if(xbox.getRawButtonPressed(2))
       turret.setOff();  
-*/
+
 
 // - - - - - - - 
- if(Math.abs(xbox.getRawAxis(3)) > 0.05) {
+ if(Math.abs(xbox.getRawAxis(3)) > 0.25) {
       turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
     }
+
     indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+  }
+  */
+ @Override
+  public void teleopPeriodic() {
+
+    
+    if(xbox.getRawButton(8)){
+      indexer.setHungry(true);
+    }
+
+    else if(xbox.getRawButton(9)){
+      indexer.setShooting();
+    }
+
+    else if(leftStick.getRawButton(3)){
+      indexer.setPuke();
+    }
+
+    else if(xbox.getRawButton(7)){
+      indexer.setIndexing();
+    }
+
+    else{
+      indexer.setHungry(false);
+    }
+
+    if(xbox.getRawButton(6)){
+      indexer.setSalivation(true);
+    }
+
+    else if(xbox.getRawButton(5)){
+      indexer.setSalivation(false);
+    }
+
+    else if(xbox.getRawButton(10)){
+      indexer.setSwallowing(true);
+    }
+    
+
+    if(xbox.getRawButtonPressed(2))
+      turret.setTargetLock();
+      
+     else if(xbox.getRawButtonPressed(1)) 
+      turret.setDebug();
+     
+    else if(xbox.getRawButtonPressed(3))
+      turret.setOff();  
+
+     if(Math.abs(xbox.getRawAxis(3)) > 0.25) {
+      turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
+    }
+
+    indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+    if(xbox.getRawButtonPressed(4)){
+      indexer.setInnerPortMode();
+    }
   }
 
   @Override

@@ -8,121 +8,158 @@
 package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import frc.robot.Constants.ClimbConstants;
 import frc.utility.Threaded;
 
 
 public class climb extends Threaded {
-public TalonFX leftClimb;
-  public TalonFX rightClimb; 
-  public ClimbState climbState;
-  double winchSpins;
-  TalonFXConfiguration config = new TalonFXConfiguration();
-  private double encoderValue;
-  
-  
-  
-  public climb(){
-      climbState = ClimbState.STATIC;
-      leftClimb = new TalonFX(ClimbConstants.DEVICE_ID_LEFT_CLIMB);//add to constants
-      rightClimb = new TalonFX(ClimbConstants.DEVICE_ID_RIGHT_CLIMB);//add to constatns
-      //leftClimb.enableVoltageCompensation(true);
-      //rightClimb.enableVoltageCompensation(true);
-      leftClimb.setNeutralMode(NeutralMode.Brake);
-      rightClimb.setNeutralMode(NeutralMode.Brake);
-      config.slot0.kP= ClimbConstants.kP;
-      config.slot0.kD = ClimbConstants.kD;
-      config.slot0.kF = ClimbConstants.kFF;
-      leftClimb.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
-      rightClimb.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
-      leftClimb.setSensorPhase(true);
-      rightClimb.setSensorPhase(true);
-      zeroEncoders();
-      rightClimb.follow(leftClimb);
-      winchSpins = 32334234.345; //idk yet
-      
+
+  private TalonSRX climbMotor;
+  private ClimbState climbState;
+  private Solenoid lockSolenoid;
+  private double realSetpoint = 0;
+  private double targetPosition;
+  private double manualSetpoint;
+  private static climb instance = new climb();
+
+  public static climb getInstance(){
+    return instance;
   }
-  
-  public enum ClimbState{
-    STATIC,
-    EXTENDING,
-    WINCHING,
-    MANUAL
-}
-
-  public synchronized void setClimbState(ClimbState climbstate){
-      this.climbState = climbstate;
-      
-  }
-  
-  public void zeroEncoders(){
-    leftClimb.setSelectedSensorPosition(0);
-    rightClimb.setSelectedSensorPosition(0);
-  }
-
-  public synchronized void updateEncoders(){
-   encoderValue = getEncoderValue(leftClimb);
-  }
-  public double getEncoderValue(TalonFX falcon){
-    return  falcon.getSelectedSensorPosition(0) / 128 / ClimbConstants.GEAR_DIVISOR;
-  }
-
-  public synchronized void Extend(double speed){   
-      speed = speed> ClimbConstants.MAX_CLIMB_SPEED ? ClimbConstants.MAX_CLIMB_SPEED : speed; //change to normalize from orange utility
-          if(getEncoderValue(leftClimb) == winchSpins && getEncoderValue(rightClimb) == winchSpins){
-          leftClimb.set(ControlMode.Disabled, 0);
-          setClimbState(ClimbState.STATIC);
-          }
-          else
-          leftClimb.set(ControlMode.PercentOutput,speed);
-
-  }
-
-  public synchronized void Winch(double speed){
-    zeroEncoders();
-    speed = speed> ClimbConstants.MAX_CLIMB_SPEED ? ClimbConstants.MAX_CLIMB_SPEED * -1 : speed; //change to normalize from orange utility
-    if(getEncoderValue(leftClimb) == winchSpins *-1 && getEncoderValue(rightClimb) == winchSpins * -1){
-      leftClimb.set(ControlMode.Disabled, 0);
-      setClimbState(ClimbState.STATIC);
-      }
-      else
-      leftClimb.set(ControlMode.PercentOutput, speed);
-  }
-
-
-  public void findVoltageSetpoint(){
-    SmartDashboard.putNumber("voltage", leftClimb.getMotorOutputVoltage());
-    SmartDashboard.putNumber("voltage", rightClimb.getMotorOutputVoltage());
-  }
-
-
 
   @Override
   public void update() {
-    updateEncoders();
-
-    switch(climbState){
-        case STATIC:
-            SmartDashboard.putString("climb state", "STATIC");
-            break; 
-        case EXTENDING:
-            SmartDashboard.putString("climb state", "EXTENDING");
-            Extend(.7);
-            break;
-
-        case WINCHING:
-            Winch(-.7);
-            SmartDashboard.putString("climb state", "WINCHING ");
-          
-          case MANUAL:
-            //manualClimb(leftSpeed, rightSpeed);
-            break;
+    ClimbState snapClimbState;
+    synchronized(this){
+      snapClimbState = climbState;
     }
-  
+    switch(snapClimbState){
+      case EXTENDING:
+        updateExtending();
+        SmartDashboard.putString("climb state", "extending");
+        break;
+      
+      case RETRACTING:
+        updateRetracting();
+        SmartDashboard.putString("climb state", "retracting");
+        break;
+      
+      case STATIC:
+        SmartDashboard.putString("climb state", "static");
+        break;
+      
+      case MANUAL:
+        SmartDashboard.putString("climb state", "manual");
+        updateManual();
+        break;
+
+      case OFF:
+        SmartDashboard.putString("climb state", "OFF");
+        break;
+      
+    }
+
+    targetPosition = realSetpoint *4096.0f; // do I need another conversion factor??? might be unsafe to test for now
+    if(climbState != ClimbState.OFF || climbState != ClimbState.STATIC|| climbState!=ClimbState.MANUAL)
+      climbMotor.set(ControlMode.MotionMagic, targetPosition);
+    
+    else if(climbState == ClimbState.STATIC)
+      climbMotor.set(ControlMode.Position, climbMotor.getSelectedSensorPosition());
+
+    SmartDashboard.putNumber("Climb Encoder stuff", climbMotor.getSelectedSensorPosition()/4096.0f);
+  }
+
+  public climb(){
+    climbMotor = new TalonSRX(ClimbConstants.DEVICE_ID_LEFT_CLIMB);
+
+    climbMotor.setSensorPhase(true);
+    climbMotor.setInverted(false);
+
+    climbMotor.selectProfileSlot(ClimbConstants.kSlotIdx, ClimbConstants.kPIDLoopx);
+    climbMotor.config_kP(ClimbConstants.kSlotIdx, ClimbConstants.kP);
+    climbMotor.config_kI(ClimbConstants.kSlotIdx, ClimbConstants.kI);
+    climbMotor.config_kD(ClimbConstants.kSlotIdx, ClimbConstants.kD);
+    climbMotor.config_kF(ClimbConstants.kSlotIdx, ClimbConstants.kF);
+
+    climbMotor.setSelectedSensorPosition(0, ClimbConstants.kPIDLoopx, ClimbConstants.kTimeoutMs);
+
+    climbMotor.configPeakOutputForward(1, ClimbConstants.kTimeoutMs);
+    climbMotor.configPeakOutputReverse(1, ClimbConstants.kTimeoutMs);
+    climbMotor.configNominalOutputForward(0,ClimbConstants.kTimeoutMs);
+    climbMotor.configNominalOutputReverse(0,ClimbConstants.kTimeoutMs);
+
+  }
+  public enum ClimbState{
+    OFF,
+    EXTENDING,
+    RETRACTING,
+    STATIC,
+    MANUAL
+  }
+
+  public synchronized void setExtending(){
+    // realSetpoint = however tall climb mechanism should be
+    climbState = ClimbState.EXTENDING;
+  }
+
+  public synchronized void setStatic(){
+    climbState = ClimbState.STATIC;
+  }
+
+  public synchronized void setRetracting(){
+    // realSetpoint = however tall climb mechanism should be
+    toggleSolenoidLock();
+    climbState = ClimbState.RETRACTING;
+  }
+
+  public synchronized void setManual(){
+    climbState = ClimbState.MANUAL;
+  }
+
+  public synchronized void setOff(){
+    climbState = ClimbState.OFF;
+  }
+
+  private void toggleSolenoidLock(){
+    if(lockSolenoid.get())
+      lockSolenoid.set(false);
+    
+    else
+      lockSolenoid.set(true);
+
+  }
+
+  private void updateManual(){
+    //realSetpoint = manualSetpoint;
+    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(2));
+  }
+
+  public synchronized void adjustClimbPosition(int input){
+    //manualSetpoint += input;
+  }
+
+  private void updateExtending(){
+
+    if(getClimbPosition()==targetPosition){
+      setStatic();
+
+    }
+
+  }
+
+  private void updateRetracting(){
+
+    if(getClimbPosition() == targetPosition){
+      setStatic();
+    }
+
+  }
+
+  public synchronized double getClimbPosition(){
+    return climbMotor.getSelectedSensorPosition() /4096.0f; // is this the right conversion factor????
   }
 }

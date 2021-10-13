@@ -40,7 +40,6 @@ public class Turret extends Threaded {
   private boolean innerPort = false;
   double distanceToInnerPort;
   double angleToInnerPort;
-  double lidarDistance;
   //public SynchronousPid turretPID = new SynchronousPid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD, 0);
   
   private static final Turret trackingInstance = new Turret();
@@ -152,24 +151,18 @@ public class Turret extends Threaded {
     }
     lastRealSetpoint = realSetpoint;
     lastFieldRelativeSetpoint = fieldRelativeSetpoint;
-    lidarDistance = lidar.getDistance();
-
     SmartDashboard.putNumber("realSetpoint", realSetpoint);
     SmartDashboard.putNumber("fieldRelativeSetpoint", fieldRelativeSetpoint);
     SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition() / 4096.0f * 360);
     SmartDashboard.putNumber("sensorVelocity", turretMotor.getSelectedSensorVelocity());
-    //SmartDashboard.putNumber("lidar distance", lidar.getDistance());
-    SmartDashboard.putNumber("lidar distance", lidarDistance);
-    SmartDashboard.putBoolean("light on", light.get()==Relay.Value.kOn);
+    SmartDashboard.putNumber("lidar distance", lidar.getDistance());
    // SmartDashboard.putNumber("angle turn compensation", getInnerPortAngle(getInnerPortDistance(lidar.getDistance(), getTurretHeading()), lidar.getDistance(), 30*2.54));
-    //SmartDashboard.putBoolean("vision target?", vision.hasTarget());
 
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
     if(turretState != TurretState.OFF){
       double targetPos = realSetpoint * 4096 / 360.0f;
       turretMotor.set(ControlMode.MotionMagic, targetPos);
       
-      //turretMotor.set(ControlMode.PercentOutput, 1);
       //SmartDashboard.putNumber("targetPos", targetPos);
       //SmartDashboard.putNumber("error", turretMotor.getSelectedSensorPosition() / 4096.0f * 360 - realSetpoint);
       SmartDashboard.putNumber("turret pos", turretMotor.getSelectedSensorPosition());
@@ -233,12 +226,8 @@ public class Turret extends Threaded {
   }
 
   private void updateTargetLock(){
-    //if(!innerPort)
       realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); //- 2.3;
     
-    /*else
-      realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
-      */
   }
 
   public synchronized void setInnerPort(){
@@ -247,10 +236,8 @@ public class Turret extends Threaded {
   }
 
   private void updateInnerPortMode(){
-    //distanceToInnerPort = getInnerPortDistance(lidar.getDistance(), getTurretHeading()); // TODO replace get Turret heading with yaw to target
+   // distanceToInnerPort = getInnerPortDistance(lidar.getDistance(), getTurretHeading()); // TODO replace get Turret heading with yaw to target
     //angleToInnerPort = getInnerPortAngle(distanceToInnerPort, lidar.getDistance(), 30*2.54); //TODO replace "30*2.54" to distance between inner and outer ports
-    distanceToInnerPort = getInnerPortDistance(lidarDistance, getTurretHeading()); // TODO replace get Turret heading with yaw to target
-    angleToInnerPort = getInnerPortAngle(distanceToInnerPort, lidarDistance, 30*2.54); //TODO replace "30*2.54" to distance between inner and outer ports
     if(VisionManager.getInstance().hasTarget())
       realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading()-angleToInnerPort; //- 2.3;
     else
@@ -273,13 +260,6 @@ public class Turret extends Threaded {
     turretState = TurretState.FIELD_LOCK;
   }
 
-  public synchronized void toggleInnerPort(){
-    if(innerPort)
-      innerPort = false;
-    
-    else
-      innerPort = true;
-  }
 
   public double getTurretHeading() {
     //between 0 and 4095
@@ -312,7 +292,7 @@ public class Turret extends Threaded {
     return Math.sqrt(bSq + cSq -(2*(b*c)*cosAlpha));
   }
 
-  private double getInnerPortDistance(double distance, double theta){
+  private synchronized double getInnerPortDistance(double distance, double theta){
     double supplementaryTheta = 180 - theta;
     double actualDistance = lawOfCosines(distance, 30*2.54, supplementaryTheta);
     return actualDistance;

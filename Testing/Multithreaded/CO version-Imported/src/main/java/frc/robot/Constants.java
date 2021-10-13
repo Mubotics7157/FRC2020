@@ -27,10 +27,10 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 3;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 1;
+    public static final int DEVICE_ID_RIGHT_MASTER = 10;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 9;
     public static final int DEVICE_ID_LEFT_MASTER = 2;
-    public static final int DEVICE_ID_LEFT_SLAVE = 0;
+    public static final int DEVICE_ID_LEFT_SLAVE = 5;
     public static final int DEVICE_ID_LEFT_SHIFTER = 8;
     public static final int DEVICE_ID_RIGHT_SHIFTER = 9;
 
@@ -40,25 +40,25 @@ public final class Constants {
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
     public static final double ENCODER_METER_CONSTANT = (0.1524 * Math.PI) / 199.0879514239766 / 100;
-    public static final double TRACK_WIDTH_METERS = .70979231;
+    public static final double TRACK_WIDTH_METERS = .70979231; //.774763926;
     public static final double TRACK_WIDTH_FEET = 2.32871493;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = .293; //.293
+    public static final double kS = .93; //.793
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 2.2; //2.2
+    public static final double kV = 2.16; //2.2s
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = .272; //.272
+    public static final double kA = .301; //.272
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
-    public static final double DEADBAND = 0.17;
+    public static final double DEADBAND = 0.15;
 
-    public static final double kP = 0.03; //.03
+    public static final double kP =  .03;//0.139; //.03
     public static final double kD = 0;
 
     public static final double CLOSED_LOOP_RAMP = .2;
@@ -99,7 +99,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int DEVICE_ID_TURRET = 4;
+    public static final int DEVICE_ID_TURRET = 7;
     public static final double kP = 20; //60
     public static final double kI = 0.00; //0
     public static final double kD = 40; //300
@@ -191,7 +191,7 @@ public final class Constants {
   }
 
   public static final class ClimbConstants{
-    public static final int DEVICE_ID_LEFT_CLIMB = 0; //update later
+    public static final int DEVICE_ID_CLIMB = 6; //update later
     public static final double kP = 0;
     public static final double kI = 0.00; 
     public static final double kD = 0;
@@ -199,6 +199,7 @@ public final class Constants {
     public static final int kTimeoutMs = 20; 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopx = 0;
+    public static final int GEARING = 20;
   }
   
   public static final class MiscConstants{

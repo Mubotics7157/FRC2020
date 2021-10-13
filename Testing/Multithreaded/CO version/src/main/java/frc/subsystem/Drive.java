@@ -144,6 +144,8 @@ public class Drive extends Threaded{
   public synchronized void setBreakMode(){
     leftMaster.setNeutralMode(NeutralMode.Brake);
     rightMaster.setNeutralMode(NeutralMode.Brake);
+    rightSlave.setNeutralMode(NeutralMode.Brake);
+   leftSlave.setNeutralMode(NeutralMode.Brake);
   }
 
   public synchronized void setAutoPath(Trajectory path, ArrayList<PathTrigger> triggers) {

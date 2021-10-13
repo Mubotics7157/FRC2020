@@ -7,22 +7,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
-import frc.robot.Constants.ShooterConstants;
 import frc.subsystem.*;
-import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 import java.time.Duration;
 import java.util.concurrent.*;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.unmanaged.Unmanaged;
 
 import frc.utility.ThreadScheduler;
 
@@ -40,12 +34,12 @@ public class Robot extends TimedRobot {
   //VisionManager vision = VisionManager.getInstance();
   Turret turret = Turret.getInstance();
   Indexer indexer = Indexer.getInstance();
+  //Climb climber = Climb.getInstance();
   //private AddressableLEDs harshalsWillie = new AddressableLEDs();
 
   //Multithreading stuff
   ExecutorService executor = Executors.newFixedThreadPool(2); //More than 2 threads is redundant as roborio only has two cores
   ThreadScheduler scheduler = new ThreadScheduler();
-  climb climber = climb.getInstance();
   Thread auto;
 
   
@@ -69,6 +63,7 @@ public class Robot extends TimedRobot {
     scheduler.schedule(robotTracker, executor);
     scheduler.schedule(turret, executor);
     scheduler.schedule(indexer, executor);
+    //scheduler.schedule(climber, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("arbitrary", 0);
     //harshalsWillie.setLED();
@@ -92,7 +87,7 @@ public class Robot extends TimedRobot {
     turret.setLight(true);
     //drive.setTuning();
     robotTracker.resetOdometry();
-    AutoRoutine option = AutoRoutineGenerator.simpleLine();
+    AutoRoutine option = AutoRoutineGenerator.generateSimpleLine();
     //AutoRoutineGenerator.getRoutine(m_chooser.getSelected());
     auto = new Thread(option);
     auto.start();
@@ -120,10 +115,9 @@ public class Robot extends TimedRobot {
     robotTracker.resetOdometry();
     turret.setOff();
     turret.resetTurretPosition();
-    climber.setManual();
+    //climber.setManual();
 
   }
-  /*
 @Override
   public void teleopPeriodic() {
 
@@ -153,8 +147,8 @@ public class Robot extends TimedRobot {
     }
 
     else if(rightStick.getRawButtonPressed(4)){
-      //indexer.setSalivation(false);
-      turret.setInnerPort();
+      indexer.setSalivation(false);
+      //turret.setInnerPort();
     }
 
     else if(xbox.getRawButton(8)){
@@ -171,7 +165,6 @@ public class Robot extends TimedRobot {
     }
 
 
-     //indexer.setRPMAdjustment(leftStick.getRawAxis(3)*-200, leftStick.getRawAxis(3)*-200/indexer.getRPMRatio()); 
 
 // - - - - - - setting different modes for the turret - - - - - - -
     if(xbox.getRawButton(5))
@@ -194,7 +187,7 @@ public class Robot extends TimedRobot {
 
     indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
   }
-  */
+  /*
  @Override
   public void teleopPeriodic() {
 
@@ -250,6 +243,7 @@ public class Robot extends TimedRobot {
       indexer.setInnerPortMode();
     }
   }
+  */
 
   @Override
   public void testInit() {

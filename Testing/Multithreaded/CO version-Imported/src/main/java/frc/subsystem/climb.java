@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,17 +11,16 @@ import frc.robot.Constants.ClimbConstants;
 import frc.utility.Threaded;
 
 
-public class climb extends Threaded {
+public class Climb extends Threaded {
 
-  private TalonSRX climbMotor;
+  private TalonFX climbMotor;
   private ClimbState climbState;
   private Solenoid lockSolenoid;
   private double realSetpoint = 0;
   private double targetPosition;
-  private double manualSetpoint;
-  private static climb instance = new climb();
+  private static final Climb instance = new Climb();
 
-  public static climb getInstance(){
+  public static Climb getInstance(){
     return instance;
   }
 
@@ -63,18 +56,18 @@ public class climb extends Threaded {
       
     }
 
-    targetPosition = realSetpoint *4096.0f; // do I need another conversion factor??? might be unsafe to test for now
-    if(climbState != ClimbState.OFF || climbState != ClimbState.STATIC|| climbState!=ClimbState.MANUAL)
+    targetPosition = realSetpoint *4096.0f; 
+    if(climbState == ClimbState.RETRACTING || climbState == ClimbState.EXTENDING)
       climbMotor.set(ControlMode.MotionMagic, targetPosition);
     
     else if(climbState == ClimbState.STATIC)
       climbMotor.set(ControlMode.Position, climbMotor.getSelectedSensorPosition());
 
-    SmartDashboard.putNumber("Climb Encoder stuff", climbMotor.getSelectedSensorPosition()/4096.0f);
+    SmartDashboard.putNumber("Climb Position", climbMotor.getSelectedSensorPosition()/4096.0f);
   }
 
-  public climb(){
-    climbMotor = new TalonSRX(ClimbConstants.DEVICE_ID_LEFT_CLIMB);
+  public Climb(){
+    climbMotor = new TalonFX(ClimbConstants.DEVICE_ID_CLIMB);
 
     climbMotor.setSensorPhase(true);
     climbMotor.setInverted(false);
@@ -85,14 +78,21 @@ public class climb extends Threaded {
     climbMotor.config_kD(ClimbConstants.kSlotIdx, ClimbConstants.kD);
     climbMotor.config_kF(ClimbConstants.kSlotIdx, ClimbConstants.kF);
 
+
     climbMotor.setSelectedSensorPosition(0, ClimbConstants.kPIDLoopx, ClimbConstants.kTimeoutMs);
 
     climbMotor.configPeakOutputForward(1, ClimbConstants.kTimeoutMs);
-    climbMotor.configPeakOutputReverse(1, ClimbConstants.kTimeoutMs);
+    climbMotor.configPeakOutputReverse(-1, ClimbConstants.kTimeoutMs);
     climbMotor.configNominalOutputForward(0,ClimbConstants.kTimeoutMs);
     climbMotor.configNominalOutputReverse(0,ClimbConstants.kTimeoutMs);
 
+    //climbMotor.configClosedloopRamp(.5);
+   // climbMotor.configReverseSoftLimitEnable(true);
+ //s   climbMotor.configReverseSoftLimitThreshold(-.01); //-2048
+    climbMotor.setNeutralMode(NeutralMode.Coast);
+
   }
+
   public enum ClimbState{
     OFF,
     EXTENDING,
@@ -134,16 +134,12 @@ public class climb extends Threaded {
   }
 
   private void updateManual(){
-    //realSetpoint = manualSetpoint;
-    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(2));
+    //SmartDashboard.putNumber("Climb value", Robot.xbox.getRawAxis(1));
+    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(1));
   }
 
-  public synchronized void adjustClimbPosition(int input){
-    //manualSetpoint += input;
-  }
 
   private void updateExtending(){
-
     if(getClimbPosition()==targetPosition){
       setStatic();
 

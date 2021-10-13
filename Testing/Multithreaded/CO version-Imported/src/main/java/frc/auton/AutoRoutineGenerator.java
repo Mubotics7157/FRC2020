@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -140,15 +141,38 @@ public class AutoRoutineGenerator {
 		initialDrive.addCommands(
 								new SetDrivePath(startMove, true,
 								PathTrigger.create(new SetTurretFieldLock(), 0),
+								PathTrigger.create(new SetIndexing(true),.1),
+								PathTrigger.create(new SetIndexing(false),.15),
 								PathTrigger.create(new SetShooting(3000, 2000, 3, false), 0.8))
 								);
 		return initialDrive;
 	}
 
-	public static AutoRoutine SixBallAuto(){ // 3 loaded + trench, can only start if in front of trench finish filling out
+		public static AutoRoutine generateSimpleLineAutomated() {
+		TrajectoryConfig config = createConfig(2,1.5, false);
+		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+		Trajectory startMove = TrajectoryGenerator.generateTrajectory(
+		  List.of(
+			  new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0)),
+			  new Pose2d(2,0, Rotation2d.fromDegrees(0))
+		  ),
+		  config);
+
+		initialDrive = new AutoRoutine();
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+		RobotTracker.getInstance().setOdometry(startPos);
+		initialDrive.addCommands(
+								new SetDrivePath(startMove, true,
+								//PathTrigger.create(new SetTurretFieldLock(), 0),
+								PathTrigger.create(new SetShooting(3, false),.8))
+								);
+		return initialDrive;
+		}
+
+	public static AutoRoutine SixBallAutoTrench(){ // 3 loaded + trench, can only start if in front of trench finish filling out
 		TrajectoryConfig config = createConfig(2,1.5, true);
 		config.setEndVelocity(0);
-		Pose2d startPos = new Pose2d(new Translation2d(1.516, -.67), new Rotation2d(3.048,0));
+		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
 		RobotTracker.getInstance().setOdometry(startPos);
 		Trajectory moveToTrench = TrajectoryGenerator.generateTrajectory(
 			List.of(
@@ -159,13 +183,18 @@ public class AutoRoutineGenerator {
 		initialDrive = new AutoRoutine();
 		RobotTracker.getInstance().setOdometry(startPos);
 		initialDrive.addCommands( 
-			new SetTurretFieldLock(),  
-			new SetShooting(3000, 1000, 3, false), //arbitrary num
-	    	new Delay(3));
+			//new SetTurretFieldLock(),  
+			new SetShooting(3, false)
+			//PathTrigger.create(SetShooting(3000, 1000, 3, false)), //arbitrary num
+			//new Delay(3));
+		);
 		initialDrive.addCommands(new SetDrivePath(moveToTrench,true,
-		 PathTrigger.create(new SetIntaking(true,true, true), .3), 
-		 PathTrigger.create(new SetIntaking(false, true, false), .65),
-		 PathTrigger.create(new SetShooting(3000, 1000, 3, false), .8))); //arbitrary num
+		 PathTrigger.create(new SetIntaking(true,true), .3), 
+		 PathTrigger.create(new SetIntaking(true,false),.65),
+		 //PathTrigger.create(new SetIntaking(false, true, false), .65),
+		 //PathTrigger.create(new SetShooting(3000, 1000, 3, false), .8))); //arbitrary num
+		 PathTrigger.create(new SetShooting(3, false), .7))
+		);
 
 		 return initialDrive;
 

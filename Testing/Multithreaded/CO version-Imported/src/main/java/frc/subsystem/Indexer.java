@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.subsystem;
-import javax.lang.model.util.ElementScanner6;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -67,7 +66,6 @@ public class Indexer extends Threaded{
 
     public enum IndexerState {
         INTAKING, // want me some balls
-        IDEXING,
         PUKE, // keep balls in me
         SHOOTING, // POOPOO
         NOPE, // virgin bot
@@ -132,7 +130,6 @@ public class Indexer extends Threaded{
                 }
                 SmartDashboard.putString("Intake State", "Shooting");
                 break;
-            
             case INDEXING:
                 runIndexer();
                 SmartDashboard.putString("Intake State", "Indexing");
@@ -188,7 +185,8 @@ public class Indexer extends Threaded{
     public synchronized void rev() {
         ShooterSpeed shot;
         if(innerPort)
-            shot = shotGen.getShot(Turret.getInstance().getInnerPortDist());
+        //shot = shotGen.getShot(Turret.getInstance().getInnerPortDist());
+            shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
         
         else
             shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
@@ -414,7 +412,7 @@ public class Indexer extends Threaded{
         SmartDashboard.putBoolean("at speed", atSpeed);
         if(shot.bottomSpeed == 0){
             shooter.setSpeed(0, 0);
-        }else if (atSpeed) {
+        }else if (atSpeed) { 
             dropSoap();
             //chew();
             if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) swallow(-.5);
@@ -450,7 +448,7 @@ public class Indexer extends Threaded{
         boolean lemonShot = shooter.lemonShot();
         if(bottomSpeed == 0){
             shooter.setSpeed(0, 0);
-        }else if (atSpeed) {
+        }else if (atSpeed) { 
             dropSoap();
             chew();
             swallow(-.5);

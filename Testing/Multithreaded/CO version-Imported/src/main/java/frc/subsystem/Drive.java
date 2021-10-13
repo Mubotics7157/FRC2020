@@ -84,10 +84,18 @@ public Drive(){
   
   rightMaster.setSensorPhase(true);
   leftMaster.setSensorPhase(true);
-  //leftSlave.setSensorPhase(true);
-  //rightSlave.setSensorPhase(true);
+  leftSlave.setSensorPhase(true);
+  rightSlave.setSensorPhase(true);
   leftMaster.overrideLimitSwitchesEnable(false);
   rightMaster.overrideLimitSwitchesEnable(false);
+  leftMaster.configClosedloopRamp(100);
+  rightMaster.configClosedloopRamp(100);
+  rightSlave.configClosedloopRamp(100);
+  leftSlave.configClosedloopRamp(100);
+  leftMaster.configPeakOutputForward(.8);
+  leftSlave.configPeakOutputForward(.8);
+  rightMaster.configPeakOutputForward(.8);
+  rightSlave.configPeakOutputForward(.8);
 
   leftSlave.follow(leftMaster);
   rightSlave.follow(rightMaster);
@@ -102,7 +110,7 @@ public Drive(){
     talonConfig.slot0.closedLoopPeakOutput = 1.0;
     talonConfig.closedloopRamp = DriveTrainConstants.CLOSED_LOOP_RAMP;
     talonConfig.openloopRamp = DriveTrainConstants.OPEN_LOOP_RAMP;
-
+    
     rightMaster.configAllSettings(talonConfig);
     leftMaster.configAllSettings(talonConfig);
   gyro.reset();
@@ -142,7 +150,7 @@ public Drive(){
         SmartDashboard.putString("Drive State", "Done");
         break;
     }
-    
+    debugDriveTrainMotors();
   }
 
 
@@ -400,6 +408,48 @@ private void outputTelemtery(){
   SmartDashboard.putNumber("right distance", getRightEncoderDistance());
   SmartDashboard.putNumber("angle", getHeading());
 }
+
+private void getCurrentDraw(){
+  SmartDashboard.putNumber("left master current output",leftMaster.getStatorCurrent());
+  SmartDashboard.putNumber("left slave current output",leftSlave.getStatorCurrent());
+  SmartDashboard.putNumber("right master current output",leftMaster.getStatorCurrent());
+  SmartDashboard.putNumber("right slave current output",rightSlave.getStatorCurrent());
+
+}
+
+private void getCurrentInput(){
+  SmartDashboard.putNumber("left master current input",leftMaster.getSupplyCurrent());
+  SmartDashboard.putNumber("left slave current input",leftSlave.getSupplyCurrent());
+  SmartDashboard.putNumber("right master current input",leftMaster.getSupplyCurrent());
+  SmartDashboard.putNumber("right slave current input",rightSlave.getSupplyCurrent());
+}
+
+private void getMotorTemp(){
+  SmartDashboard.putNumber("left master temperature",leftMaster.getTemperature());
+  SmartDashboard.putNumber("left slave temperature",leftSlave.getTemperature());
+  SmartDashboard.putNumber("right master temperature",leftMaster.getTemperature());
+  SmartDashboard.putNumber("right slave temperature",rightSlave.getTemperature());
+}
+
+private void getCanBusVoltage(){ // if they are the same you can delete one of the lines
+  SmartDashboard.putNumber("Can Bus Voltage Left", leftMaster.getBusVoltage());
+  SmartDashboard.putNumber("Can Bus Voltage Right", rightMaster.getBusVoltage());
+}
+
+private void getCanBusID(){
+  SmartDashboard.putNumber("Left Slave ID", leftSlave.getDeviceID());
+  SmartDashboard.putNumber("Left Master ID", leftMaster.getDeviceID());
+}
+
+private void debugDriveTrainMotors(){
+  getCurrentDraw();
+  getCurrentInput();
+  getMotorTemp();
+  getCanBusVoltage();
+  getCanBusID();
+
+} 
+
   
 
   public Rotation2d getDriveRotation2d(){

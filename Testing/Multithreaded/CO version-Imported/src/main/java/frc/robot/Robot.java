@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
     indexer.setLemons(1000);
     robotTracker.resetOdometry();
     turret.setOff();
-    turret.resetTurretPosition();
+    //turret.resetTurretPosition();
     //climber.setManual();
 
   }
@@ -167,8 +167,8 @@ public class Robot extends TimedRobot {
 
 
 // - - - - - - setting different modes for the turret - - - - - - -
-    if(xbox.getRawButton(5))
-      turret.setFieldLock();
+    if(xbox.getRawButton(8))
+      turret.setInnerPort();
 
     else if(xbox.getRawButtonPressed(6))
       turret.setTargetLock();

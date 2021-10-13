@@ -240,6 +240,7 @@ public class Indexer extends Threaded{
         if(hungry){
             setSalivation(true);
             indexerState = IndexerState.INTAKING;
+            
         }else{
             //setSalivation(false);
             //intakeSolenoid.set(Value.kReverse);

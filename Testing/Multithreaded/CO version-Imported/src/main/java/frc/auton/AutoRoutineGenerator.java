@@ -127,6 +127,7 @@ public class AutoRoutineGenerator {
 	
 	public static AutoRoutine generateSimpleLine() {
 		TrajectoryConfig config = createConfig(2,1.5, false);
+		config.setStartVelocity(1.5);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startMove = TrajectoryGenerator.generateTrajectory(
 		  List.of(

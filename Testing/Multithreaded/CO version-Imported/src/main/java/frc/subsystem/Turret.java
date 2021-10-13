@@ -111,6 +111,7 @@ public class Turret extends Threaded {
     //turretMotor.configReverseSoftLimitThreshold(TurretConstants.REVERSE_LIMIT_NATIVE); //-2048
     turretMotor.configReverseSoftLimitThreshold(-785); //-2048
 
+
     SmartDashboard.putNumber("Angle Offset", 0);
     
     vision = VisionManager.getInstance();
@@ -239,7 +240,7 @@ public class Turret extends Threaded {
    // distanceToInnerPort = getInnerPortDistance(lidar.getDistance(), getTurretHeading()); // TODO replace get Turret heading with yaw to target
     //angleToInnerPort = getInnerPortAngle(distanceToInnerPort, lidar.getDistance(), 30*2.54); //TODO replace "30*2.54" to distance between inner and outer ports
     if(VisionManager.getInstance().hasTarget())
-      realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading()-angleToInnerPort; //- 2.3;
+      realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading()+angleToInnerPort; //- 2.3;
     else
       realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); //- 2.3;
   }

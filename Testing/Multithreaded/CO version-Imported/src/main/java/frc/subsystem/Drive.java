@@ -44,7 +44,7 @@ public class Drive extends Threaded{
 private final TalonFX leftMaster = new TalonFX(DEVICE_ID_LEFT_MASTER);
 private final TalonFX leftSlave = new TalonFX(DEVICE_ID_LEFT_SLAVE);
 private final TalonFX rightMaster = new TalonFX(DEVICE_ID_RIGHT_MASTER);
-private final TalonFX rightSlave = new TalonFX(DEVICE_ID_RIGHT_MASTER);
+private final TalonFX rightSlave = new TalonFX(DEVICE_ID_RIGHT_SLAVE);
 
 private Servo leftShifter = new Servo(DEVICE_ID_LEFT_SHIFTER);
 private Servo rightShifter = new Servo(DEVICE_ID_RIGHT_SHIFTER);
@@ -53,7 +53,7 @@ private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
 DriveState driveState = DriveState.TELEOP;
 
-private Timer timer = new Timer();
+private Timer timer;
 private RamseteController ramseteController = new RamseteController();
 
 private double previousTime;
@@ -67,38 +67,9 @@ private static final Drive instance = new Drive();
 
 public Drive(){
 
-  gyro.zeroYaw();
-
-  leftMaster.setNeutralMode(NeutralMode.Coast);
-  leftSlave.setNeutralMode(NeutralMode.Coast);
-  rightMaster.setNeutralMode(NeutralMode.Coast);
-  rightSlave.setNeutralMode(NeutralMode.Coast);
-
-  leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,10);
-  rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,10);
-
-  leftMaster.setInverted(true);
-  rightMaster.setInverted(false);
-  leftSlave.setInverted(true);
-  rightSlave.setInverted(false);
-  
-  rightMaster.setSensorPhase(true);
-  leftMaster.setSensorPhase(true);
-  leftSlave.setSensorPhase(true);
-  rightSlave.setSensorPhase(true);
-  leftMaster.overrideLimitSwitchesEnable(false);
-  rightMaster.overrideLimitSwitchesEnable(false);
-  leftMaster.configClosedloopRamp(100);
-  rightMaster.configClosedloopRamp(100);
-  rightSlave.configClosedloopRamp(100);
-  leftSlave.configClosedloopRamp(100);
-  leftMaster.configPeakOutputForward(.8);
-  leftSlave.configPeakOutputForward(.8);
-  rightMaster.configPeakOutputForward(.8);
-  rightSlave.configPeakOutputForward(.8);
-
-  leftSlave.follow(leftMaster);
-  rightSlave.follow(rightMaster);
+    timer = new Timer();
+    resetEncoders();
+    gyro.zeroYaw();
 
     TalonFXConfiguration talonConfig = new TalonFXConfiguration();
     talonConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
@@ -110,11 +81,27 @@ public Drive(){
     talonConfig.slot0.closedLoopPeakOutput = 1.0;
     talonConfig.closedloopRamp = DriveTrainConstants.CLOSED_LOOP_RAMP;
     talonConfig.openloopRamp = DriveTrainConstants.OPEN_LOOP_RAMP;
-    
+
     rightMaster.configAllSettings(talonConfig);
     leftMaster.configAllSettings(talonConfig);
-  gyro.reset();
+    leftMaster.setNeutralMode(NeutralMode.Coast);
+    rightMaster.setNeutralMode(NeutralMode.Coast);
+    rightSlave.setNeutralMode(NeutralMode.Coast);
+    leftSlave.setNeutralMode(NeutralMode.Coast);
 
+    leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
+    rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
+    
+    leftMaster.setInverted(true);
+    leftSlave.setInverted(true);
+    rightMaster.setSensorPhase(true);
+    leftMaster.setSensorPhase(true);
+    rightMaster.overrideLimitSwitchesEnable(false);
+    leftMaster.overrideLimitSwitchesEnable(false);
+
+    leftSlave.follow(leftMaster);
+    rightSlave.follow(rightMaster);
+    gyro.reset();
 }
 
   @Override
@@ -150,7 +137,7 @@ public Drive(){
         SmartDashboard.putString("Drive State", "Done");
         break;
     }
-    debugDriveTrainMotors();
+    //debugDriveTrainMotors();
   }
 
 
@@ -203,6 +190,7 @@ public Drive(){
 
   private void updateTeleop(){
     tankDriveTeleop(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
+    //tankDrivePercentOutput(0, .9);
   }
 
   private void updatePathController(){
@@ -349,7 +337,7 @@ public Drive(){
    * @param deltaTime change in time
    */
   private void tankDriveVelocity(double left, double right, double deltaTime){
-      double actualLeftVelocity = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
+    double actualLeftVelocity = stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity());
     double actualRightVelocity = stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity());
     SmartDashboard.putNumber("actual left vel", actualLeftVelocity);
     SmartDashboard.putNumber("actual right vel", actualRightVelocity);
@@ -357,16 +345,16 @@ public Drive(){
     double rightAccel = (right-actualRightVelocity)/deltaTime; 
     double leftFeedForward = FEED_FORWARD.calculate(left, leftAccel);
     double rightFeedForward = FEED_FORWARD.calculate(right, rightAccel);
-    if(left == 0)
+    if(left == 0){
       leftMaster.set(ControlMode.PercentOutput,0);
-    
+    }
       else
         leftMaster.set(ControlMode.Velocity,metersPerSecToStepsPerDecisec(left),DemandType.ArbitraryFeedForward,leftFeedForward/12);
 
-    if(right == 0)
+    if(right == 0){
       rightMaster.set(ControlMode.PercentOutput,0);
-
-     else
+    }
+    else
        rightMaster.set(ControlMode.Velocity,metersPerSecToStepsPerDecisec(right),DemandType.ArbitraryFeedForward,rightFeedForward/12);
 
     

@@ -105,8 +105,8 @@ public class Turret extends Threaded {
 
     turretMotor.configForwardSoftLimitEnable(true);
     turretMotor.configReverseSoftLimitEnable(true);
-    turretMotor.configForwardSoftLimitThreshold(2048);
-    turretMotor.configReverseSoftLimitThreshold(-2048);
+    turretMotor.configForwardSoftLimitThreshold(785);
+    turretMotor.configReverseSoftLimitThreshold(-785);
 
     SmartDashboard.putNumber("Angle Offset", 0);
     
@@ -205,7 +205,7 @@ public class Turret extends Threaded {
 
   private void updateTargetLock(){
     //realSetpoint = getAngleToInnerPortOdometry() - driveTrainHeading;
-    realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading() - 2.3;
+    realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); 
   }
 
   public double getFieldRelativeHeading() {

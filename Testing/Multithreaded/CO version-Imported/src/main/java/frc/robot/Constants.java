@@ -46,13 +46,13 @@ public final class Constants {
         TRACK_WIDTH_METERS);
 
     /** Voltage needed to overcome the motor’s static friction. kS */
-    public static final double kS = .93; //.793
+    public static final double kS = .293;//.93; //.793
 
     /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-    public static final double kV = 2.16; //2.2s
+    public static final double kV = 2.2; //2.16s
 
     /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-    public static final double kA = .301; //.272
+    public static final double kA = .272; //.301
 
     public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 
@@ -100,10 +100,10 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final int DEVICE_ID_TURRET = 7;
-    public static final double kP = 20; //60
+    public static final double kP = 15; //60 //13 
     public static final double kI = 0.00; //0
-    public static final double kD = 40; //300
-    public static final double kF = 0.00; //0
+    public static final double kD = 13; //300 //15
+    public static final double kF = 0; //0
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;

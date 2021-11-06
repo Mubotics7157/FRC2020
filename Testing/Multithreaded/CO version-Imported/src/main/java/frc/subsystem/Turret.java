@@ -127,6 +127,7 @@ public class Turret extends Threaded {
     switch(turretState){
       case OFF:
         SmartDashboard.putString("TurretState", "OFF");
+        updateOff();
         break;
       case FIELD_LOCK:
         updateFieldLock();
@@ -154,9 +155,10 @@ public class Turret extends Threaded {
     lastFieldRelativeSetpoint = fieldRelativeSetpoint;
     SmartDashboard.putNumber("realSetpoint", realSetpoint);
     SmartDashboard.putNumber("fieldRelativeSetpoint", fieldRelativeSetpoint);
-    SmartDashboard.putNumber("currentPosition", turretMotor.getSelectedSensorPosition() / 4096.0f * 360);
+    SmartDashboard.putNumber("currentPosition degrees", turretMotor.getSelectedSensorPosition() / 4096.0f * 360);
     SmartDashboard.putNumber("sensorVelocity", turretMotor.getSelectedSensorVelocity());
     SmartDashboard.putNumber("lidar distance", lidar.getDistance());
+      SmartDashboard.putNumber("turret pos native", turretMotor.getSelectedSensorPosition());
    // SmartDashboard.putNumber("angle turn compensation", getInnerPortAngle(getInnerPortDistance(lidar.getDistance(), getTurretHeading()), lidar.getDistance(), 30*2.54));
 
     /* 4096 ticks/rev * realSetpoint(degrees) / 360 */
@@ -165,8 +167,7 @@ public class Turret extends Threaded {
       turretMotor.set(ControlMode.MotionMagic, targetPos);
       
       //SmartDashboard.putNumber("targetPos", targetPos);
-      //SmartDashboard.putNumber("error", turretMotor.getSelectedSensorPosition() / 4096.0f * 360 - realSetpoint);
-      SmartDashboard.putNumber("turret pos", turretMotor.getSelectedSensorPosition());
+      SmartDashboard.putNumber("error", turretMotor.getSelectedSensorPosition() / 4096.0f * 360 - realSetpoint);
 
 
     }
@@ -183,6 +184,10 @@ public class Turret extends Threaded {
 
   public void setArbitraryLock(){
     turretState = TurretState.ARB_LOCK;
+  }
+
+  private void updateOff(){
+    turretMotor.set(ControlMode.PercentOutput, 0);
   }
 
   public void setRealSetpoint(double setpoint){
@@ -213,10 +218,6 @@ public class Turret extends Threaded {
     turretState = TurretState.DEBUG_MODE;
   }
 
-  public void softLimit(){
-    if(turretMotor.getSelectedSensorPosition() / 4096.0f * 360>= 90 || turretMotor.getSelectedSensorPosition() / 4096.0f * 360 <= -180)
-      setOff();
-  }
 
   public void setFieldRelativeSetpoint(double setpoint){
     fieldRelativeSetpoint = setpoint;
@@ -228,21 +229,19 @@ public class Turret extends Threaded {
 
   private void updateTargetLock(){
       realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); //- 2.3;
+      //realSetpoint = -VisionManager.getInstance().yaw.getDouble(0) + getTurretHeading(); //- 2.3;
     
   }
 
   public synchronized void setInnerPort(){
     turretState = TurretState.INNER_PORT;
-    //Indexer.getInstance().setInnerPortMode();
+    //Indexer.getInstance().setInnerPort
   }
 
   private void updateInnerPortMode(){
-   // distanceToInnerPort = getInnerPortDistance(lidar.getDistance(), getTurretHeading()); // TODO replace get Turret heading with yaw to target
-    //angleToInnerPort = getInnerPortAngle(distanceToInnerPort, lidar.getDistance(), 30*2.54); //TODO replace "30*2.54" to distance between inner and outer ports
-    if(VisionManager.getInstance().hasTarget())
+    distanceToInnerPort = getInnerPortDistance(lidar.getDistance(), getTurretHeading()); // TODO replace get Turret heading with yaw to target
+    angleToInnerPort = getInnerPortAngle(distanceToInnerPort, lidar.getDistance(), 30*2.54); //TODO replace "30*2.54" to distance between inner and outer ports
       realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading()+angleToInnerPort; //- 2.3;
-    else
-      realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); //- 2.3;
   }
 
   public double getFieldRelativeHeading() {

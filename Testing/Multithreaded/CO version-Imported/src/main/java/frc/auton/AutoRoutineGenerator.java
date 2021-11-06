@@ -126,8 +126,8 @@ public class AutoRoutineGenerator {
 
 	
 	public static AutoRoutine generateSimpleLine() {
-		TrajectoryConfig config = createConfig(2,1.5, false);
-		config.setStartVelocity(1.5);
+		TrajectoryConfig config = createConfig(1.5,1, false);
+		config.setStartVelocity(1.);
 		RobotTracker.getInstance().setOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 		Trajectory startMove = TrajectoryGenerator.generateTrajectory(
 		  List.of(
@@ -140,11 +140,11 @@ public class AutoRoutineGenerator {
 		Pose2d startPos = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
 		RobotTracker.getInstance().setOdometry(startPos);
 		initialDrive.addCommands(
-								new SetDrivePath(startMove, true,
+                            new SetDrivePath(startMove, true,
 								PathTrigger.create(new SetTurretFieldLock(), 0),
-								PathTrigger.create(new SetIndexing(true),.1),
-								PathTrigger.create(new SetIndexing(false),.15),
-								PathTrigger.create(new SetShooting(3000, 2000, 3, false), 0.8))
+								 PathTrigger.create(new SetIntaking(true, true),.05),
+						 		PathTrigger.create(new SetShooting(3000, 2500, 3, false), 0.8),
+								PathTrigger.create(new SetIndexing(true),.85))
 								);
 		return initialDrive;
 	}

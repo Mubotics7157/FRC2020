@@ -5,6 +5,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import frc.auton.AutoRoutine;
 import frc.auton.AutoRoutineGenerator;
 import frc.subsystem.*;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
 //import frc.robot.subsystem.Drive;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -34,7 +36,8 @@ public class Robot extends TimedRobot {
   //VisionManager vision = VisionManager.getInstance();
   Turret turret = Turret.getInstance();
   Indexer indexer = Indexer.getInstance();
-  //Climb climber = Climb.getInstance();
+  Climb climber = Climb.getInstance();
+  public Timer time = new Timer();
   //private AddressableLEDs harshalsWillie = new AddressableLEDs();
 
   //Multithreading stuff
@@ -63,13 +66,14 @@ public class Robot extends TimedRobot {
     scheduler.schedule(robotTracker, executor);
     scheduler.schedule(turret, executor);
     scheduler.schedule(indexer, executor);
-    //scheduler.schedule(climber, executor);
+    scheduler.schedule(climber, executor);
     //scheduler.schedule(vision, executor);
     m_chooser.addOption("arbitrary", 0);
     //harshalsWillie.setLED();
     m_chooser.addOption("human player station", 2);
     m_chooser.setDefaultOption("target", 1);
     SmartDashboard.putData(m_chooser);
+    PortForwarder.add(5800, "photonvision.local", 5800);
   }
 
   @Override
@@ -114,8 +118,10 @@ public class Robot extends TimedRobot {
     indexer.setLemons(1000);
     robotTracker.resetOdometry();
     turret.setOff();
-    //turret.resetTurretPosition();
-    //climber.setManual();
+    turret.resetTurretPosition();
+   // climber.setOff();
+    time.start();
+    climber.setManual();
 
   }
 @Override
@@ -137,21 +143,23 @@ public class Robot extends TimedRobot {
     else if(rightStick.getRawButton(1)){
       indexer.setIndexing();
     }
-
     else{
       indexer.setHungry(false);
     }
 
-    if(xbox.getRawButton(4)){
+    /*if(xbox.getRawButton(4)){
       indexer.setSalivation(true);
-    }
+    }*/
 
-    else if(rightStick.getRawButtonPressed(4)){
+    if(rightStick.getRawButtonPressed(4)){
       indexer.setSalivation(false);
       //turret.setInnerPort();
     }
+    
+    else if(leftStick.getRawButton(2))
+      indexer.toggleIntakeRunBackwards();
 
-    else if(xbox.getRawButton(8)){
+    else if(xbox.getRawButton(4)){
       indexer.setSwallowing(true);
     }
 
@@ -185,8 +193,12 @@ public class Robot extends TimedRobot {
       turret.adjustDebugHeading(xbox.getRawAxis(3) * -0.2);
     }
 
-    indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+    //indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+    indexer.setRPMAdjustment(rightStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+    //if(Timer.getFPGATimestamp() > 105)
+        //climber.setManual();
   }
+
   /*
  @Override
   public void teleopPeriodic() {

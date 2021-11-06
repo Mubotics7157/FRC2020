@@ -26,8 +26,8 @@ import frc.utility.Coordinate;
 public final class Constants {
 
   public static final class DriveTrainConstants {
-    public static final int DEVICE_ID_RIGHT_MASTER = 3;
-    public static final int DEVICE_ID_RIGHT_SLAVE = 1;
+    public static final int DEVICE_ID_RIGHT_MASTER = 10;
+    public static final int DEVICE_ID_RIGHT_SLAVE = 9;
     public static final int DEVICE_ID_LEFT_MASTER = 2;
     public static final int DEVICE_ID_LEFT_SLAVE = 5;
     public static final int DEVICE_ID_LEFT_SHIFTER = 8;
@@ -98,10 +98,10 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int DEVICE_ID_TURRET = 4;
-    public static final double kP = 20; //60
+    public static final int DEVICE_ID_TURRET = 7;
+    public static final double kP = 15; //60
     public static final double kI = 0.00; //0
-    public static final double kD = 40; //300
+    public static final double kD = 13; //300
     public static final double kF = 0.00; //0
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;

@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.Constants.ClimbConstants;
@@ -15,7 +14,6 @@ public class Climb extends Threaded {
 
   private TalonFX climbMotor;
   private ClimbState climbState;
-  private Solenoid lockSolenoid;
   private double realSetpoint = 0;
   private double targetPosition;
   private static final Climb instance = new Climb();
@@ -34,15 +32,13 @@ public class Climb extends Threaded {
       case EXTENDING:
         updateExtending();
         SmartDashboard.putString("climb state", "extending");
+       //climbMotor.set(ControlMode.MotionMagic, targetPosition);
         break;
       
       case RETRACTING:
         updateRetracting();
         SmartDashboard.putString("climb state", "retracting");
-        break;
-      
-      case STATIC:
-        SmartDashboard.putString("climb state", "static");
+     // climbMotor.set(ControlMode.MotionMagic, targetPosition);
         break;
       
       case MANUAL:
@@ -57,20 +53,18 @@ public class Climb extends Threaded {
     }
 
     targetPosition = realSetpoint *4096.0f; 
-    if(climbState == ClimbState.RETRACTING || climbState == ClimbState.EXTENDING)
-      climbMotor.set(ControlMode.MotionMagic, targetPosition);
+    //if(climbState == ClimbState.RETRACTING || climbState == ClimbState.EXTENDING)
+     // climbMotor.set(ControlMode.MotionMagic, targetPosition);
     
-    else if(climbState == ClimbState.STATIC)
-      climbMotor.set(ControlMode.Position, climbMotor.getSelectedSensorPosition());
 
-    SmartDashboard.putNumber("Climb Position", climbMotor.getSelectedSensorPosition()/4096.0f);
+    SmartDashboard.putNumber("Climb Position", climbMotor.getSelectedSensorPosition());
   }
-
+  
   public Climb(){
     climbMotor = new TalonFX(ClimbConstants.DEVICE_ID_CLIMB);
 
     climbMotor.setSensorPhase(true);
-    climbMotor.setInverted(false);
+    climbMotor.setInverted(true);
 
     climbMotor.selectProfileSlot(ClimbConstants.kSlotIdx, ClimbConstants.kPIDLoopx);
     climbMotor.config_kP(ClimbConstants.kSlotIdx, ClimbConstants.kP);
@@ -87,9 +81,12 @@ public class Climb extends Threaded {
     climbMotor.configNominalOutputReverse(0,ClimbConstants.kTimeoutMs);
 
     //climbMotor.configClosedloopRamp(.5);
-   // climbMotor.configReverseSoftLimitEnable(true);
- //s   climbMotor.configReverseSoftLimitThreshold(-.01); //-2048
+    climbMotor.configReverseSoftLimitEnable(true);
+    climbMotor.configReverseSoftLimitThreshold(-1); //-2048
     climbMotor.setNeutralMode(NeutralMode.Coast);
+
+    climbMotor.setInverted(true);
+    climbMotor.setSensorPhase(true);
 
   }
 
@@ -97,7 +94,6 @@ public class Climb extends Threaded {
     OFF,
     EXTENDING,
     RETRACTING,
-    STATIC,
     MANUAL
   }
 
@@ -106,13 +102,9 @@ public class Climb extends Threaded {
     climbState = ClimbState.EXTENDING;
   }
 
-  public synchronized void setStatic(){
-    climbState = ClimbState.STATIC;
-  }
 
   public synchronized void setRetracting(){
     // realSetpoint = however tall climb mechanism should be
-    toggleSolenoidLock();
     climbState = ClimbState.RETRACTING;
   }
 
@@ -124,34 +116,19 @@ public class Climb extends Threaded {
     climbState = ClimbState.OFF;
   }
 
-  private void toggleSolenoidLock(){
-    if(lockSolenoid.get())
-      lockSolenoid.set(false);
-    
-    else
-      lockSolenoid.set(true);
-
-  }
-
   private void updateManual(){
     //SmartDashboard.putNumber("Climb value", Robot.xbox.getRawAxis(1));
-    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(1));
+    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(2));
   }
 
 
   private void updateExtending(){
-    if(getClimbPosition()==targetPosition){
-      setStatic();
 
-    }
 
   }
 
   private void updateRetracting(){
 
-    if(getClimbPosition() == targetPosition){
-      setStatic();
-    }
 
   }
 

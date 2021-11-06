@@ -37,6 +37,7 @@ public class Indexer extends Threaded{
     DoubleSolenoid shooterSolenoid;
     Shooter shooter;
     ShotGenerator shotGen;
+    LED light;
     private boolean lastAtSpeed = false;
 
     private boolean automated = true;
@@ -51,10 +52,12 @@ public class Indexer extends Threaded{
     private double rpmRatio = 2.57;
 
     private boolean turretUp = false;
-    private double intakeSpeed = -1;
+    private double intakeSpeed = -.6;
     private boolean innerPort = false;
 
     private boolean passed;
+
+    private boolean backwards = false;
 
     private int lemons = 0;
 
@@ -89,6 +92,8 @@ public class Indexer extends Threaded{
 
         shooter = new Shooter();
         shotGen = new ShotGenerator();
+
+        light = new LED();
         
         SmartDashboard.putString("Intake State", "NOPE");
         slamMotor.setIdleMode(IdleMode.kCoast);
@@ -192,6 +197,7 @@ public class Indexer extends Threaded{
             shot = shotGen.getShot(Turret.getInstance().getDistanceToWall());
             
         shooter.atSpeed(shot.bottomSpeed + botRPMAdjust, shot.topSpeed + topRPMAdjust);
+        light.set(-.45);
  //shooter.atSpeed(4000, 4000);
     }
 
@@ -359,15 +365,25 @@ public class Indexer extends Threaded{
      * Runs when intaking
      */
     private void feast() {
-        if (swallow && !heightLimitPassed()) 
-            swallow(-.2);
-        else if(swallow &&heightLimitPassed()){
+        if (swallow && !heightLimitPassed()) {
+        swallow(-.2);
+        light.set(-.15);
+
+        }
+        else if(swallow &&heightLimitPassed() && backwards){
             swallow(0);
+            light.set(-.17);
             intakeMotor.set(-intakeSpeed);
             }
+
+
          sideChew();
-         intakeMotor.set(intakeSpeed);
+         if(backwards)
+            intakeMotor.set(-intakeSpeed);
+        else
+            intakeMotor.set(intakeSpeed);
          SmartDashboard.putBoolean("swallowing", swallow);
+         SmartDashboard.putBoolean("backwards?", backwards);
          SmartDashboard.putBoolean("passed?", heightLimitPassed());
 
         
@@ -414,6 +430,7 @@ public class Indexer extends Threaded{
         if(shot.bottomSpeed == 0){
             shooter.setSpeed(0, 0);
         }else if (atSpeed) { 
+            light.set(-.07);
             dropSoap();
             //chew();
             if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) swallow(-.5);
@@ -441,6 +458,10 @@ public class Indexer extends Threaded{
 
     public void setLemons(int lemons){
         this.lemons = lemons;
+    }
+
+    public synchronized void toggleIntakeRunBackwards(){
+        backwards = !backwards;
     }
 
     

@@ -118,7 +118,7 @@ public class Climb extends Threaded {
 
   private void updateManual(){
     //SmartDashboard.putNumber("Climb value", Robot.xbox.getRawAxis(1));
-    climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(2));
+    //climbMotor.set(ControlMode.PercentOutput, Robot.xbox.getRawAxis(2));
   }
 
 
@@ -134,5 +134,9 @@ public class Climb extends Threaded {
 
   public synchronized double getClimbPosition(){
     return climbMotor.getSelectedSensorPosition() /4096.0f; // is this the right conversion factor????
+  }
+
+  public synchronized void setclimber(double speed){
+    climbMotor.set(ControlMode.PercentOutput, speed);
   }
 }

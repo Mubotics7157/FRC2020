@@ -27,11 +27,13 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Twist2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.auton.PathTrigger;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
@@ -153,6 +155,7 @@ public Drive(){
     synchronized(this){
       driveState = DriveState.TELEOP;
     }
+    setNeutralMode(NeutralMode.Brake);
   }
 
   public void setHold(){
@@ -189,7 +192,8 @@ public Drive(){
 
 
   private void updateTeleop(){
-    tankDriveTeleop(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
+    //tankDriveTeleop(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
+    setChezy(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(0), Robot.leftStick.getRawAxis(2));
     //tankDrivePercentOutput(0, .9);
   }
 
@@ -292,6 +296,48 @@ public Drive(){
       tankDrive(l, r, false);
     
   }
+
+  private void setChezy(double left, double right, double pivot){
+    double l = 0;
+
+    double r = 0;
+    if(Math.abs(left)>=DriveTrainConstants.DEADBAND)
+      l=left;
+      
+    if(Math.abs(right)>=DriveTrainConstants.DEADBAND)
+      r = right;
+
+      bootlegCheesyDrive(l, r,pivot);
+  }
+      private void bootlegCheesyDrive(double throttle, double turn, double pivotTurn){
+
+        if(Math.abs(pivotTurn)>1E-4){
+          tankDrive(pivotTurn/2, -pivotTurn/2, false);
+        }
+
+        else{
+        double denominator = Math.sin(Math.PI/2d*.05);
+
+        turn = Math.sin(Math.PI/2d*.05*turn);
+        //turn = Math.sin(Math.PI/2d*.05*turn);
+        turn = turn / Math.pow(denominator, 2) * Math.abs(throttle);
+
+
+
+       // turn*= .05;
+
+        //velocity control:
+        //double [] speeds = invKinematicsWheelSpeedsMPS(new Twist2d(throttle, 0d, turn));
+
+
+        //setting raw speeds: 
+        double [] speeds = invKinematicsWheelSpeedsSignal(new Twist2d(throttle,0d,turn));
+        //SmartDashboard.putNumber("leftSignal", speeds[0]);
+        //SmartDashboard.putNumber("rightSignal", speeds[1]);
+        //tankDrivePercentOutput(speeds[0], speeds[1]);
+        tankDriveVelocity(speeds[0], speeds[1]);
+        }
+    }
  /**
    * sets the drive train to drive at a given velocity
    * to calculate the feedforward to get us to that velocity we need to know our acceleration and velocity setpoints
@@ -502,5 +548,51 @@ private void debugDriveTrainMotors(){
   public static double metersPerSecToStepsPerDecisec(double metersPerSec) {
     return metersToSteps(metersPerSec) * .1d;
   }
+
+      private DifferentialDriveWheelSpeeds invKinematicsWheelSpeedsMPS(Twist2d velocityVector){
+
+        if(Math.abs(velocityVector.dtheta)<1E-4)
+            return new DifferentialDriveWheelSpeeds(velocityVector.dx, velocityVector.dx);
+
+            else{
+                double delta_v = Constants.DriveTrainConstants.TRACK_WIDTH_METERS*velocityVector.dtheta/2d;
+
+                double l = velocityVector.dx + delta_v;
+                double r = velocityVector.dx - delta_v;
+
+                double scaling = Math.max(1d,Math.max(Math.abs(l), Math.abs(r)));
+
+                double leftadjMeters = (l/scaling) * Constants.TeleConstants.MAX_SPEED_TELE;
+                double rightadjMeters = (r/scaling) * Constants.TeleConstants.MAX_SPEED_TELE;
+
+                return new DifferentialDriveWheelSpeeds(leftadjMeters, rightadjMeters);
+            }
+
+    }
+
+    private double[] invKinematicsWheelSpeedsSignal(Twist2d velocityVector){
+        double l;
+        double r;
+
+        if(Math.abs(velocityVector.dtheta)<1E-4){
+            l = velocityVector.dx;
+            r = velocityVector.dx;
+        }
+
+        else{
+        double delta_v = (Constants.DriveTrainConstants.TRACK_WIDTH_FEET/12) * velocityVector.dtheta / 2d;
+        l = velocityVector.dx + delta_v;
+        r = velocityVector.dx - delta_v;
+        }
+        SmartDashboard.putNumber("theta",velocityVector.dtheta);
+        SmartDashboard.putNumber("leftVector", l);
+        SmartDashboard.putNumber("rightVector", r);
+
+
+        double scaling = Math.max(1d,Math.max(Math.abs(l), Math.abs(r)));
+        double [] speeds = {l/scaling*Constants.TeleConstants.MAX_SPEED_TELE,r/scaling*Constants.TeleConstants.MAX_SPEED_TELE};
+
+        return speeds;
+    }
 
 }

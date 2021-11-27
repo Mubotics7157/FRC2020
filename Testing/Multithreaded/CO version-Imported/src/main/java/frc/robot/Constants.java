@@ -102,7 +102,7 @@ public final class Constants {
     public static final int DEVICE_ID_TURRET = 7;
     public static final double kP = 15; //60 //13 
     public static final double kI = 0.00; //0
-    public static final double kD = 13; //300 //15
+    public static final double kD = 17; //300 //15
     public static final double kF = 0; //0
     public static final int kTimeoutMs = 30;
     public static final int kSlotIdx = 0;

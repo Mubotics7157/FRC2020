@@ -228,7 +228,7 @@ public class Turret extends Threaded {
   }
 
   private void updateTargetLock(){
-      realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading(); //- 2.3;
+      realSetpoint = -VisionManager.getInstance().getTarget().getYaw() + getTurretHeading()-2.3; //- 2.3;
       //realSetpoint = -VisionManager.getInstance().yaw.getDouble(0) + getTurretHeading(); //- 2.3;
     
   }

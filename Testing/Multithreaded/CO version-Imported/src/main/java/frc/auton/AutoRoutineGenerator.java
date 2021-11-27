@@ -142,10 +142,11 @@ public class AutoRoutineGenerator {
 		initialDrive.addCommands(
                             new SetDrivePath(startMove, true,
 								PathTrigger.create(new SetTurretFieldLock(), 0),
-								 PathTrigger.create(new SetIntaking(true, true),.05),
-						 		PathTrigger.create(new SetShooting(3000, 2500, 3, false), 0.8),
+								 PathTrigger.create(new SetIntaking(false, true),.05),
+						 		PathTrigger.create(new SetShooting(3500, 2000, 3, false), 0.8),
 								PathTrigger.create(new SetIndexing(true),.85))
-								);
+								// PathTrigger.create(new SetIntaking(true, true),.05))
+		);
 		return initialDrive;
 	}
 

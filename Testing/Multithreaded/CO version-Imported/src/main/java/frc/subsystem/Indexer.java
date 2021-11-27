@@ -73,7 +73,8 @@ public class Indexer extends Threaded{
         SHOOTING, // POOPOO
         NOPE, // virgin bot
         REVVING,
-        INDEXING
+        INDEXING,
+        POOPING
     }
 
     private IndexerState indexerState = IndexerState.NOPE;
@@ -139,6 +140,11 @@ public class Indexer extends Threaded{
                 runIndexer();
                 SmartDashboard.putString("Intake State", "Indexing");
                 break;
+            case POOPING:
+                poop();
+                SmartDashboard.putString("Intake State", "Pooping");
+                break;
+                
         }
         SmartDashboard.putBoolean("running chute?", swallow);
         SmartDashboard.putBoolean("intake up?", intakeSolenoid.get()==IndexerConstants.INTAKE_DEPLOYED);
@@ -165,6 +171,7 @@ public class Indexer extends Threaded{
 
     private void runIndexer(){
         sideChew();
+        intakeMotor.set(intakeSpeed);
           if (!heightLimitPassed()) 
             swallow(-.5);
          else if(heightLimitPassed()){
@@ -377,7 +384,7 @@ public class Indexer extends Threaded{
             }
 
 
-         sideChew();
+         //sideChew();
          if(backwards)
             intakeMotor.set(-intakeSpeed);
         else
@@ -432,8 +439,12 @@ public class Indexer extends Threaded{
         }else if (atSpeed) { 
             light.set(-.07);
             dropSoap();
+            sideChew();
+            intakeMotor.set(intakeSpeed/2);
             //chew();
-            if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) swallow(-.5);
+            if(shooter.getRPMTolerance() == ShooterConstants.MAX_ALLOWABLE_ERROR_RPM) {
+                swallow(-.5);
+            }
             else swallow(-1);
         }
         else {
@@ -500,4 +511,11 @@ public class Indexer extends Threaded{
         return lemons;
     }
 
+    public synchronized void setPoop(){
+        indexerState = IndexerState.POOPING;
+    }
+
+    private void poop(){
+        intakeMotor.set(-intakeSpeed);
+    }
 }

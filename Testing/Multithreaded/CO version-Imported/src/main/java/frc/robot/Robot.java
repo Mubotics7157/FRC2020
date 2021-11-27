@@ -120,7 +120,6 @@ public class Robot extends TimedRobot {
     turret.setOff();
     turret.resetTurretPosition();
    // climber.setOff();
-    time.start();
     climber.setManual();
 
   }
@@ -142,6 +141,9 @@ public class Robot extends TimedRobot {
 
     else if(rightStick.getRawButton(1)){
       indexer.setIndexing();
+    }
+    else if(leftStick.getRawButton(4)){
+      indexer.setPoop();
     }
     else{
       indexer.setHungry(false);
@@ -174,6 +176,7 @@ public class Robot extends TimedRobot {
 
 
 
+
 // - - - - - - setting different modes for the turret - - - - - - -
     if(xbox.getRawButton(8))
       turret.setInnerPort();
@@ -194,7 +197,8 @@ public class Robot extends TimedRobot {
     }
 
     //indexer.setRPMAdjustment(leftStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
-    indexer.setRPMAdjustment(rightStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -200 / indexer.getRPMRatio());
+    indexer.setRPMAdjustment(rightStick.getRawAxis(3) * -200, leftStick.getRawAxis(3) * -300 / indexer.getRPMRatio());
+    climber.setclimber(xbox.getRawAxis(2));
     //if(Timer.getFPGATimestamp() > 105)
         //climber.setManual();
   }
@@ -259,6 +263,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    climber.setManual();
   }
   @Override
   public void testPeriodic() {

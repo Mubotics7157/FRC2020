@@ -1,29 +1,18 @@
 package frc.auton;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveTrainConstants;
 import frc.robot.Constants.TrajectoryConstants;
 import frc.subsystem.RobotTracker;
-import frc.subsystem.Turret;
-import frc.utility.Coordinate;
-import frc.utility.FieldCooridnates;
 
 public class AutoRoutineGenerator {
 	private static Translation2d robotStartPosition = new Translation2d(20, 115);
@@ -31,7 +20,6 @@ public class AutoRoutineGenerator {
 	private static Translation2d midFieldLeftPosition = new Translation2d(240, 108);
 
 	private static AutoRoutine initialDrive;
-	static FieldCooridnates fieldCooridnates = new FieldCooridnates();
 
 
 	public enum PathOption {

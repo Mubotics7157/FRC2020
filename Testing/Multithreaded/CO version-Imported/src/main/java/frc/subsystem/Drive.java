@@ -109,11 +109,9 @@ public Drive(){
   @Override
   public void update() {
     DriveState snapDriveState;
-    
     synchronized(this){
       snapDriveState = driveState;
     }
-
     switch(snapDriveState){
       case TELEOP:
         updateTeleop();
@@ -193,7 +191,7 @@ public Drive(){
 
   private void updateTeleop(){
     //tankDriveTeleop(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(1));
-    setChezy(Robot.leftStick.getRawAxis(1), Robot.rightStick.getRawAxis(0), Robot.leftStick.getRawAxis(2));
+    setChezy(Robot.leftStick.getRawAxis(1), Robot.leftStick.getRawAxis(0), Robot.leftStick.getRawAxis(2));
     //tankDrivePercentOutput(0, .9);
   }
 
@@ -494,9 +492,8 @@ private void debugDriveTrainMotors(){
     return new DifferentialDriveWheelSpeeds(stepsPerDecisecToMetersPerSec(leftMaster.getSelectedSensorVelocity()),stepsPerDecisecToMetersPerSec(rightMaster.getSelectedSensorVelocity()));
   }
   public double getHeading(){
-    //might have to change the output
-    //return gyro.getAngle();   
-    return Math.IEEEremainder(gyro.getAngle(), 360.0d) * -1.0d; //why????
+
+    return Math.IEEEremainder(gyro.getAngle(), 360.0d) * -1.0d; 
   }
 
   public void calibrateGyro(){

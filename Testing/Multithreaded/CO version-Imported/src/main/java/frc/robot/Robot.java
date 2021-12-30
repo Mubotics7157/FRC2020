@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
 
   
 
-  private Integer m_autoSelected;
   private final SendableChooser<Integer> m_chooser = new SendableChooser<Integer>();
   Trajectory traj2;
 
